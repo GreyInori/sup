@@ -1,0 +1,9 @@
+.idea
+composer.lock
+*.log
+thinkphp
+runtime
+application/database.php
+public
+
+
