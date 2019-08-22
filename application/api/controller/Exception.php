@@ -2,7 +2,6 @@
 	
 	namespace app\api\controller;
 
-	use app\api\controller\Send;
 	/**
 	 *异常提示
 	 */

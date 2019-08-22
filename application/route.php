@@ -11,5 +11,6 @@
 use think\Route;
 
 Route::get('/','Index/Index/index');
+Route::controller('/company','Company/Company');
 /* 所有路由匹配不到的情况下触发 */
 Route::miss('Api/Exception/miss');

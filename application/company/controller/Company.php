@@ -42,6 +42,10 @@ class Company extends Controller
         return self::returnMsg(500,'fail',$result);
     }
 
+    /**
+     * @return false|string
+     * @throws \think\exception\DbException
+     */
     public function postCompanyAdd()
     {
         $data = FieldCheck::checkData('add');
@@ -49,6 +53,10 @@ class Company extends Controller
         if(!is_array($data)){
             return self::returnMsg(500,'fail',$data);
         }
+
+        $list = CompanyMain::toAdd($data);
+
+        return self::returnMsg(200,'success',$list);
     }
 
     /**
