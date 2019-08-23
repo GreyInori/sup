@@ -10,11 +10,15 @@
 </body>
 <script>
     $.ajax({
-        url : 'http://localhost/company/companyAdd',
+        url : 'http://localhost/company/CompanyDel',
         type : 'post',
         async : true,
         data : {
-            'name' : '儒雅随和公司',
+            // 'name' : '不儒雅随和公司',
+            // 'corporation' : '陨石',
+            // 'record' : 0,
+            // 'page' : [0,1],
+            'uuid' : '2008f23efa4d32d23440ecc9225e03aa',
         },
         success : function(msg) {
             msg = JSON.parse(msg);

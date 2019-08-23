@@ -21,6 +21,7 @@ class CompanyAutoLoad extends Controller
      * 把传递过来的字段转换成后台数据库对应的字段
      */
     protected static $fieldArr = array(
+        'uuid' => 'company_id',
         'company' => 'company_name',
         'name' => 'company_full_name',
         'uniform' => 'company_code',
@@ -44,7 +45,9 @@ class CompanyAutoLoad extends Controller
         'businessAddr' => 'company_business_address',
         'rules' => 'company_rules',
         'profile' => 'company_profile',
-        'email' => 'company_linkman_email'
+        'email' => 'company_linkman_email',
+        'page' => 'page',
+        'show' => 'show',
     );
 
     /**
@@ -54,7 +57,7 @@ class CompanyAutoLoad extends Controller
     protected static $fieldGroup = array(
         'main' => array('company_corporation','company_corporation_mobile','company_registered_capital','company_character','company_website','company_fax','company_area','company_register_address','company_AD','company_postal_code','company_business_address'),
         'text' => array('company_rules','company_profile'),
-        'company' => array('company_name','company_full_name','company_code','company_linkman','company_linkman_mobile','company_mobile','company_contact_information','company_business_license','company_business_start','company_business_end')
+        'company' => array('company_id','company_name','company_full_name','company_code','company_linkman','company_linkman_mobile','company_mobile','company_contact_information','company_business_license','company_business_start','company_business_end')
     );
     /**
      * 根据预定义的分组数组，传递过来的数组进行分组

@@ -21,6 +21,7 @@ class CompanyValidate extends Validate
     );
 
     protected $rule = array(
+        'uuid' => 'require|alphaDash',        // 企业id
         'company' => 'require|alphaDash',             // 企业账号
         'name' => 'require|chsDash',                    // 企业名称
         'uniform' => 'alphaNum',     // 社会统一认证编号
@@ -47,11 +48,14 @@ class CompanyValidate extends Validate
         'rules' => 'chsDash',                // 企业章程
         'profile' => 'chsDash',             // 企业简介
         'email' => 'email',                // 企业邮箱
+        'show' => 'number'              // 企业软删除状态
     );
 
     protected $message = array(
+        'uuid.require' =>  '请传递企业id',
+        'uuid.alphaDash' => '传递企业id不符合规范，企业id只能为字母、数字、下划线',
         'company.require' => '请传递企业账号',
-        'company.alpha' => '企业账号不符合规范，企业账号只能为字母、数字、下划线',
+        'company.alphaDash' => '企业账号不符合规范，企业账号只能为字母、数字、下划线',
         'name.require' => '请传递全称',
         'name.chsDash' => '企业全称不符合规范，企业全称只能为汉字、字母、数字、下划线',
         'uniform.alphaNum' => '传递社会认证统一编号不符合规范',
@@ -81,6 +85,7 @@ class CompanyValidate extends Validate
         'rules.chsDash' => '传递的企业章程数据不符合规范',
         'profile.chsDash' => '传递的企业简介数据不符合规范',
         'email.email' => '请传递正确格式的企业邮箱',
+        'show.number' => '请传递正确格式的企业状态',
     );
 
     protected $scene = array(
@@ -88,5 +93,7 @@ class CompanyValidate extends Validate
         'getCode' => ['mobile'],
         'list' => ['record'],
         'add' => ['name','uniform','business','start','end','capital','character','corporationMobile','website','fax','area','regAddr','postal','AD','rules','profile','linkman','mobile','contact','email'],
+        'edit' => ['uuid','name','uniform','business','start','end','capital','character','corporationMobile','website','fax','area','regAddr','postal','AD','rules','profile','linkman','mobile','contact','email'],
+        'del' => ['uuid'],
     );
 }

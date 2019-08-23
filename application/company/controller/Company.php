@@ -21,7 +21,6 @@ use \app\company\controller\api\CompanySearch as CompanySearch;
 class Company extends Controller
 {
     use Send;
-
     /**
      * 企业注册方法
      * @return false|string
@@ -43,23 +42,6 @@ class Company extends Controller
     }
 
     /**
-     * @return false|string
-     * @throws \think\exception\DbException
-     */
-    public function postCompanyAdd()
-    {
-        $data = FieldCheck::checkData('add');
-
-        if(!is_array($data)){
-            return self::returnMsg(500,'fail',$data);
-        }
-
-        $list = CompanyMain::toAdd($data);
-
-        return self::returnMsg(200,'success',$list);
-    }
-
-    /**
      * 获取指定的企业列表
      * @return false|string
      */
@@ -67,17 +49,86 @@ class Company extends Controller
     {
         /* 检查传递参数是否符合规范 */
         $data = FieldCheck::checkData('list',['page']);
-
         if(!is_array($data)) {
             return self::returnMsg(500,'fail',$data);
         }
         /* 获取企业列表数据，如果有抛出异常的话就返回错误信息 */
         $list = CompanySearch::toList($data);
-
         if(!is_array($list)) {
             return self::returnMsg(500,'fail',$list);
         }
-
         return self::returnMsg(200,'success',$list);
+    }
+
+    /**
+     * 添加企业方法
+     * @return false|string
+     */
+    public function postCompanyAdd()
+    {
+        /* 检测传递的参数是否符合企业添加的规范，如果不符合就返回错误信息 */
+        $data = FieldCheck::checkData('add');
+        if(!is_array($data)){
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 执行企业添加方法，如果成功的话就返回企业的id，否则返回错误信息 */
+        $list = CompanyMain::toAdd($data);
+        if(is_array($list)){
+            return self::returnMsg(200, 'success', $list['uid']);
+        }else{
+            return self::returnMsg(500,'fail',$list);
+        }
+    }
+
+    /**
+     * 修改企业信息方法
+     * @return false|string
+     * @throws \think\exception\DbException
+     */
+    public function postCompanyEdit()
+    {
+        /* 检测传递的参数是否符合企业添加的规范，如果不符合就返回错误信息 */
+        $data = FieldCheck::checkData('edit');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 执行企业添加方法，如果成功的话就返回企业的id，否则返回错误信息 */
+        $list = CompanyMain::toEdit($data);
+        if(is_array($list)){
+            return self::returnMsg(200, 'success', $list['uid']);
+        }else{
+            return self::returnMsg(500,'fail',$list);
+        }
+    }
+
+    /**
+     * 企业删除方法
+     * @return false|string
+     * @throws \think\exception\DbException
+     */
+    public function postCompanyDel()
+    {
+        /* 检测传递的参数是否符合企业添加的规范，如果不符合就返回错误信息 */
+        $data = FieldCheck::checkData('del');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 执行企业添加方法，如果成功的话就返回企业的id，否则返回错误信息 */
+        $list = CompanyMain::toDel($data);
+        if(is_array($list)){
+            return self::returnMsg(200, 'success', $list['uid']);
+        }else{
+            return self::returnMsg(500,'fail',$list);
+        }
+    }
+
+    public function getCompanyMain()
+    {
+        /* 检测传递的参数是否符合企业添加的规范，如果不符合就返回错误信息 */
+        $data = FieldCheck::checkData('del');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        
     }
 }
