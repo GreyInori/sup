@@ -22,13 +22,24 @@ class CompanyMain extends Controller
     /**
      * 创建企业方法
      * @param $data
-     * @return int|string
+     * @return array|int|string
+     * @throws \think\exception\DbException
      */
     public static function toRegister($data)
     {
+        /* 把传递过来的数据根据数据表进行分组，用于后续插入和检测等操作 */
+        $group = new CompanyAutoLoad();
+        $check = $group->toGroup($data);
+        /* 检测当前用户名是否已经存在 */
+        $already = self::companyAlreadyCreat($check);
+        if(!is_array($already)){
+            return $already;
+        }
         /* 生成企业注册时间并进行插入企业数据插入操作 */
         $data['company_register_time'] = time();
         $companyModel = new companyModel();
+        $data['company_passwd'] = md5($data['company_passwd']);
+        $data['company_id'] = $already[0];
         try{
             $companyModel->save($data);
         }catch(\Exception $e){
@@ -43,7 +54,37 @@ class CompanyMain extends Controller
      * @return array|string
      * @throws \think\exception\DbException
      */
+    public static function toAdd($data)
+    {
+        /* 把传递过来的数据根据数据表进行分组，用于后续插入和检测等操作 */
+        $group = new CompanyAutoLoad();
+        $data = $group->toGroup($data);
+        /* 如果检测通过的话方法会返回一个索引数组，其中第一项就是生成的uuid，否则就会返回错误信息字符串 */
+        $uuid = self::companyAlreadyCreat($data, 1);
+        if(!is_array($uuid)) {
+            return $uuid;
+        }
+        $company = $data['company'];
+        $company['company_id'] = $uuid[0];
+        /* 进行企业以及企业详细信息的添加操作 */
+        Db::startTrans();
+        try{
+            Db::table('su_company')->insert($company);
+            self::companyMainCheck($data, $uuid[0]);          // 进行企业详细信息的修改或者添加操作
+            Db::commit();
+            return array('uid'=>$uuid[0]);
+        }catch(\Exception $e) {
+            Db::rollback();
+            return $e->getMessage();
+        }
+    }
 
+    /**
+     * 执行企业修改方法
+     * @param $data
+     * @return array|string
+     * @throws \think\exception\DbException
+     */
     public static function toEdit($data)
     {
         /* 把传递过来的数据根据数据表进行分组，用于后续插入和检测等操作 */
@@ -92,6 +133,78 @@ class CompanyMain extends Controller
         }catch(\Exception $e) {
             return $e->getMessage();
         }
+    }
+
+    /**
+     * 获取企业详细信息方法
+     * @param $data
+     * @return array|string
+     * @throws \think\exception\DbException
+     */
+    public static function toMain($data)
+    {
+        /* 把传递过来的数据根据数据表进行分组，用于后续插入和检测等操作 */
+        $group = new CompanyAutoLoad();
+        $data = $group->toGroup($data);
+        $field = $group::$fieldGroup;
+        $check = $group::$fieldArr;
+        /* 如果检测通过的话方法会返回一个索引数组，其中第一项就是生成的uuid，否则就会返回错误信息字符串 */
+        $uuid = self::companyAlreadyCreat($data, 1);
+        if(!is_array($uuid)) {
+            return $uuid;
+        }
+        try{
+            /* 通过分组字段获取到需要查询的数据字段，返回出来 */
+            $list = self::fetchMain($uuid, $field, $check);
+            return $list;
+        }catch(\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * 获取企业详细信息
+     * @param $uuid
+     * @param $field
+     * @param $check
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    private static function fetchMain($uuid, $field, $check)
+    {
+        $result = array();
+       $company = Db::table('su_company')->where('company_id',$uuid[0])->field($field['company'])->select();
+        $main = Db::table('su_company_main')->where('company_id',$uuid[0])->field($field['main'])->select();
+        $text = Db::table('su_company_text')->where('company_id',$uuid[0])->field($field['text'])->select();
+
+        /* 循环查询数据，把数据库内字段转换成前端传递过来的字段进行处理，并塞进返回值数组内 */
+        foreach ($company[0] as $key => $row) {
+            $key = array_search($key, $check);
+            if($key == 'regTime' || $key == 'start' || $key == 'end'){
+                $row = date('Y:m:d H:i:s', $row);
+            }
+            $result[$key] = $row;
+        }
+        if(!empty($main)) {
+            foreach ($main[0] as $mainKey => $mainRow) {
+                $mainKey = array_search($mainKey, $check);
+                $result[$mainKey] = $mainRow;
+            }
+        }
+        if(!empty($text)) {
+            foreach ($text[0] as $textKey => $textRow) {
+                $textKey = array_search($textKey, $check);
+                $result[$textKey] = $textRow;
+            }
+        }
+        if($result['area'] != null) {
+            $area = new \app\lib\controller\Area();
+            $result['area'] = $area::getAreaList($result['area']);
+        }
+
+        return $result;
     }
 
     /**

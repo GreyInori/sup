@@ -6,51 +6,36 @@
  * Time: 17:43
  */
 
-namespace app\company\controller;
+namespace app\people\controller;
 
 use think\Controller;
 
 /**
- * Class CompanyAutoLoad
- * @package app\company\controller
+ * Class PeopleAutoLoad
+ * @package app\people\controller
  */
-class CompanyAutoLoad extends Controller
+class PeopleAutoLoad extends Controller
 {
     /**
      * @var array
      * 把传递过来的字段转换成后台数据库对应的字段
      */
     public static $fieldArr = array(
-        'uuid' => 'company_id',
-        'pass' => 'company_passwd',
-        'company' => 'company_name',
-        'name' => 'company_full_name',
-        'uniform' => 'company_code',
-        'linkman' => 'company_linkman',
-        'linkmanMobile' => 'company_linkman_mobile',
-        'mobile' => 'company_mobile',
-        'contact' => 'company_contact_information',
-        'record' => 'is_record',
-        'corporation' => 'company_corporation',
-        'corporation_mobile' => 'company_corporation_mobile',
-        'business' => 'company_business_license',
-        'start' => 'company_business_start',
-        'end' => 'company_business_end',
-        'capital' => 'company_registered_capital',
-        'character' => 'company_character',
-        'website' => 'company_website',
-        'fax' => 'company_fax',
-        'area' => 'company_area',
-        'regAddr' => 'company_register_address',
-        'AD' => 'company_AD',
-        'postal' => 'company_postal_code',
-        'businessAddr' => 'company_business_address',
-        'rules' => 'company_rules',
-        'profile' => 'company_profile',
-        'email' => 'company_linkman_email',
-        'page' => 'page',
-        'show' => 'show',
-        'regTime' => 'company_register_time'
+        'uuid' => 'people_id',
+        'code' => 'people_code',
+        'name' => 'people_name',
+        'idCard' => 'people_idCard',
+        'mobile' => 'people_mobile',
+        'professional' => 'professional_id',
+        'birthday' => 'people_birthday',
+        'information' => 'people_concat_information',
+        'address' => 'people_address',
+        'credential' => 'people_credential_code',
+        'company' => 'company_Id',
+        'verify' => 'people_verify',
+        'sex' => 'people_sex',
+        'user' => 'people_user',
+        'pass' => 'people_passwd'
     );
 
     /**
@@ -58,9 +43,7 @@ class CompanyAutoLoad extends Controller
      * 给指定字段数据根据数据表区别分组
      */
     public static $fieldGroup = array(
-        'main' => array('company_corporation','company_corporation_mobile','company_registered_capital','company_character','company_website','company_fax','company_area','company_register_address','company_AD','company_postal_code','company_business_address'),
-        'text' => array('company_rules','company_profile'),
-        'company' => array('company_id','company_register_time','company_name','company_full_name','company_code','company_linkman','company_linkman_mobile','company_mobile','company_contact_information','company_business_license','company_business_start','company_business_end')
+        'people' => array('people_id','people_code','people_passwd','people_verify','company_id','people_sex','people_user','people_name','people_name','people_idCard','people_mobile','professional_id','people_birthday','people_concat_information','people_address','people_credential_code')
     );
     /**
      * 根据预定义的分组数组，传递过来的数组进行分组
@@ -109,7 +92,7 @@ class CompanyAutoLoad extends Controller
      */
     public static function checkData($control = '', $field = '')
     {
-        $companyValidate = new \app\company\validate\CompanyValidate();
+        $companyValidate = new \app\people\validate\PeopleValidate();
         $request = request()->param();
 
         /* 对传递过来的参数进行制定场景 $control 来进行检测，如果不符合规则就返回错误信息，返回函数进行后面的处理 */

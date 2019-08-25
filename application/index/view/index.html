@@ -10,15 +10,21 @@
 </body>
 <script>
     $.ajax({
-        url : 'http://localhost/company/CompanyDel',
+        url : 'http://localhost/people/PeopleDel',
         type : 'post',
         async : true,
         data : {
+            // 'user' : '1231',
+            // 'pass' : '1234',
+            // 'name': '陨石',
+            // 'idCard' : '330382199601196319',
+            // 'mobile': '13857643643',
+            // 'check' : 111,
             // 'name' : '不儒雅随和公司',
             // 'corporation' : '陨石',
             // 'record' : 0,
             // 'page' : [0,1],
-            'uuid' : '2008f23efa4d32d23440ecc9225e03aa',
+            'uuid' : 'a25164d94658c6f757edabf157af5e77',
         },
         success : function(msg) {
             msg = JSON.parse(msg);

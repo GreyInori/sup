@@ -22,6 +22,7 @@ class CompanyValidate extends Validate
 
     protected $rule = array(
         'uuid' => 'require|alphaDash',        // 企业id
+        'pass' => 'require',                     // 企业密码
         'company' => 'require|alphaDash',             // 企业账号
         'name' => 'require|chsDash',                    // 企业名称
         'uniform' => 'alphaNum',     // 社会统一认证编号
@@ -54,6 +55,7 @@ class CompanyValidate extends Validate
     protected $message = array(
         'uuid.require' =>  '请传递企业id',
         'uuid.alphaDash' => '传递企业id不符合规范，企业id只能为字母、数字、下划线',
+        'pass.require' => '请传递需要注册的企业密码',
         'company.require' => '请传递企业账号',
         'company.alphaDash' => '企业账号不符合规范，企业账号只能为字母、数字、下划线',
         'name.require' => '请传递全称',
@@ -89,7 +91,7 @@ class CompanyValidate extends Validate
     );
 
     protected $scene = array(
-        'reg' => ['company','name','uniform','linkMan','mobile','code','contact','accept'],     // 企业账号注册申请
+        'reg' => ['company','name','uniform','linkMan','mobile','code','contact','accept','pass'],     // 企业账号注册申请
         'getCode' => ['mobile'],
         'list' => ['record'],
         'add' => ['name','uniform','business','start','end','capital','character','corporationMobile','website','fax','area','regAddr','postal','AD','rules','profile','linkman','mobile','contact','email'],

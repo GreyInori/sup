@@ -16,7 +16,7 @@ trait Picture
      * @param array $field
      * @return array|bool
      */
-    public function imgUp($path = '', $field = array())
+    public static function imgUp($path = '', $field = array())
     {
         $request = array();   // 返回值的格式为 需要上传的图片字段信息 => 保存的图片路径
         /* 如果没有传递需要上传的图片字段值的话，就返回错误信息 */
@@ -25,8 +25,7 @@ trait Picture
         }
         /* 由于传递过来的需要处理的图片字段数据是数组格式，因此要循环数组，把每个字段制定的图片对象进行保存 */
         foreach($field as $picKey){
-
-            $pic = $this->toImgUp($path, $picKey);
+            $pic = self::toImgUp($path, $picKey);
             /* 图片上传失败时会返回错误信息，直接把错误信息返回 */
             if(!is_array($pic)){
                 return $pic;
@@ -47,10 +46,10 @@ trait Picture
      * @param $pic
      * @return array|int|string
      */
-    private function toImgUp($path, $pic)
+    private static function toImgUp($path, $pic)
     {
         if(!is_object(request()->file($pic))){
-            return '请传递正确的图片名';
+            return array('pic'=>'');
         }
         /* 判断上传的文件是否符规范，如果是就丢到制定的目录下 */
         $image = request()->file($pic);
