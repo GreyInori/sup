@@ -127,7 +127,6 @@ class People extends Controller
     /**
      * 获取人员详细信息方法
      * @return false|string
-     * @throws \think\exception\DbException
      */
     public function getPeopleMain()
     {
