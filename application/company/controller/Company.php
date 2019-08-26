@@ -65,6 +65,7 @@ class Company extends Controller
     /**
      * 添加企业方法
      * @return false|string
+     * @throws \think\exception\DbException
      */
     public function postCompanyAdd()
     {

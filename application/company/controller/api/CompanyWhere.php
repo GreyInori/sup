@@ -46,7 +46,6 @@ class CompanyWhere extends Controller
         /* 循环传递过来的查询条件，比对已经有了的字段，进行查询匹配 */
         foreach($where as $key => $row) {
             $whereCode = $this->whereChange($key, $row);
-
             if($whereCode != 'fail'){
                 array_push($result, $whereCode);
             }

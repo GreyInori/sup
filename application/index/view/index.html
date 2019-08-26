@@ -10,8 +10,8 @@
 </body>
 <script>
     $.ajax({
-        url : 'http://localhost/people/PeopleDel',
-        type : 'post',
+        url : 'http://localhost/engineer/EngineerList',
+        type : 'get',
         async : true,
         data : {
             // 'user' : '1231',
@@ -24,7 +24,29 @@
             // 'corporation' : '陨石',
             // 'record' : 0,
             // 'page' : [0,1],
-            'uuid' : 'a25164d94658c6f757edabf157af5e77',
+            'code' : 'G',
+            'company' : '2008f23efa4d32d23440ecc9225e03aa',
+            'engineer' : 'f08611d1529024d1a35f00748d5ba5b8',
+            'people' : 'a25164d94658c6f757edabf157af5e77',
+            'name' : '陨',
+            'type' : '建筑工程',
+            'person' : '随和',
+            // 'from' : 'sedfsdfsdfds',
+            // 'level' : 'asdasfasdasd',
+            // 'area' : 1,
+            // 'foundations' : 1,
+            // 'site' : 55.1,
+            // 'underground' : 55.1,
+            // 'CCAD' : 55.1,
+            // 'address' : '浙江温州',
+            'build' : '随和',
+            'supervise' : '随和',
+            'construction' : '随和',
+            'survey' : '随和',
+            'design' : '随和',
+            'witness' : '陨',
+            'makeup' : '陨',
+            'sampling' : '陨',
         },
         success : function(msg) {
             msg = JSON.parse(msg);

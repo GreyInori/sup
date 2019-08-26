@@ -49,7 +49,8 @@ class CompanyValidate extends Validate
         'rules' => 'chsDash',                // 企业章程
         'profile' => 'chsDash',             // 企业简介
         'email' => 'email',                // 企业邮箱
-        'show' => 'number'              // 企业软删除状态
+        'show' => 'number',              // 企业软删除状态
+        'form' => 'number',             // 企业种类
     );
 
     protected $message = array(
@@ -88,14 +89,15 @@ class CompanyValidate extends Validate
         'profile.chsDash' => '传递的企业简介数据不符合规范',
         'email.email' => '请传递正确格式的企业邮箱',
         'show.number' => '请传递正确格式的企业状态',
+        'form.number' => '请传递正确的企业种类',
     );
 
     protected $scene = array(
         'reg' => ['company','name','uniform','linkMan','mobile','code','contact','accept','pass'],     // 企业账号注册申请
         'getCode' => ['mobile'],
         'list' => ['record'],
-        'add' => ['name','uniform','business','start','end','capital','character','corporationMobile','website','fax','area','regAddr','postal','AD','rules','profile','linkman','mobile','contact','email'],
-        'edit' => ['uuid','name','uniform','business','start','end','capital','character','corporationMobile','website','fax','area','regAddr','postal','AD','rules','profile','linkman','mobile','contact','email'],
+        'add' => ['form','name','uniform','business','start','end','capital','character','corporationMobile','website','fax','area','regAddr','postal','AD','rules','profile','linkman','mobile','contact','email'],
+        'edit' => ['form','uuid','name','uniform','business','start','end','capital','character','corporationMobile','website','fax','area','regAddr','postal','AD','rules','profile','linkman','mobile','contact','email'],
         'del' => ['uuid'],
     );
 }

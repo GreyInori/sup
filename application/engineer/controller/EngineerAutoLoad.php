@@ -2,55 +2,49 @@
 /**
  * Created by PhpStorm.
  * User: admin
- * Date: 2019/8/19
- * Time: 17:43
+ * Date: 2019/8/26
+ * Time: 9:11
  */
 
-namespace app\company\controller;
+namespace app\engineer\controller;
 
 use think\Controller;
 
 /**
- * Class CompanyAutoLoad
- * @package app\company\controller
+ * Class EngineerAutoLoad
+ * @package app\engineer\controller
  */
-class CompanyAutoLoad extends Controller
+class EngineerAutoLoad extends Controller
 {
     /**
      * @var array
      * 把传递过来的字段转换成后台数据库对应的字段
      */
     public static $fieldArr = array(
-        'uuid' => 'company_id',
-        'pass' => 'company_passwd',
-        'company' => 'company_name',
-        'name' => 'company_full_name',
-        'uniform' => 'company_code',
-        'linkman' => 'company_linkman',
-        'linkmanMobile' => 'company_linkman_mobile',
-        'mobile' => 'company_mobile',
-        'contact' => 'company_contact_information',
-        'record' => 'is_record',
-        'corporation' => 'company_corporation',
-        'corporation_mobile' => 'company_corporation_mobile',
-        'business' => 'company_business_license',
-        'start' => 'company_business_start',
-        'end' => 'company_business_end',
-        'capital' => 'company_registered_capital',
-        'character' => 'company_character',
-        'website' => 'company_website',
-        'fax' => 'company_fax',
-        'area' => 'company_area',
-        'regAddr' => 'company_register_address',
-        'AD' => 'company_AD',
-        'postal' => 'company_postal_code',
-        'businessAddr' => 'company_business_address',
-        'rules' => 'company_rules',
-        'profile' => 'company_profile',
-        'email' => 'company_linkman_email',
-        'page' => 'page',
-        'show' => 'show',
-        'regTime' => 'company_register_time'
+        'people' => 'people_id',
+        'company' => 'company_id',
+        'code' => 'contract_code',
+        'engineer' => 'engineering_id',
+        'name' => 'engineering_name',
+        'type' => 'engineering_type',
+        'from' => 'QA_from',
+        'level' => 'QA_level',
+        'area' => 'engineering_area',
+        'foundations' => 'engineering_foundations',
+        'site' => 'site_area',
+        'underground' => 'underground_area',
+        'CCAD' => 'CCAD_area',
+        'address' => 'engineering_address',
+        'build' => 'build_company',
+        'supervise' => 'supervise_company',
+        'construction' => 'construction_company',
+        'survey' => 'survey_company',
+        'design' => 'design_company',
+        'witness' => 'witness_people',
+        'makeup' => 'makeup_people',
+        'sampling' => 'sampling_people',
+        'person' => 'input_person',
+        'input' => 'input_type'
     );
 
     /**
@@ -58,10 +52,14 @@ class CompanyAutoLoad extends Controller
      * 给指定字段数据根据数据表区别分组
      */
     public static $fieldGroup = array(
-        'main' => array('company_corporation','company_corporation_mobile','company_registered_capital','company_character','company_website','company_fax','company_area','company_register_address','company_AD','company_postal_code','company_business_address'),
-        'text' => array('company_rules','company_profile'),
-        'company' => array('form','company_id','company_register_time','company_name','company_full_name','company_code','company_linkman','company_linkman_mobile','company_mobile','company_contact_information','company_business_license','company_business_start','company_business_end')
+        'main' => array('QA_from','QA_level','site_area','underground_area','CCAD_area','engineering_address'),
+        'engineer' => array('engineering_id','input_type','input_person','contract_code','engineering_name','engineering_type','engineering_area','engineering_foundations','build_company','supervise_company','construction_company','survey_company','design_company','witness_people','makeup_people','sampling_people'),
+        'people' => array('people_id'),
+        'company' => array('company_id'),
+        'companyList' => array('build_company','supervise_company','construction_company','survey_company','design_company'),
+        'peopleList' => array('witness_people','makeup_people','sampling_people'),
     );
+
     /**
      * 根据预定义的分组数组，传递过来的数组进行分组
      * @param array $data
@@ -80,7 +78,7 @@ class CompanyAutoLoad extends Controller
     }
 
     /**
-     * 判断指定字段是否在字段分类数组内，如果有，就进行分类，范回复分类后的数组
+     * 判断指定字段是否在字段分类数组内，如果有，就进行分类，返回分类后的数组
      * @param $dataKey
      * @param $dataRow
      * @param $fieldKey
@@ -109,17 +107,14 @@ class CompanyAutoLoad extends Controller
      */
     public static function checkData($control = '', $field = '')
     {
-        $companyValidate = new \app\company\validate\CompanyValidate();
+        $companyValidate = new \app\engineer\validate\EngineerValidate();
         $request = request()->param();
-
         /* 对传递过来的参数进行制定场景 $control 来进行检测，如果不符合规则就返回错误信息，返回函数进行后面的处理 */
         $check = $companyValidate->scene($control)->check($request);
-
         if($check === false){
             return $companyValidate->getError();
         }
         $request = self::buildRequestField($request, $field);
-
         return $request;
     }
 
@@ -132,17 +127,13 @@ class CompanyAutoLoad extends Controller
     private static function buildRequestField($data, $field = array())
     {
         $result = array();
-
         foreach($data as $key => $row){
             /* $field 数组内的数据是不需要对应数据库字段的额外条件，进行额外条件的查询或者分页 */
             if(!empty($field) && in_array($key, $field)){
-
                 $fieldArr[$key] = $row;
             }
-
             isset(self::$fieldArr[$key])?$result[self::$fieldArr[$key]] = $row : false;
         }
-
         return $result;
     }
 }

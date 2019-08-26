@@ -60,7 +60,7 @@ class CompanyMain extends Controller
         $group = new CompanyAutoLoad();
         $data = $group->toGroup($data);
         /* 如果检测通过的话方法会返回一个索引数组，其中第一项就是生成的uuid，否则就会返回错误信息字符串 */
-        $uuid = self::companyAlreadyCreat($data, 1);
+        $uuid = self::companyAlreadyCreat($data);
         if(!is_array($uuid)) {
             return $uuid;
         }
@@ -203,7 +203,6 @@ class CompanyMain extends Controller
             $area = new \app\lib\controller\Area();
             $result['area'] = $area::getAreaList($result['area']);
         }
-
         return $result;
     }
 
@@ -308,6 +307,4 @@ class CompanyMain extends Controller
         }
         return 0;
     }
-
-
 }
