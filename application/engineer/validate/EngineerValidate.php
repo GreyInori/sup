@@ -72,7 +72,8 @@ class EngineerValidate extends Validate
     protected $scene = array(
         'add' => ['company','name','type','from','level','area','foundations','site','underground','CCAD','address','build','supervise','construction','survey','design','witness','makeup','sampling'],     // 工程录入
         'edit' => ['engineer','name','type','from','level','area','foundations','site','underground','CCAD','address','build','supervise','construction','survey','design','witness','makeup','sampling'],
-        'del' =>['engineer'],
+        'del' =>['engineer'],           // 工程删除
         'list' => ['name','from','area','address'],     // 工程查询
+        'main' => ['engineer'],      // 工程详情
     );
 }

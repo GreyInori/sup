@@ -44,7 +44,7 @@ class EngineerAutoLoad extends Controller
         'makeup' => 'makeup_people',
         'sampling' => 'sampling_people',
         'person' => 'input_person',
-        'input' => 'input_type'
+        'input' => 'input_type',
     );
 
     /**

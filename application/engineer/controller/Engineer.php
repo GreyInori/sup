@@ -100,4 +100,26 @@ class Engineer extends Controller
         }
         return self::returnMsg(200,'success',$list);
     }
+
+    /**
+     * 获取工程详细信息方法
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getEngineerMain()
+    {
+        /* 检查传递参数是否符合规范 */
+        $data = FieldCheck::checkData('main');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 获取企业详细数据，如果有抛出异常的话就返回错误信息 */
+        $list = EngineerMain::toMain($data);
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        return self::returnMsg(200,'success',$list);
+    }
 }

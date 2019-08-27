@@ -66,6 +66,7 @@ class CompanyMain extends Controller
         }
         $company = $data['company'];
         $company['company_id'] = $uuid[0];
+        $company['company_number'] = self::creatCode();
         /* 进行企业以及企业详细信息的添加操作 */
         Db::startTrans();
         try{
@@ -204,6 +205,18 @@ class CompanyMain extends Controller
             $result['area'] = $area::getAreaList($result['area']);
         }
         return $result;
+    }
+
+    /**
+     * 生成工程编号方法
+     * @return string
+     */
+    private static function creatCode()
+    {
+        $str = 'Q';
+        $timeStr = date('Ymd');
+        $rand = rand(100000,999999);
+        return $str.$timeStr.$rand;
     }
 
     /**

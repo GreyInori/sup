@@ -50,7 +50,8 @@ class CompanyAutoLoad extends Controller
         'email' => 'company_linkman_email',
         'page' => 'page',
         'show' => 'show',
-        'regTime' => 'company_register_time'
+        'regTime' => 'company_register_time',
+        'number' => 'company_number',
     );
 
     /**

@@ -131,6 +131,41 @@ class EngineerMain extends Controller
     }
 
     /**
+     * 获取工程详细信息方法
+     * @param $data
+     * @return false|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toMain($data)
+    {
+        $result = array();
+        /* 把传递过来的数据根据数据表进行分组，用于后续插入和检测等操作 */
+        $group = new EngineerAutoLoad();
+        $check = $group->toGroup($data);
+        $field = $group::$fieldGroup;
+
+        $list = Db::table('su_engineering')
+                ->where('engineering_id',$check['engineer']['engineering_id'])
+                ->field($field['engineer'])
+                ->select();
+        if(empty($list)) {
+            return '查无此工程，请检查传递的工程id';
+        }
+        /* 获取到工程对应的详细人员以及企业的数据，进行匹配以及键值对转换 */
+        $mainList = self::fetchMainList($list[0]);
+        foreach($list[0] as $key => $row) {
+            if(strchr($key,'_company') || strchr($key,'_people') && isset($mainList[$row])) {
+                $list[0][$key] = $mainList[$row];
+            }
+            $result[array_search($key, $group::$fieldArr)] = $list[0][$key];
+        }
+
+        return $result;
+    }
+
+    /**
      * 执行工程详细信息删除方法
      * @param $uuid
      * @return string
@@ -143,6 +178,106 @@ class EngineerMain extends Controller
         Db::table('su_engineering_reckoner')->where('engineering_id',$uuid)->delete();
         Db::table('su_engineering_child')->where('engineering_id',$uuid)->delete();
         return 'success';
+    }
+
+    /**
+     * 获取工程对应的详细人员以及企业数据列表
+     * @param $data
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    private static function fetchMainList($data)
+    {
+        $whereStr = array('company' => '','people' => '');
+        /* 根据传入的值来给获取指定的人员以及企业的where IN 查询条件 */
+        foreach($data as $key => $row) {
+            if(strchr($key, '_company')) {
+                $whereStr['company'] .= "{$row},";
+            }
+            if(strchr($key, '_people')) {
+                $whereStr['people'] .= "{$row},";
+            }
+        }
+        /* 根据查询条件获取指定的企业以及人员数据，用于匹配 */
+        $whereStr['company'] = rtrim($whereStr['company'], ',');
+        $whereStr['people'] = rtrim($whereStr['people'], ',');
+        $company = self::fetchCompanyList($whereStr['company']);
+        $people = self::fetchPeopleList($whereStr['people']);
+        $mainList = array_merge($company,$people);
+        return $mainList;
+    }
+
+    /**
+     * 获取指定的企业列表方法
+     * @param $companyStr
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    private static function fetchCompanyList($companyStr)
+    {
+        $result = array();
+        $companyCheck = new \app\company\controller\CompanyAutoLoad();
+        $company = Db::table('su_company')
+                        ->alias('sc')
+                        ->join('su_company_main scm','scm.company_id = sc.company_Id')
+                        ->where('sc.company_id','IN',$companyStr)
+                        ->field(['sc.company_id','sc.company_number','sc.company_full_name','scm.company_corporation','sc.company_linkman','sc.company_linkman_mobile'])
+                        ->select();
+        /* 如果查询结果不为空，就把索引数组的结果转换为主键对应详细信息的键值对数组，用于后面的匹配 */
+        if(!empty($company)) {
+            $result = self::valueToKey($company,'company_id',$companyCheck::$fieldArr);
+        }
+        return $result;
+    }
+
+    /**
+     * 获取指定的人员列表方法
+     * @param $peopleStr
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    private static function fetchPeopleList($peopleStr)
+    {
+        $result = array();
+        $peopleCheck = new \app\people\controller\PeopleAutoLoad();
+        $people = Db::table('su_people')
+            ->where('people_id','IN',$peopleStr)
+            ->field(['people_id','people_code','people_name','people_mobile','people_idCard'])
+            ->select();
+        /* 如果查询结果不为空，就把索引数组的结果转换为主键对应详细信息的键值对数组，用于后面的匹配 */
+        if(!empty($people)) {
+            $result = self::valueToKey($people,'people_id',$peopleCheck::$fieldArr);
+        }
+        return $result;
+    }
+
+    /**
+     * 把查询结果的索引数组转换为主键对应详细信息的数组
+     * @param $list
+     * @param $field
+     * @param $check
+     * @return array
+     */
+    private static function valueToKey($list, $field, $check)
+    {
+        $result = array();
+        /* 把传入的字段作为主键字段匹配转换数据 */
+        foreach($list as $key => $row) {
+            $keyWord = $row[$field];              // 用来保存主键用于匹配
+            $checkArr = array();                   // 用来保存键值转换后的数组
+            /* 把详细查询结果的字段转换为前端传递过来的字段 */
+            foreach($row as $rowKey => $rowMain) {
+                $checkArr[array_search($rowKey, $check)] = $rowMain;
+            }
+            $result[$keyWord] = $checkArr;
+        }
+        return $result;
     }
 
     /**
