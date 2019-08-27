@@ -31,14 +31,14 @@ class EngineerValidate extends Validate
         'underground' => 'number',     // 地下室面积
         'CCAD' => 'number',    // 人防工程面积
         'address' => 'chsDash',    // 工程地点
-        'build' => 'alphaDash',     // 建设单位
-        'supervise' => 'alphaDash',   // 监理单位
-        'construction' => 'alphaDash',  // 施工单位
-        'survey' => 'alphaDash',     // 勘察单位
-        'design' => 'alphaDash',    // 设计单位
-        'witness' => 'alphaDash',   // 见证人员
-        'makeup' => 'alphaDash',   // 填单人员
-        'sampling' => 'alphaDash',    // 取样人员
+        'build' => 'array',     // 建设单位
+        'supervise' => 'array',   // 监理单位
+        'construction' => 'array',  // 施工单位
+        'survey' => 'array',     // 勘察单位
+        'design' => 'array',    // 设计单位
+        'witness' => 'array',   // 见证人员
+        'makeup' => 'array',   // 填单人员
+        'sampling' => 'array',    // 取样人员
     );
 
     protected $message = array(
@@ -59,21 +59,21 @@ class EngineerValidate extends Validate
         'underground.number' => '传递地下室面具不符合规范',
         'CCAD.number' => '传递人防工程面积不符合规范',
         'address.chsDash' => '传递工程地点不符合规范',
-        'build.alphaDash' => '传递建设单位不符合规范',
-        'supervise.alphaDash' => '传递监理单位不符合规范',
-        'construction.alphaDash' => '传递施工单位不符合规范',
-        'survey.alphaDash' => '传递勘察单位不符合规范',
-        'design.alphaDash' => '传递设计单位不符合规范',
-        'witness.alphaDash' => '传递见证人员不符合规范',
-        'makeup.alphaDash' => '传递填单人员不符合规范',
-        'sampling.alphaDash' => '传递取样人员不符合规范',
+        'build.array' => '传递建设单位不符合规范',
+        'supervise.array' => '传递监理单位不符合规范',
+        'construction.array' => '传递施工单位不符合规范',
+        'survey.array' => '传递勘察单位不符合规范',
+        'design.array' => '传递设计单位不符合规范',
+        'witness.array' => '传递见证人员不符合规范',
+        'makeup.array' => '传递填单人员不符合规范',
+        'sampling.array' => '传递取样人员不符合规范',
     );
 
     protected $scene = array(
         'add' => ['company','name','type','from','level','area','foundations','site','underground','CCAD','address','build','supervise','construction','survey','design','witness','makeup','sampling'],     // 工程录入
         'edit' => ['engineer','name','type','from','level','area','foundations','site','underground','CCAD','address','build','supervise','construction','survey','design','witness','makeup','sampling'],
         'del' =>['engineer'],           // 工程删除
-        'list' => ['name','from','area','address'],     // 工程查询
+        'list' => ['from','area','address'],     // 工程查询
         'main' => ['engineer'],      // 工程详情
     );
 }

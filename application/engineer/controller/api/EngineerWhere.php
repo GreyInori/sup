@@ -26,12 +26,12 @@ class EngineerWhere extends Controller
         'engineering_name' => ['se.engineering_name','LIKE','%code%'],
         'engineering_area' => ['se.engineering_area','LIKE','%code%'],
         'engineering_type' => ['se.engineering_type','=','type'],
-        'build_company' => ['se.build_company','IN','company'],
-        'construction_company' => ['se.construction_company','IN','company'],
-        'supervise_company' => ['se.supervise_company','IN','company'],
-        'witness_people' => ['se.witness_people','IN','people'],
-        'makeup_people' => ['se.makeup_people','IN','people'],
-        'sampling_people' => ['se.sampling_people','IN','people'],
+        'build_company' => ['se.build_company','LIKE','%code%'],
+        'construction_company' => ['se.construction_company','LIKE','%code%'],
+        'supervise_company' => ['se.supervise_company','LIKE','%code%'],
+        'witness_people' => ['se.witness_people','LIKE','%code%'],
+        'makeup_people' => ['se.makeup_people','LIKE','%code%'],
+        'sampling_people' => ['se.sampling_people','LIKE','%code%'],
         'input_person' => ['se.input_person','LIKE','%code%'],
         'input_type' => ['se.input_type','=','input']
     );

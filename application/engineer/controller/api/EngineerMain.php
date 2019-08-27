@@ -29,23 +29,22 @@ class EngineerMain extends Controller
         /* 把传递过来的数据根据数据表进行分组，用于后续插入和检测等操作 */
         $group = new EngineerAutoLoad();
         $check = $group->toGroup($data);
+
         /* 检测当前工程是否已经存在 */
         $uuid = self::engineerAlreadyCreat($check);
         if(!is_array($uuid)) {
             return $uuid;
         }
-        $check['engineer']['engineering_id'] = $uuid[0];
         $inputCheck = new EngineerCheck();                // 传参是否在数据库内存在检测类
-        /* 检测传递过来的人员列表是否存在，如果数据库内不存在就返回错误信息 */
-        $listCheck = $inputCheck::listCheck($check);
-        if($listCheck !== 1) {
-            return $listCheck;
-        }
+        $value = self::engineerValueCreat($check['engineer'],$uuid[0]);
         /* 进行人员检测，如果存在该人员就返回人员信息以及时间信息用于添加 */
         $people = $inputCheck::peopleCheck($check);
         if(!is_array($people)) {
             return $people;
         }
+        $check['engineer'] = $value['engineer'];
+        $check['divide'] = $value['divide'];
+        $check['engineer']['engineering_id'] = $uuid[0];
         $check['engineer']['input_time'] = $people['input_time'];
         $check['engineer']['input_person'] = $people['input_person'];
         $check['engineer']['contract_code'] = self::creatCode();      // 生成工程编号
@@ -53,6 +52,7 @@ class EngineerMain extends Controller
         Db::startTrans();
         try{
             Db::table('su_engineering')->insert($check['engineer']);
+            Db::table('su_engineering_divide')->insertAll($check['divide']);
             self::engineerMainCheck($check, $uuid[0]);
             Db::commit();
             return array('uid'=>$uuid[0]);
@@ -80,17 +80,28 @@ class EngineerMain extends Controller
         if(!is_array($uuid)) {
             return $uuid;
         }
+        $value = self::engineerValueCreat($check['engineer'],$uuid[0]);
+        $check['engineer'] = $value['engineer'];
         $check['engineer']['engineering_id'] = $uuid[0];
-        $inputCheck = new EngineerCheck();                // 传参是否在数据库内存在检测类
+        $check['divide'] = $value['divide'];
+//        $inputCheck = new EngineerCheck();                // 传参是否在数据库内存在检测类
         /* 检测传递过来的人员列表是否存在，如果数据库内不存在就返回错误信息 */
-        $listCheck = $inputCheck::listCheck($check);
-        if($listCheck !== 1) {
-            return $listCheck;
+//        $listCheck = $inputCheck::listCheck($check);
+//        if($listCheck !== 1) {
+//            return $listCheck;
+//        }
+        if(isset($check['engineer']['input_person'])) {
+            unset($check['engineer']['input_person']);
+        }
+        if(isset($check['engineer']['contract_code'])) {
+            unset($check['engineer']['contract_code']);
         }
         /* 进行工程以及工程详细信息添加等操作 */
         Db::startTrans();
         try{
             Db::table('su_engineering')->where('engineering_id',$uuid[0])->update($check['engineer']);
+            Db::table('su_engineering_divide')->where('engineering_id',$uuid[0])->delete();
+            Db::table('su_engineering_divide')->insertAll($check['divide']);
             self::engineerMainCheck($check, $uuid[0]);
             Db::commit();
             return array('uid'=>$uuid[0]);
@@ -121,6 +132,7 @@ class EngineerMain extends Controller
         Db::startTrans();
         try{
             Db::table('su_engineering')->where('engineering_id',$uuid)->delete();
+            Db::table('su_engineering_divide')->where('engineering_id',$uuid)->delete();
             self::mainDel($uuid);
             Db::commit();
             return array('success');
@@ -133,7 +145,7 @@ class EngineerMain extends Controller
     /**
      * 获取工程详细信息方法
      * @param $data
-     * @return false|\PDOStatement|string|\think\Collection
+     * @return array|string
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
@@ -154,14 +166,106 @@ class EngineerMain extends Controller
             return '查无此工程，请检查传递的工程id';
         }
         /* 获取到工程对应的详细人员以及企业的数据，进行匹配以及键值对转换 */
-        $mainList = self::fetchMainList($list[0]);
+//        $mainList = self::fetchMainList($list[0]);
+        $mainList = self::fetchDivide($check['engineer']['engineering_id']);
         foreach($list[0] as $key => $row) {
-            if(strchr($key,'_company') || strchr($key,'_people') && isset($mainList[$row])) {
-                $list[0][$key] = $mainList[$row];
+            if(isset($mainList[$key])) {
+                $list[0][$key] = $mainList[$key];
             }
+//            if(strchr($key,'_company') || strchr($key,'_people') && isset($mainList[$row])) {
+//                $list[0][$key] = $mainList[$row];
+//            }
             $result[array_search($key, $group::$fieldArr)] = $list[0][$key];
         }
+        return $result;
+    }
 
+    /**
+     * 获取工程内成员列表数据
+     * @param $uid
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    private static function fetchDivide($uid)
+    {
+        $company = self::fetchCompanyMember($uid);
+        $people = self::fetchPeopleMember($uid);
+
+        return array_merge($company,$people);
+    }
+
+    /**
+     * 获取工程内企业成员的详细数据
+     * @param $uid
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    private static function fetchCompanyMember($uid)
+    {
+        $result = array();
+        $field = new \app\company\controller\CompanyAutoLoad();        //  用于把企业信息转换成前端传递过来字段
+        $field = $field::$fieldArr;
+        $company = Db::table('su_engineering_divide')
+                    ->alias('sed')
+                    ->join('su_divide sd','sd.divide_id = sed.divide_id')
+                    ->join('su_company sc','sc.company_id = sed.member_id')
+                    ->join('su_company_main scm','scm.company_id = sc.company_id','left')
+                    ->field(['sd.divide_field','sc.company_id','sc.company_number','sc.company_full_name','scm.company_corporation','sc.company_linkman','sc.company_linkman_mobile'])
+                    ->where('sed.engineering_id',$uid)
+                    ->select();
+        /* 把查询出来的企业数据转换成前端传递过来的字段，并且根据成员字段信息对企业列表数据进行分类，返回后能直接根据工程内字段数据匹配到指定的数据 */
+        foreach($company as $key => $row) {
+            $value = array();
+            if(!isset($result[$row['divide_field']])) {
+                $result[$row['divide_field']] = array();
+            }
+            foreach($row as $rowKey => $rowMain) {
+                if(array_search($rowKey,$field)) {
+                    $value[array_search($rowKey,$field)] = $rowMain;
+                }
+            }
+            array_push($result[$row['divide_field']],$value);
+        }
+        return $result;
+    }
+
+    /**
+     * 获取工程内人员成员的详细数据
+     * @param $uid
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    private static function fetchPeopleMember($uid)
+    {
+        $result = array();
+        $field = new \app\people\controller\PeopleAutoLoad();             // 用于把人员数据转换成前端传递过来的字段数据
+        $field = $field::$fieldArr;
+        $people = Db::table('su_engineering_divide')
+                   ->alias('sed')
+                    ->join('su_divide sd','sd.divide_id = sed.divide_id')
+                    ->join('su_people sp','sp.people_id = sed.member_id')
+                    ->field(['sd.divide_field','people_id','people_code','people_name','people_mobile','people_idCard'])
+                    ->where('sed.engineering_id',$uid)
+                    ->select();
+        /* 把查询出来的人员数据转换成前端传递过来的字段，并且根据成员字段信息对人员列表数据进行分类，返回后能直接根据工程内字段数据匹配到指定的数据 */
+        foreach($people as $key => $row) {
+            $value = array();
+            if(!isset($result[$row['divide_field']])) {
+                $result[$row['divide_field']] = array();
+            }
+            foreach($row as $rowKey => $rowMain) {
+                if(array_search($rowKey,$field)) {
+                    $value[array_search($rowKey,$field)] = $rowMain;
+                }
+            }
+            array_push($result[$row['divide_field']],$value);
+        }
         return $result;
     }
 
@@ -188,7 +292,7 @@ class EngineerMain extends Controller
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    private static function fetchMainList($data)
+    public static function fetchMainList($data)
     {
         $whereStr = array('company' => '','people' => '');
         /* 根据传入的值来给获取指定的人员以及企业的where IN 查询条件 */
@@ -324,6 +428,60 @@ class EngineerMain extends Controller
         }
         $uuid = md5(uniqid(mt_rand(),true));
         return array($uuid);
+    }
+
+    /**
+     * 把传入的成员数组数据转换成分别向工程表以及成员表插入的数据格式
+     * @param $data
+     * @param $uid
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    private static function engineerValueCreat($data, $uid)
+    {
+        $result = array('engineer'=>array(),'divide'=>array());
+        /* 循环前端传入的数据，重组成工程数据以及成员数据的两个数组 */
+        foreach($data as $key => $row) {
+            $value = $row;
+            /* 如果碰上以 _company 或者 _people结尾的字段,就是成员相关数据
+                其中工程数据库内需要 "成员名，"的格式，成员数据需要处理成索引数组
+             */
+            if(strchr($key,'_company') || strchr($key,'_people') && is_array($row)) {
+                $value = '';
+                foreach($row as $rowKey => $rowMain) {
+                    $value .= "{$rowMain['name']},";
+                    array_push($result['divide'],array('engineering_id'=>$uid,'member_id'=>$rowMain['id'],'divide_id'=>$key));
+                }
+                $value = rtrim($value,',');
+            }
+            $result['engineer'][$key] = $value;
+        }
+        $result['divide'] = self::divideChange($result['divide']);
+        return $result;
+    }
+
+    /**
+     * 把工程参与成员索引数组的指定字段转换为公用字典表id
+     * @param $list
+     * @return mixed
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    private static function divideChange($list)
+    {
+        $divide = Db::table('su_divide')->field(['divide_id','divide_field'])->select();
+        $divideList = array();
+        /* 循环字典表内的数据，把数据转换成数据表字段 => 字典索引id 的格式，用于后面跟详细信息列表进行比较获取索引值 */
+        foreach($divide as $key => $row) {
+            $divideList[$row['divide_field']] = $row['divide_id'];
+        }
+        foreach($list as $key => $row) {
+            $list[$key]['divide_id'] = $divideList[$row['divide_id']];
+        }
+        return $list;
     }
 
     /**
