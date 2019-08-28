@@ -2,56 +2,35 @@
 /**
  * Created by PhpStorm.
  * User: admin
- * Date: 2019/8/19
- * Time: 17:43
+ * Date: 2019/8/28
+ * Time: 17:19
  */
 
-namespace app\company\controller;
+namespace app\material\controller;
 
 use think\Controller;
 
 /**
- * Class CompanyAutoLoad
- * @package app\company\controller
+ * Class MaterialAutoLoad
+ * @package app\material\controller
  */
-class CompanyAutoLoad extends Controller
+class MaterialAutoLoad extends Controller
 {
     /**
      * @var array
      * 把传递过来的字段转换成后台数据库对应的字段
      */
     public static $fieldArr = array(
-        'uuid' => 'company_id',
-        'pass' => 'company_passwd',
-        'company' => 'company_name',
-        'name' => 'company_full_name',
-        'uniform' => 'company_code',
-        'linkman' => 'company_linkman',
-        'linkmanMobile' => 'company_linkman_mobile',
-        'mobile' => 'company_mobile',
-        'contact' => 'company_contact_information',
-        'record' => 'is_record',
-        'corporation' => 'company_corporation',
-        'corporation_mobile' => 'company_corporation_mobile',
-        'business' => 'company_business_license',
-        'start' => 'company_business_start',
-        'end' => 'company_business_end',
-        'capital' => 'company_registered_capital',
-        'character' => 'company_character',
-        'website' => 'company_website',
-        'fax' => 'company_fax',
-        'area' => 'company_area',
-        'regAddr' => 'company_register_address',
-        'AD' => 'company_AD',
-        'postal' => 'company_postal_code',
-        'businessAddr' => 'company_business_address',
-        'rules' => 'company_rules',
-        'profile' => 'company_profile',
-        'email' => 'company_linkman_email',
-        'page' => 'page',
-        'show' => 'show',
-        'regTime' => 'company_register_time',
-        'number' => 'company_number',
+        'standard' => 'testing_id',
+        'standardNumber' => 'testing_number',
+        'standardCompany' => 'testing_company',
+        'standardCode' => 'testing_code',
+        'standardType' => 'testing_type',
+        'standardFrom' => 'testing_from',
+        'basisNumber' => 'testing_basis_number',
+        'basis' => 'testing_basis',
+        'determineNumber' => 'determine_standard_number',
+        'determine' => 'determine_standard',
     );
 
     /**
@@ -59,9 +38,7 @@ class CompanyAutoLoad extends Controller
      * 给指定字段数据根据数据表区别分组
      */
     public static $fieldGroup = array(
-        'main' => array('company_corporation','company_corporation_mobile','company_registered_capital','company_character','company_website','company_fax','company_area','company_register_address','company_AD','company_postal_code','company_business_address'),
-        'text' => array('company_rules','company_profile'),
-        'company' => array('form','company_id','company_register_time','company_name','company_full_name','company_code','company_linkman','company_linkman_mobile','company_mobile','company_contact_information','company_business_license','company_business_start','company_business_end')
+        'standard' => array('testing_id','testing_number','testing_company','testing_code','testing_type','testing_from','testing_basis_number','testing_basis','determine_standard_number','determine_standard'),
     );
 
     /**
@@ -111,14 +88,14 @@ class CompanyAutoLoad extends Controller
      */
     public static function checkData($control = '', $field = '')
     {
-        $companyValidate = new \app\company\validate\CompanyValidate();
+        $materialValidate = new \app\material\validate\MaterialValidate();
         $request = request()->param();
 
         /* 对传递过来的参数进行制定场景 $control 来进行检测，如果不符合规则就返回错误信息，返回函数进行后面的处理 */
-        $check = $companyValidate->scene($control)->check($request);
+        $check = $materialValidate->scene($control)->check($request);
 
         if($check === false){
-            return $companyValidate->getError();
+            return $materialValidate->getError();
         }
         $request = self::buildRequestField($request, $field);
 

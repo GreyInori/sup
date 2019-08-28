@@ -8,7 +8,7 @@
 
 namespace app\engineer\controller\api;
 
-use app\engineer\controller\EngineerAutoLoad;
+//use app\engineer\controller\EngineerAutoLoad;
 use think\Controller;
 use think\Db;
 use \app\engineer\controller\api\EngineerWhere as EngineerWhere;
@@ -29,8 +29,8 @@ class EngineerSearch extends Controller
      */
     public static function toList($search)
     {
-        $field = new EngineerAutoLoad();
-        $check = $field::$fieldArr;
+//        $field = new EngineerAutoLoad();
+//        $check = $field::$fieldArr;
         /* 初始化，根据传递的数据生成指定的分页信息以及查询条件 */
         $page = self::pageInit($search);
         $where = new EngineerWhere();
