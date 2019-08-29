@@ -14,5 +14,6 @@ Route::get('/','Index/Index/index');
 Route::controller('/company','Company/Company');
 Route::controller('/people','People/People');
 Route::controller('/engineer','Engineer/Engineer');
+Route::controller('/material','Material/Material');
 /* 所有路由匹配不到的情况下触发 */
 Route::miss('Api/Exception/miss');

@@ -2,30 +2,26 @@
 /**
  * Created by PhpStorm.
  * User: admin
- * Date: 2019/8/28
- * Time: 17:15
+ * Date: 2019/8/29
+ * Time: 14:41
  */
 
-namespace app\material\controller\api\standard;
+namespace app\material\controller\api;
 
 use think\Controller;
 
-/**
- * Class StandardWhere
- * @package app\material\controller\api\standard
- */
-class StandardWhere extends Controller
+class MaterialWhere extends Controller
 {
     private $where = array(
-        'testing_number' => ['sts.testing_number','LIKE','code%'],
-        'testing_company' => ['sts.company_full_name','LIKE','%code%'],
-        'testing_code' => ['sts.testing_code','LIKE','code%'],
-        'testing_type' => ['sts.testing_type','LIKE','%code'],
-        'testing_from' => ['sts.testing_from','LIKE','%code%'],
-        'testing_basis_number' => ['sts.testing_basis_number','LIKE','%code%'],
-        'testing_basis' => ['sts.testing_basis','LIKE','code%'],
-        'determine_standard_number' => ['sts.determine_standard_number','LIKE','code%'],
-        'determine_standard' => ['sts.determine_standard','LIKE','code%'],
+        'testing_code' => ['stp.testing_code','LIKE','code%'],
+        'testing_number' => ['stp.testing_number','LIKE','code%'],
+        'company_full_name' => ['stp.company_full_name','LIKE','%code%'],
+        'testing_type' => ['stp.testing_type','LIKE','%code%'],
+        'testing_from' => ['stp.testing_from','LIKE','%code%'],
+        'testing_price' => ['stp.testing_price','LIKE','code%'],
+        'material_remarks' => ['stp.material_remarks','LIKE','code%'],
+        'tag_number' => ['stp.tag_number','LIKE','code%'],
+        'is_end' => ['stp.is_end','LIKE','code%'],
     );
 
     /**

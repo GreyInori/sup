@@ -31,7 +31,7 @@ class MaterialValidate extends Validate
         'defaultValue' => 'chsDash',   // 试验项目检测字段默认值
         'defaultToken' => 'number',   // 试验项目检测字段结果
         'defaultVerify' => 'number',   // 试验项目检测字段是否单选
-        'standard' => 'number',   // 检测标准id
+        'standard' => 'require|number',   // 检测标准id
         'standardNumber' => 'alphaDash',   // 检测标准编号
         'standardCompany' => 'chsDash',   // 检测标准企业名称
         'standardCode' => 'alphaDash',   // 试验代号
@@ -41,10 +41,11 @@ class MaterialValidate extends Validate
         'companyName' => 'chsDash',   // 企业名称
         'company' => 'alphaDash',   // 企业id
         'valid' => 'number',   // 是否有效
-        'priceId' => 'alphaDash',   // 检测费用编号
+        'priceId' => 'alphaDash',   // 检测费用id
         'price' => 'chsDash',     // 价格
         'tag' => 'chsDash',     // 标签
         'end' => 'number',    // 是否到期
+        'remarks' => 'chsDash',    // 分类条件备注
     );
 
     protected $message = array(
@@ -64,6 +65,7 @@ class MaterialValidate extends Validate
         'defaultToke.number' => '传递的试验项目检测字段结果不符合规范',
         'defaultVerify.number' => '传递的试验项目检测字段是否单选不符合规范',
         'standard.number' => '传递的检测标准id不符合规范',
+        'standard.require' => '请传递检测标准id',
         'standardNumber.alphaDash' => '传递的检测标准编号不符合规范',
         'standardCompany.chsDash' => '传递检测标准企业名称不符合规范',
         'standardCode.alphaDash' => '传递的试验代号不符合规范',
@@ -73,15 +75,23 @@ class MaterialValidate extends Validate
         'companyName.chsDash' => '传递的企业名称不符规范',
         'company.alphaDash' => '传递的企业id不符合规范',
         'valid.number' => '请确认是否有效',
-        'priceId.alphaDash' => '传递的检测费用编号不符合规范',
+        'priceId.alphaDash' => '传递的检测费用id不符合规范',
         'price.chsDash' => '传递的价格不符合规范',
         'tag.chsDash' => '传递的标签不符合规范',
-        'end.number' => '传递的是否到期不符合规范'
+        'end.number' => '传递的是否到期不符合规范',
+        'remarks.chsDash' => '传递的分类条件备注不符合规范',
     );
 
     protected $scene = array(
         'materialList' => ['type'],
+        'priceList' => ['standardNumber','companyName','standardCode','standardType','standardFrom','price','remarks','tag','end'],
+        'priceAdd' => ['company','standardNumber','companyName','standardCode','standardType','standardFrom','price','remarks','tag','end'],
+        'priceEdit' => ['priceId','company','standardNumber','companyName','standardCode','standardType','standardFrom','price','remarks','tag','end'],
+        'priceDel' => ['priceId'],
         'fileList' => [],
-        'standardList' => ['standardNumber','standardCompany','standardCode','standardType','standardFrom'],
+        'standardList' => ['standardNumber','companyName','standardCode','standardType','standardFrom'],
+        'standardAdd' => ['standardNumber','companyName','standardCode','standardType','standardFrom'],
+        'standardEdit' => ['standard','standardNumber','companyName','standardCode','standardType','standardFrom'],
+        'standardDel' => ['standard'],
     );
 }

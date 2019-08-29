@@ -23,7 +23,7 @@ class MaterialAutoLoad extends Controller
     public static $fieldArr = array(
         'standard' => 'testing_id',
         'standardNumber' => 'testing_number',
-        'standardCompany' => 'testing_company',
+        'companyName' => 'company_full_name',
         'standardCode' => 'testing_code',
         'standardType' => 'testing_type',
         'standardFrom' => 'testing_from',
@@ -31,6 +31,12 @@ class MaterialAutoLoad extends Controller
         'basis' => 'testing_basis',
         'determineNumber' => 'determine_standard_number',
         'determine' => 'determine_standard',
+        'priceId' => 'price_id',
+        'company' => 'company_id',
+        'remarks' => 'material_remarks',
+        'price' => 'testing_price',
+        'end' => 'is_end',
+        'tag' => 'tag_number',
     );
 
     /**
@@ -38,7 +44,8 @@ class MaterialAutoLoad extends Controller
      * 给指定字段数据根据数据表区别分组
      */
     public static $fieldGroup = array(
-        'standard' => array('testing_id','testing_number','testing_company','testing_code','testing_type','testing_from','testing_basis_number','testing_basis','determine_standard_number','determine_standard'),
+        'standard' => array('testing_id','testing_number','company_full_name','testing_code','testing_type','testing_from','testing_basis_number','testing_basis','determine_standard_number','determine_standard'),
+        'price' => array('price_id','company_id','testing_number','company_full_name','testing_code','testing_type','testing_from','testing_price','material_remarks','tag_number','is_end'),
     );
 
     /**

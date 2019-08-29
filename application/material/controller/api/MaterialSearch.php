@@ -2,33 +2,32 @@
 /**
  * Created by PhpStorm.
  * User: admin
- * Date: 2019/8/28
- * Time: 17:15
+ * Date: 2019/8/29
+ * Time: 14:32
  */
 
-namespace app\material\controller\api\standard;
+namespace app\material\controller\api;
 
 use think\Controller;
 use think\Db;
-use \app\material\controller\api\standard\StandardWhere as StandardWhere;
 
-/**
- * Class StandardSearch
- * @package app\material\controller\api\standard
- */
-class StandardSearch extends Controller
+class MaterialSearch extends Controller
 {
-    public static function toList($search)
+    /**
+     * @param $search
+     * @return string
+     */
+    public static function toPriceList($search)
     {
         /* 初始化，根据传递的数据生成指定的分页信息以及查询条件 */
         $page = self::pageInit($search);
-        $where = new StandardWhere();
+        $where = new MaterialWhere();
         $where = $where->getWhereArray($search);
         /* 执行企业列表查询 */
         try{
-            $list = Db::table('su_testing_standard')
-                ->alias('sts')
-                ->field(['sts.testing_id','sts.testing_number','sts.company_full_name','sts.testing_code','sts.testing_type','sts.testing_from','sts.testing_basis_number','sts.testing_basis','sts.determine_standard_number','sts.determine_standard'])
+            $list = Db::table('su_testing_price')
+                ->alias('stp')
+                ->field(['stp.testing_code','stp.testing_number','stp.company_full_name','stp.testing_type','stp.testing_from','stp.testing_price','stp.material_remarks','stp.tag_number','stp.is_end'])
                 ->where($where)
                 ->limit($page[0], $page[1])
                 ->select();
