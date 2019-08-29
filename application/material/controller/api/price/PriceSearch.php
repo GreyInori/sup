@@ -6,12 +6,17 @@
  * Time: 14:32
  */
 
-namespace app\material\controller\api;
+namespace app\material\controller\api\price;
 
 use think\Controller;
 use think\Db;
+use \app\material\controller\api\price\PriceWhere as PriceWhere;
 
-class MaterialSearch extends Controller
+/**
+ * Class PriceSearch
+ * @package app\material\controller\api\price
+ */
+class PriceSearch extends Controller
 {
     /**
      * @param $search
@@ -21,7 +26,7 @@ class MaterialSearch extends Controller
     {
         /* 初始化，根据传递的数据生成指定的分页信息以及查询条件 */
         $page = self::pageInit($search);
-        $where = new MaterialWhere();
+        $where = new PriceWhere();
         $where = $where->getWhereArray($search);
         /* 执行企业列表查询 */
         try{

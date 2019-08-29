@@ -6,25 +6,19 @@
  * Time: 11:28
  */
 
-namespace app\material\controller\api;
+namespace app\material\controller\api\price;
 
 use think\Controller;
 use think\Db;
 use \app\material\controller\MaterialAutoLoad as MaterAutoLoad;
 use \app\material\model\PriceModel as PriceModel;
 
-class MaterialMain extends Controller
+/**
+ * Class PriceMain
+ * @package app\material\controller\api\price
+ */
+class PriceMain extends Controller
 {
-    public static function toMaterialAdd()
-    {
-
-    }
-
-    public static function toMaterialList()
-    {
-
-    }
-
     /**
      * 执行检测费用添加方法
      * @param $data

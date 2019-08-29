@@ -6,11 +6,15 @@
  * Time: 14:41
  */
 
-namespace app\material\controller\api;
+namespace app\material\controller\api\price;
 
 use think\Controller;
 
-class MaterialWhere extends Controller
+/**
+ * Class PriceWhere
+ * @package app\material\controller\api\price
+ */
+class PriceWhere extends Controller
 {
     private $where = array(
         'testing_code' => ['stp.testing_code','LIKE','code%'],

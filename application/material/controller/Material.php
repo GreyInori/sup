@@ -8,8 +8,8 @@
 
 namespace app\material\controller;
 
-use app\material\controller\api\MaterialMain as MaterialMain;
-use app\material\controller\api\MaterialSearch;
+use app\material\controller\api\price\PriceMain as PriceMain;
+use app\material\controller\api\price\PriceSearch;
 //use app\material\model\StandardModel;
 use think\Controller;
 use \app\material\controller\api\standard\StandardSearch;
@@ -120,12 +120,12 @@ class Material extends Controller
             return self::returnMsg(500,'fail',$data);
         }
         /* 获取企业列表数据，如果有抛出异常的话就返回错误信息 */
-        $list = MaterialSearch::toPriceList($data);
+        $list = PriceSearch::toPriceList($data);
         if(!is_array($list)) {
             return self::returnMsg(500,'fail',$list);
         }
         /* 把查询结果的字段转换为前端传递过来的字段数据 */
-        $change = new MaterialMain();
+        $change = new PriceMain();
         $list = $change::fieldChange($list);
         return self::returnMsg(200,'success',$list);
     }
@@ -143,7 +143,7 @@ class Material extends Controller
             return self::returnMsg(500,'fail',$data);
         }
         /* 获取企业列表数据，如果有抛出异常的话就返回错误信息 */
-        $list = MaterialMain::toPriceAdd($data);
+        $list = PriceMain::toPriceAdd($data);
         if(!is_array($list)) {
             return self::returnMsg(500,'fail',$list);
         }
@@ -163,7 +163,7 @@ class Material extends Controller
             return self::returnMsg(500,'fail',$data);
         }
         /* 获取企业列表数据，如果有抛出异常的话就返回错误信息 */
-        $list = MaterialMain::toPriceEdit($data);
+        $list = PriceMain::toPriceEdit($data);
         if(!is_array($list)) {
             return self::returnMsg(500,'fail',$list);
         }
@@ -183,11 +183,29 @@ class Material extends Controller
             return self::returnMsg(500,'fail',$data);
         }
         /* 执行企业添加方法，如果成功的话就返回企业的id，否则返回错误信息 */
-        $list = MaterialMain::toPriceDel($data);
+        $list = PriceMain::toPriceDel($data);
         if(is_array($list)){
             return self::returnMsg(200, 'success', $list['uid']);
         }else{
             return self::returnMsg(500,'fail',$list);
         }
+    }
+
+    public function getFileList()
+    {
+        /* 检查传递参数是否符合规范 */
+        $data = FieldCheck::checkData('priceList',['page']);
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 获取企业列表数据，如果有抛出异常的话就返回错误信息 */
+        $list = PriceSearch::toPriceList($data);
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        /* 把查询结果的字段转换为前端传递过来的字段数据 */
+        $change = new PriceMain();
+        $list = $change::fieldChange($list);
+        return self::returnMsg(200,'success',$list);
     }
 }
