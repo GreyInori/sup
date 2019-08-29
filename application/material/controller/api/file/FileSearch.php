@@ -19,7 +19,7 @@ use \app\material\controller\api\file\FileWhere as FileWhere;
 class FileSearch extends Controller
 {
 
-    public static function toPriceList($search)
+    public static function toFileList($search)
     {
         /* 初始化，根据传递的数据生成指定的分页信息以及查询条件 */
         $page = self::pageInit($search);

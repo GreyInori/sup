@@ -37,6 +37,17 @@ class MaterialAutoLoad extends Controller
         'price' => 'testing_price',
         'end' => 'is_end',
         'tag' => 'tag_number',
+        'material' => 'material_name',
+        'fileNumber' => 'file_number',
+        'valid' => 'is_valid',
+        'fileId' => 'file_id',
+        'type' => 'type_id',
+        'typeParent' => 'type_pid',
+        'typeName' => 'type_name',
+        'block' => 'block_type',
+        'upload' => 'upload_type',
+        'blockId' => 'block_id',
+//        'trialNumber' => 'trial_number'
     );
 
     /**
@@ -46,6 +57,10 @@ class MaterialAutoLoad extends Controller
     public static $fieldGroup = array(
         'standard' => array('testing_id','testing_number','company_full_name','testing_code','testing_type','testing_from','testing_basis_number','testing_basis','determine_standard_number','determine_standard'),
         'price' => array('price_id','company_id','testing_number','company_full_name','testing_code','testing_type','testing_from','testing_price','material_remarks','tag_number','is_end'),
+        'file' => array('company_id','company_full_name','testing_code','file_number','file_id','material_name','is_valid','testing_number'),
+        'type' => array('type_id','type_pid','type_name'),
+        'block' => array('block_type','upload_type','block_id'),
+        'material' => array('type_id'),
     );
 
     /**

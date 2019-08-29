@@ -19,7 +19,8 @@ class MaterialValidate extends Validate
     protected $rule = array(
         'uuid' => 'require|alphaDash',      // 检测项目id
         'material' => 'chsDash',    // 材料名
-        'type' => 'number',      // 材料类型
+        'type' => 'number|require',      // 材料类型
+        'typeParent' => 'number',    // 材料父类id
         'block' => 'number',     // 是否试块
         'typeName' => 'chsDash',   // 类型名
         'trial' => 'number',    // 试验项目id
@@ -46,12 +47,17 @@ class MaterialValidate extends Validate
         'tag' => 'chsDash',     // 标签
         'end' => 'number',    // 是否到期
         'remarks' => 'chsDash',    // 分类条件备注
+        'fileId' => 'require|number',   // 文件号id
+        'companyId' => 'alphaDash',   // 企业id
+        'upload' => 'number',   // 上传文件类型id
+        'blockId' => 'require|number',   // 上传文件类型条件id
     );
 
     protected $message = array(
         'uuid.require' => '请传递检测项目id',
         'uuid.alphaDash' => '传递检测项目id不符合规范',
         'material.chsDash' => '传递检测项目名不符合规范',
+        'type.require' => '请传递检测项目类型id',
         'type.number' => '传递检测项目类型id不符合规范',
         'block.number' => '请确认上传的是否为试块',
         'typeName.chsDash' => '传递的类型名不符合规范',
@@ -80,6 +86,13 @@ class MaterialValidate extends Validate
         'tag.chsDash' => '传递的标签不符合规范',
         'end.number' => '传递的是否到期不符合规范',
         'remarks.chsDash' => '传递的分类条件备注不符合规范',
+        'fileId.require' => '请传递文件号id',
+        'fileId.number' => '传递的文件号id不符合规范',
+        'companyId.alphaDash' => '传递企业id不符合规范',
+        'typeParent.number' => '传递类型父类id不符合规范',
+        'upload.number' => '传递上传文件类型id不符合规范',
+        'blockId.require' => '请传递上传图片条件id',
+        'blockId.number' => '上传图片条件id不符合规范',
     );
 
     protected $scene = array(
@@ -88,10 +101,21 @@ class MaterialValidate extends Validate
         'priceAdd' => ['company','standardNumber','companyName','standardCode','standardType','standardFrom','price','remarks','tag','end'],
         'priceEdit' => ['priceId','company','standardNumber','companyName','standardCode','standardType','standardFrom','price','remarks','tag','end'],
         'priceDel' => ['priceId'],
-        'fileList' => [],
+        'fileList' => ['companyName','material','standardCode','valid'],
+        'fileAdd' => ['companyName','material','standardCode','valid','companyId'],
+        'fileEdit' => ['fileId','companyName','material','standardCode','valid','companyId'],
+        'fileDel' => ['fileId'],
         'standardList' => ['standardNumber','companyName','standardCode','standardType','standardFrom'],
         'standardAdd' => ['standardNumber','companyName','standardCode','standardType','standardFrom'],
         'standardEdit' => ['standard','standardNumber','companyName','standardCode','standardType','standardFrom'],
         'standardDel' => ['standard'],
+        'typeList' => ['type'],
+        'typeAdd' => ['typeName','typeParent'],
+        'typeEdit' => ['type','typeName','typeParent'],
+        'typeDel' => ['type'],
+        'blockList' => ['block','upload'],
+        'blockAdd' => ['block','upload'],
+        'blockEdit' => ['blockId','block','upload'],
+        'blockDel' => ['blockId','block','upload'],
     );
 }

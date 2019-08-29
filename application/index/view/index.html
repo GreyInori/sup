@@ -10,13 +10,25 @@
 </body>
 <script>
     $.ajax({
-        url : 'http://localhost/material/PriceDel',
-        type : 'post',
+        url : 'http://localhost/material/MaterialList',
+        type : 'get',
         async : true,
         data : {
-            'priceId' : 1,
+            // 'blockId' : 6,
+            // 'block' : 1,
+            // 'upload' : 4,
+            'type' : 0,
+            // 'typeParent' : '2',
+            // 'typeName' : '陨石不砸地检测',
+            // 'priceId' : 1,
+            // 'fileId' : '5',
             // 'company' : '2008f23efa4d32d23440ecc9225e03aa',
             // 'companyName' : '不儒雅随和公司',
+            // 'fileNumber' : 'JAS/JS010-23-12',
+            // 'material' : '陨石法',
+            // 'standardCode' : 'YSH',
+            // 'valid' : 1,
+            // 'standardNumber' : 'YSH02',
             // 'standard' : '1',
             // 'standardNumber' : 'YSH02',
             // 'standardCompany' : '儒雅随和',
