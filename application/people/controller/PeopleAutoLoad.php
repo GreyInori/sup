@@ -128,5 +128,4 @@ class PeopleAutoLoad extends Controller
 
         return $result;
     }
-
 }

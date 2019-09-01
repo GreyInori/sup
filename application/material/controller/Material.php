@@ -449,10 +449,17 @@ class Material extends Controller
     // +----------------------------------------------------------------------
     // | 检测项目相关
     // +----------------------------------------------------------------------
+    /**
+     * 获取检测项目列表方法
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public function getMaterialList()
     {
         /* 检查传递参数是否符合规范 */
-        $data = FieldCheck::checkData('materialList',['page']);
+        $data = FieldCheck::checkData('materialList');
         if(!is_array($data)) {
             return self::returnMsg(500,'fail',$data);
         }
@@ -461,9 +468,216 @@ class Material extends Controller
         if(!is_array($list)) {
             return self::returnMsg(500,'fail',$list);
         }
-        /* 把查询结果的字段转换为前端传递过来的字段数据 */
-        $change = new MaterialMain();
-        $list = $change::fieldChange($list);
         return self::returnMsg(200,'success',$list);
+    }
+
+    /**
+     * 检测项目添加方法
+     * @return false|string
+     */
+    public function postMaterialAdd()
+    {
+        /* 检测传递参数是否符合规范 */
+        $data = FieldCheck::checkData('materialAdd');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 获取企业列表数据，如果有抛出异常的话就返回错误信息 */
+        $list = MaterialMain::toMaterialAdd($data);
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        return self::returnMsg(200,'success',$list['uid']);
+    }
+
+    /**
+     * 检测项目修改方法
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function postMaterialEdit()
+    {
+        /* 检测传递参数是否符合规范 */
+        $data = FieldCheck::checkData('materialEdit');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 获取企业列表数据，如果有抛出异常的话就返回错误信息 */
+        $list = MaterialMain::toMaterialEdit($data);
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        return self::returnMsg(200,'success',$list['uid']);
+    }
+
+    /**
+     * 检测项目删除方法
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function postMaterialDel()
+    {
+        /* 检测传递的参数是否符合企业添加的规范，如果不符合就返回错误信息 */
+        $data = FieldCheck::checkData('materialDel');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 执行企业添加方法，如果成功的话就返回企业的id，否则返回错误信息 */
+        $list = MaterialMain::toMaterialDel($data);
+        if(is_array($list)){
+            return self::returnMsg(200, 'success', $list['uid']);
+        }else{
+            return self::returnMsg(500,'fail',$list);
+        }
+    }
+
+    /**
+     * 获取检测项目字段以及默认值方法
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getMaterialField()
+    {
+        /* 检查传递参数是否符合规范 */
+        $data = FieldCheck::checkData('materialField');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 获取企业列表数据，如果有抛出异常的话就返回错误信息 */
+        $list = MaterialMain::toMaterialField($data);
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        return self::returnMsg(200,'success',$list);
+    }
+
+    /**
+     * 检测项目字段添加方法
+     * @return false|string
+     */
+    public function postMaterialFieldAdd()
+    {
+        /* 检测传递参数是否符合规范 */
+        $data = FieldCheck::checkData('materialFieldAdd');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 获取企业列表数据，如果有抛出异常的话就返回错误信息 */
+        $list = MaterialMain::toMaterialFieldAdd($data);
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        return self::returnMsg(200,'success',$list['uid']);
+    }
+
+    /**
+     * 检测项目字段修改方法
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function postMaterialFieldEdit()
+    {
+        /* 检测传递参数是否符合规范 */
+        $data = FieldCheck::checkData('materialFieldEdit');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 获取企业列表数据，如果有抛出异常的话就返回错误信息 */
+        $list = MaterialMain::toMaterialFieldEdit($data);
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        return self::returnMsg(200,'success',$list['uid']);
+    }
+
+    /**
+     * 检测项目字段删除方法
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function postMaterialFieldDel()
+    {
+        /* 检测传递的参数是否符合企业添加的规范，如果不符合就返回错误信息 */
+        $data = FieldCheck::checkData('materialFieldDel');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 执行企业添加方法，如果成功的话就返回企业的id，否则返回错误信息 */
+        $list = MaterialMain::toMaterialFieldDel($data);
+        if(is_array($list)){
+            return self::returnMsg(200, 'success', $list['uid']);
+        }else{
+            return self::returnMsg(500,'fail',$list);
+        }
+    }
+
+    public function postMaterialDefaultAdd()
+    {
+        /* 检测传递参数是否符合规范 */
+        $data = FieldCheck::checkData('materialDefaultAdd');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 获取企业列表数据，如果有抛出异常的话就返回错误信息 */
+        $list = MaterialMain::toDefaultAdd($data);
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        return self::returnMsg(200,'success',$list['uid']);
+    }
+
+    /**
+     * 检测项目字段默认值修改方法
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function postMaterialDefaultEdit()
+    {
+        /* 检测传递参数是否符合规范 */
+        $data = FieldCheck::checkData('materialDefaultEdit');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 获取企业列表数据，如果有抛出异常的话就返回错误信息 */
+        $list = MaterialMain::toDefaultEdit($data);
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        return self::returnMsg(200,'success',$list['uid']);
+    }
+
+    /**
+     * 检测羡慕字段默认值删除方法
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function postMaterialDefaultDel()
+    {
+        /* 检测传递的参数是否符合企业添加的规范，如果不符合就返回错误信息 */
+        $data = FieldCheck::checkData('materialDefaultDel');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 执行企业添加方法，如果成功的话就返回企业的id，否则返回错误信息 */
+        $list = MaterialMain::toDefaultDel($data);
+        if(is_array($list)){
+            return self::returnMsg(200, 'success', $list['uid']);
+        }else{
+            return self::returnMsg(500,'fail',$list);
+        }
     }
 }

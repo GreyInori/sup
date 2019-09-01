@@ -272,31 +272,412 @@ class MaterialMain extends Controller
     // +----------------------------------------------------------------------
     // | 检测项目相关
     // +----------------------------------------------------------------------
+    /**
+     * 检测项目列表方法
+     * @param $data
+     * @return false|mixed|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public static function fetchMaterialList($data)
     {
         /* 把传递过来的数据根据数据表进行分组，用于后续插入和检测等操作 */
         $group = new MaterialAutoLoad();
-        $field = $group::$fieldGroup;
+        $data = $group->toGroup($data);
         /* 根据传递的类型id生成指定的查询语句 */
-        $typeList = self::fetchTypeList($data);
         $where = new MaterialWhere();
-        $where = $where->getWhereArray($typeList);
-        var_dump($where);exit;
+        $where = $where->getWhereArray($data['material']);
+
         /* 执行查询操作 */
         $list = Db::table('su_material')
             ->alias('sm')
+            ->join('su_material_type smt','smt.type_id = sm.material_type')
             ->where($where)
-            ->field($field['type'])
+            ->field(['material_id','material_name','material_type','smt.type_name'])
             ->select();
         if(empty($list)){
-            return '查无此检测分类，请检查传递的检测分类id';
+            return '查无此检测项目数据，请检查传递的检测分类id';
         }
-        $list = self::fetchTypeChild($list);
+        $list = self::typeGroup($list);
         return $list;
+    }
+
+    /**
+     * 添加检测项目方法
+     * @param $data
+     * @return array|string
+     */
+    public static function toMaterialAdd($data)
+    {
+        /* 把传递过来的数据根据数据表进行分组，用于后续插入和检测等操作 */
+        $group = new MaterialAutoLoad();
+        $data = $group->toGroup($data);
+        if(isset($data['material_id'])) {
+            unset($data['material_id']);
+        }
+        /* 进行图片上传规范的添加操作 */
+        Db::startTrans();
+        try{
+            $id = Db::table('su_material')->insertGetId($data['material']);
+            Db::commit();
+            return array('uid'=>$id);
+        }catch(\Exception $e) {
+            Db::rollback();
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * 修改检测项目方法
+     * @param $data
+     * @return array|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toMaterialEdit($data)
+    {
+        /* 把传递过来的数据根据数据表进行分组，用于后续插入和检测等操作 */
+        $group = new MaterialAutoLoad();
+        $data = $group->toGroup($data);
+        /* 进行图片上传规范的添加操作 */
+        $material = Db::table('su_material')->where('material_id',$data['material']['material_id'])->field(['material_id'])->select();
+        if(empty($material)) {
+            return '查无此检测项目，请检查传递的检测项目id';
+        }
+        $material = $data['material'];
+        $uuid = $material['material_id'];
+        unset($material['material_id']);
+
+        Db::startTrans();
+        try{
+            $id = Db::table('su_material')->where('material_id',$uuid)->update($material);
+            Db::commit();
+            return array('uid'=>$id);
+        }catch(\Exception $e) {
+            Db::rollback();
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * 检测项目删除方法
+     * @param $data
+     * @return array|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toMaterialDel($data)
+    {
+        /* 把传递过来的数据根据数据表进行分组，用于后续插入和检测等操作 */
+        $group = new MaterialAutoLoad();
+        $data = $group->toGroup($data);
+        /* 进行图片上传规范的添加操作 */
+        $material = Db::table('su_material')->where('material_id',$data['material']['material_id'])->field(['material_id'])->select();
+        if(empty($material)) {
+            return '查无此j检测项目，请检查传递的检测项目id';
+        }
+        $material = $data['material'];
+        $uuid = $material['material_id'];
+        unset($material['material_id']);
+
+        Db::startTrans();
+        try{
+            $id = Db::table('su_material')->where('material_id',$uuid)->update(['show_type'=>0]);
+            Db::commit();
+            return array('uid'=>$id);
+        }catch(\Exception $e) {
+            Db::rollback();
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * 获取检测标准测试字段方法
+     * @param $data
+     * @return array|false|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toMaterialField($data)
+    {
+        /* 把传递过来的数据根据数据表进行分组，用于后续插入和检测等操作 */
+        $group = new MaterialAutoLoad();
+        $data = $group->toGroup($data);
+        /* 执行查询操作 */
+        $list = Db::table('su_material_list')
+            ->alias('sml')
+            ->join('su_material sm','sm.material_id = sml.material_id ')
+            ->where('sml.material_id',$data['materialField']['material_id'])
+            ->where('sml.show_type',1)
+            ->field(['sml.trial_id','sml.trial_name','sml.trial_depict','sml.trial_default_hint','sml.trial_custom_hint','sm.testing_code'])
+            ->select();
+        if(empty($list)) {
+            return $list;
+        }
+        /* 根据字段获取对应的默认值 */
+        $list = self::fieldDefault($list);
+        return $list;
+    }
+
+    /**
+     * 执行检测项目字段添加方法
+     * @param $data
+     * @return array|string
+     */
+    public static function toMaterialFieldAdd($data)
+    {
+        /* 把传递过来的数据根据数据表进行分组，用于后续插入和检测等操作 */
+        $group = new MaterialAutoLoad();
+        $data = $group->toGroup($data);
+        if(isset($data['materialField']['trial_id'])) {
+            unset($data['materialField']['trial_id']);
+        }
+        /* 进行图片上传规范的添加操作 */
+        Db::startTrans();
+        try{
+            $id = Db::table('su_material_list')->insertGetId($data['materialField']);
+            Db::commit();
+            return array('uid'=>$id);
+        }catch(\Exception $e) {
+            Db::rollback();
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * 执行检测项目字段修改方法
+     * @param $data
+     * @return array|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toMaterialFieldEdit($data)
+    {
+        /* 把传递过来的数据根据数据表进行分组，用于后续插入和检测等操作 */
+        $group = new MaterialAutoLoad();
+        $data = $group->toGroup($data);
+        /* 进行图片上传规范的添加操作 */
+        $material = Db::table('su_material_list')->where('trial_id',$data['materialField']['trial_id'])->field(['trial_id'])->select();
+        if(empty($material)) {
+            return '查无此检测项目字段，请检查传递的检测项目字段id';
+        }
+        $material = $data['materialField'];
+        $uuid = $material['trial_id'];
+        unset($material['trial_id']);
+        Db::startTrans();
+        try{
+            $id = Db::table('su_material_list')->where('trial_id',$uuid)->update($material);
+            Db::commit();
+            return array('uid'=>$id);
+        }catch(\Exception $e) {
+            Db::rollback();
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * 执行检测项目字段删除操作
+     * @param $data
+     * @return array|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toMaterialFieldDel($data)
+    {
+        /* 把传递过来的数据根据数据表进行分组，用于后续插入和检测等操作 */
+        $group = new MaterialAutoLoad();
+        $data = $group->toGroup($data);
+        /* 进行图片上传规范的添加操作 */
+        $material = Db::table('su_material_list')->where('trial_id',$data['materialField']['trial_id'])->field(['trial_id'])->select();
+        if(empty($material)) {
+            return '查无此检测项目字段，请检查传递的检测项目字段id';
+        }
+        $material = $data['materialField'];
+        $uuid = $material['trial_id'];
+        unset($material['trial_id']);
+        Db::startTrans();
+        try{
+            $id = Db::table('su_material_list')->where('trial_id',$uuid)->update(['show_type'=>0]);
+            Db::commit();
+            return array('uid'=>$id);
+        }catch(\Exception $e) {
+            Db::rollback();
+            return $e->getMessage();
+        }
+    }
+
+    // +----------------------------------------------------------------------
+    // | 检测字段默认值相关
+    // +----------------------------------------------------------------------
+    /**
+     * 获取检测项目的默认值等数据
+     * @param $list
+     * @return mixed
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function fieldDefault($list)
+    {
+        $result = array();
+        $defaultStr = "";
+        $defaultArr = array();
+        /* 根据已经查询出来的检测字段数据缩小默认值的查询范围，获取需要的默认值 */
+        foreach($list as $key => $row) {
+            $defaultStr .= "{$row['trial_id']},";
+        }
+        $defaultStr = rtrim($defaultStr,',');
+        $defaultList = Db::table('su_material_list_default')
+                            ->where('trial_id','IN',$defaultStr)
+                            ->where('show_type',1)
+                            ->field(['default_id','trial_id','trial_default_value','trial_default_token','trial_verify'])
+                            ->select();
+        if(empty($defaultList)) {
+            return $list;
+        }
+        /* 把所有默认值转换成 字段id => 结果数组 的格式，方便匹配到字段下
+            顺便把数据库字段转换成前端传递过来的字段
+         */
+        foreach($defaultList as $key => $row) {
+            if(!isset($defaultArr[$row['trial_id']])) {
+                $defaultArr[$row['trial_id']] = array();
+            }
+            $row = self::fieldChange($row);
+            array_push($defaultArr[$row['trial']],$row);
+        }
+        foreach($list as $key => $row) {
+            $result[$key] = self::fieldChange($row);
+            if(isset($defaultArr[$row['trial_id']])){
+                $result[$key]['default'] = $defaultArr[$row['trial_id']];
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * 执行检测项目字段默认值添加方法
+     * @param $data
+     * @return array|string
+     */
+    public static function toDefaultAdd($data)
+    {
+        /* 把传递过来的数据根据数据表进行分组，用于后续插入和检测等操作 */
+        $group = new MaterialAutoLoad();
+        $data = $group->toGroup($data);
+        if(isset($data['materialDefault']['default_id'])) {
+            unset($data['materialDefault']['default_id']);
+        }
+        /* 进行图片上传规范的添加操作 */
+        Db::startTrans();
+        try{
+            $id = Db::table('su_material_list_default')->insertGetId($data['materialDefault']);
+            Db::commit();
+            return array('uid'=>$id);
+        }catch(\Exception $e) {
+            Db::rollback();
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * 执行检测项目默认字段修改方法
+     * @param $data
+     * @return array|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toDefaultEdit($data)
+    {
+        /* 把传递过来的数据根据数据表进行分组，用于后续插入和检测等操作 */
+        $group = new MaterialAutoLoad();
+        $data = $group->toGroup($data);
+        /* 进行图片上传规范的添加操作 */
+        $material = Db::table('su_material_list_default')->where('default_id',$data['materialDefault']['default_id'])->field(['default_id'])->select();
+        if(empty($material)) {
+            return '查无此检测项目字段，请检查传递的检测项目字段id';
+        }
+        $material = $data['materialDefault'];
+        $uuid = $material['default_id'];
+        unset($material['default_id']);
+        Db::startTrans();
+        try{
+            $id = Db::table('su_material_list_default')->where('default_id',$uuid)->update($material);
+            Db::commit();
+            return array('uid'=>$id);
+        }catch(\Exception $e) {
+            Db::rollback();
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * 执行检测字段默认项目删除方法
+     * @param $data
+     * @return array|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toDefaultDel($data)
+    {
+        /* 把传递过来的数据根据数据表进行分组，用于后续插入和检测等操作 */
+        $group = new MaterialAutoLoad();
+        $data = $group->toGroup($data);
+        /* 进行图片上传规范的添加操作 */
+        $material = Db::table('su_material_list_default')->where('default_id',$data['materialDefault']['default_id'])->field(['default_id'])->select();
+        if(empty($material)) {
+            return '查无此检测项目字段，请检查传递的检测项目字段id';
+        }
+        $material = $data['materialDefault'];
+        $uuid = $material['default_id'];
+        unset($material['default_id']);
+        Db::startTrans();
+        try{
+            $id = Db::table('su_material_list_default')->where('default_id',$uuid)->update(['show_type'=>0]);
+            Db::commit();
+            return array('uid'=>$id);
+        }catch(\Exception $e) {
+            Db::rollback();
+            return $e->getMessage();
+        }
     }
     // +----------------------------------------------------------------------
     // | 辅助相关
     // +----------------------------------------------------------------------
+    /**
+     * 把查询出来的检测项目根据项目类型分类
+     * @param $list
+     * @return array
+     */
+    private static function typeGroup($list)
+   {
+        $material = array();
+        $result = array();
+        /* 根据检测项目的类型id，给每个检测项目分好组，顺便把字段转换成前端传递过来的字段 */
+        foreach($list as $key => $row) {
+            if(!isset($material[$row['material_type']])) {
+                $material[$row['material_type']] = array(
+                    'material' => array(),
+                    'type' => $row['type_name']
+                );
+            }
+            $row = self::fieldChange($row);
+            array_push($material[$row['materialType']]['material'],$row);
+        }
+        /* 把分组后的数据转换为索引数组，方便前端操作 */
+        foreach($material as $key => $row) {
+            array_push($result, $row);
+        }
+        return $result;
+   }
+
     /**
      * 获取查询出来的分类的子类，并分配给父类方法
      * @param $typeList

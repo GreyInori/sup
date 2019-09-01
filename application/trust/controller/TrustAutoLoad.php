@@ -1,63 +1,51 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: admin
- * Date: 2019/8/28
- * Time: 17:19
+ * User: Administrator
+ * Date: 2019/9/2
+ * Time: 0:15
  */
 
-namespace app\material\controller;
+namespace app\trust\controller;
 
-use think\Controller;
+use think\Validate;
 
 /**
- * Class MaterialAutoLoad
- * @package app\material\controller
+ * Class TrustAutoLoad
+ * @package app\trust\controller
  */
-class MaterialAutoLoad extends Controller
+class TrustAutoLoad extends Validate
 {
     /**
      * @var array
      * 把传递过来的字段转换成后台数据库对应的字段
      */
     public static $fieldArr = array(
-        'standard' => 'testing_id',
-        'standardNumber' => 'testing_number',
+        'trust' => 'trust_id',
+        'trustCode' => 'trust_code',
+        'serial' => 'serial_number',
         'companyName' => 'company_full_name',
-        'standardCode' => 'testing_code',
-        'standardType' => 'testing_type',
-        'standardFrom' => 'testing_from',
-        'basisNumber' => 'testing_basis_number',
-        'basis' => 'testing_basis',
-        'determineNumber' => 'determine_standard_number',
-        'determine' => 'determine_standard',
-        'priceId' => 'price_id',
-        'company' => 'company_id',
-        'remarks' => 'material_remarks',
+        'materialName' => 'testing_name',
+        'project' => 'project_name',
+        'testName' => 'testing_name',
+        'customCompany' => 'custom_company',
+        'preCompany' => 'pre_testing_company',
+        'inputCompany' => 'input_testing_company',
+        'testType' => 'testing_type',
+        'material' => 'testing_material',
+        'input' => 'input_time',
         'price' => 'testing_price',
-        'end' => 'is_end',
-        'tag' => 'tag_number',
-        'material' => 'material_name',
-        'fileNumber' => 'file_number',
-        'valid' => 'is_valid',
-        'fileId' => 'file_id',
-        'type' => 'type_id',
-        'typeParent' => 'type_pid',
-        'typeName' => 'type_name',
-        'block' => 'block_type',
-        'upload' => 'upload_type',
-        'blockId' => 'block_id',
-        'materialId' => 'material_id',
-        'materialType' => 'material_type',
-        'trial' => 'trial_id',
-        'trialName' => 'trial_name',
-        'trialDepict' => 'trial_depict',
-        'trialHint' => 'trial_default_hint',
-        'trialCustomHint' => 'trial_custom_hint',
-        'default' => 'default_id',
-        'defaultValue' => 'trial_default_value',
-        'defaultToken' => 'trial_default_token',
-        'defaultVerify' => 'trial_verify'
+        'submit' => 'is_submit',
+        'print' => 'is_print',
+        'witness' => 'is_witness',
+        'sample' => 'is_sample',
+        'testing' => 'is_testing',
+        'report' => 'is_report',
+        'cancellation' => 'is_cancellation',
+        'allow' => 'is_allow',
+        'result' => 'testing_result',
+        'engineering' => 'engineering_id',
+        'processing' => 'processing_type',
     );
 
     /**
@@ -65,14 +53,10 @@ class MaterialAutoLoad extends Controller
      * 给指定字段数据根据数据表区别分组
      */
     public static $fieldGroup = array(
-        'standard' => array('testing_id','testing_number','company_full_name','testing_code','testing_type','testing_from','testing_basis_number','testing_basis','determine_standard_number','determine_standard'),
-        'price' => array('price_id','company_id','testing_number','company_full_name','testing_code','testing_type','testing_from','testing_price','material_remarks','tag_number','is_end'),
-        'file' => array('company_id','company_full_name','testing_code','file_number','file_id','material_name','is_valid','testing_number'),
-        'type' => array('type_id','type_pid','type_name'),
-        'block' => array('block_type','upload_type','block_id'),
-        'material' => array('testing_code','type_id','material_type','material_id','material_name','block_id'),
-        'materialField' => array('trial_name','trial_depict','trial_default_hint','trial_custom_hint','material_id','trial_id'),
-        'materialDefault' => array('default_id','trial_default_value','trial_default_token','trial_verify','trial_id'),
+        'trust' => array('testing_type','processing_type','engineering_id','trust_id','serial_number','company_full_name','testing_name','project_name','custom_company','pre_testing_company','input_testing_company','testing_type','testing_material','input_time','testing_price','is_submit','is_print','is_witness','is_sample','is_testing','is_cancellation','is_allow','testing_result'),
+    );
+    public static $listField = array(
+        'list' => array('trust','serial','preCompany','inputCompany','testName','trustCode','project','customCompany','input','price','submit','print','witness','sample','testing','report','cancellation','allow','result'),
     );
 
     /**
@@ -122,14 +106,14 @@ class MaterialAutoLoad extends Controller
      */
     public static function checkData($control = '', $field = '')
     {
-        $materialValidate = new \app\material\validate\MaterialValidate();
+        $companyValidate = new \app\people\validate\PeopleValidate();
         $request = request()->param();
 
         /* 对传递过来的参数进行制定场景 $control 来进行检测，如果不符合规则就返回错误信息，返回函数进行后面的处理 */
-        $check = $materialValidate->scene($control)->check($request);
+        $check = $companyValidate->scene($control)->check($request);
 
         if($check === false){
-            return $materialValidate->getError();
+            return $companyValidate->getError();
         }
         $request = self::buildRequestField($request, $field);
 
@@ -145,14 +129,17 @@ class MaterialAutoLoad extends Controller
     private static function buildRequestField($data, $field = array())
     {
         $result = array();
+
         foreach($data as $key => $row){
             /* $field 数组内的数据是不需要对应数据库字段的额外条件，进行额外条件的查询或者分页 */
             if(!empty($field) && in_array($key, $field)){
 
                 $fieldArr[$key] = $row;
             }
+
             isset(self::$fieldArr[$key])?$result[self::$fieldArr[$key]] = $row : false;
         }
+
         return $result;
     }
 }

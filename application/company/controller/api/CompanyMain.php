@@ -241,7 +241,6 @@ class CompanyMain extends Controller
         }else{
             $list = CompanyModel::get(['company_full_name' => $company['company_full_name']]);
         }
-
         /* 检测企业是否存在并如果是修改之类的操作的话就需要返回查询出来的企业id进行返回 */
         if(!empty($list) && $token == 0){
             return '当前添加的企业已存在，请检查填写的企业全称';

@@ -9,6 +9,7 @@
 namespace app\material\controller\api;
 
 use think\Controller;
+use think\Db;
 
 /**
  * Class MaterialWhere
@@ -17,8 +18,12 @@ use think\Controller;
 class MaterialWhere extends Controller
 {
     /**
-     * 返回查询条件
+     * 返回查询条件方法
      * @param array $type
+     * @return array|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function getWhereArray($type = array())
     {
@@ -28,42 +33,44 @@ class MaterialWhere extends Controller
     /**
      * 生成基本查询条件
      * @param $type
-     * @return string
+     * @return array|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     private function createQueryCode($type)
     {
         $checkType = $this->checkType($type);
+        $checkType['sm.show_type'] = 1;
         return $checkType;
     }
 
     /**
-     * 根据传递的类型数组生成类型查询条件
+     * 获取检查项目类型的where查询语句
      * @param $type
-     * @param string $whereStr
-     * @return string
+     * @return array|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
-    private function checkType($type, $whereStr = '')
+    private function checkType($type)
     {
-        if(empty($type) || !is_array($type)) {
-            return $whereStr;
+        if(!isset($type['type_id'])) {
+           return '';
         }
-        foreach($type as $key => $row) {
-            var_dump($row);exit;
-            if(isset($row['child'])) {
-                $whereStr .= $this->checkType($row['child'],$whereStr);
-            }
-            return "{$row['type']},";
+        /* 判断当前传递过来的类型下是否有子类，如果没有就直接返回类型查询条件，否则返回子类查询条件 */
+        $typeList = Db::table('su_material_type')
+                        ->where('type_pid',$type['type_id'])
+                        ->field(['type_id'])
+                        ->select();
+        if(empty($typeList)) {
+            return array('material_type'=>['=',$type['type_id']]);
         }
-        return $whereStr;
-    }
-
-    /**
-     * 检测数组是否为索引数组
-     * @param $arr
-     * @return bool
-     */
-    private static function is_assoc($arr)
-    {
-        return array_keys($arr) !== range(0, count($arr) - 1);
+        $typeStr = '';
+        foreach($typeList as $k => $v) {
+            $typeStr .= "{$v['type_id']},";
+        }
+        $typeStr = rtrim($typeStr, ',');
+        return array('material_type'=>['IN',$typeStr]);
     }
 }
