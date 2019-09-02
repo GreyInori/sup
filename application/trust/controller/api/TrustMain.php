@@ -19,6 +19,19 @@ use app\trust\controller\TrustAutoLoad as TrustAutoload;
  */
 class TrustMain extends Controller
 {
+
+    public static function toTrustUploadList($data)
+    {
+        $group = new TrustAutoLoad();
+        $data = $group->toGroup($data);
+        $uuid = self::trustAlreadyCreat($data, 1);
+        if(!is_array($uuid)) {
+            return $uuid;
+        }
+        $uuid = $uuid[0];
+
+    }
+
     /**
      * 执行委托单添加方法
      * @param $data
@@ -42,7 +55,10 @@ class TrustMain extends Controller
         Db::startTrans();
         try{
             Db::table('su_trust')->insert($trust);
-            self::fetchTrustUpload($data);
+            $Upload = self::fetchTrustUpload($trust,$uuid[0]);
+            if(!is_array($Upload)) {
+                return $Upload;
+            }
             Db::commit();
             return array('uid'=>$uuid[0]);
         }catch(\Exception $e) {
@@ -76,7 +92,6 @@ class TrustMain extends Controller
         Db::startTrans();
         try{
             Db::table('su_trust')->where('trust_id',$uuid[0])->update($trust);
-            self::fetchTrustUpload($data);
             Db::commit();
             return array('uid'=>$uuid[0]);
         }catch(\Exception $e) {
@@ -103,7 +118,6 @@ class TrustMain extends Controller
         Db::startTrans();
         try{
             Db::table('su_trust')->where('trust_id',$uuid[0])->update(['show_type'=>0]);
-            self::fetchTrustUpload($data);
             Db::commit();
             return array('uid'=>$uuid[0]);
         }catch(\Exception $e) {
@@ -183,9 +197,45 @@ class TrustMain extends Controller
         return $result;
     }
 
-    public static function fetchTrustUpload($data)
+    /**
+     * 进行委托单号需要上传的图片添加占位操作
+     * @param $data
+     * @param $uuid
+     * @return array|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function fetchTrustUpload($data, $uuid)
     {
+        /* 根据委托单号查询获取到当前委托单需要上传的个图片数量列表 */
+        if(!isset($data['testing_material'])) {
+            return '请传递委托单相关的检测项目';
+        }
+        $block = Db::table('su_material')
+                    ->where(['material_id'=>$data['testing_material'],'show_type'=>1])
+                    ->field(['block_type'])
+                    ->select();
 
+        if(empty($block)) {
+            return '当前检测项目下尚未存在上传图片规定,请先进行添加';
+        }
+        $upload = Db::table('su_material_upload')
+                        ->where(['block_type'=>$block[0]['block_type'],'show_type'=>1])
+                        ->field(['block_id','block_type','upload_type'])
+                        ->select();
+        /* 根据查询结果获取到当前试块需要上传的图片类型以及数量，转换成图片插入数组 */
+        $uploadArr = array();
+        foreach($upload as $key => $row) {
+            $uploadArr[$key] = array(
+                'trust_id' => $uuid,
+                'file_type' => $row['upload_type'],
+            );
+        }
+        if(!empty($uploadArr)) {
+           Db::table('su_status_file')->insertAll($uploadArr);
+        }
+        return array(1);
     }
 
     /**
