@@ -46,6 +46,11 @@ class TrustAutoLoad extends Validate
         'result' => 'testing_result',
         'engineering' => 'engineering_id',
         'processing' => 'processing_type',
+        'default' => 'default_id',
+        'trial' => 'trial_id',
+        'trialValue' => 'trial_default_value',
+        'trialToken' => 'trial_default_token',
+        'trialVerify' => 'trial_verify',
     );
 
     /**
@@ -54,6 +59,7 @@ class TrustAutoLoad extends Validate
      */
     public static $fieldGroup = array(
         'trust' => array('testing_type','processing_type','engineering_id','trust_id','serial_number','company_full_name','testing_name','project_name','custom_company','pre_testing_company','input_testing_company','testing_type','testing_material','input_time','testing_price','is_submit','is_print','is_witness','is_sample','is_testing','is_cancellation','is_allow','testing_result'),
+        'default' => array('default_id','trial_id','trial_default_value','trial_default_token','trial_verify','trust_id')
     );
     public static $listField = array(
         'list' => array('trust','serial','preCompany','inputCompany','testName','trustCode','project','customCompany','input','price','submit','print','witness','sample','testing','report','cancellation','allow','result'),
@@ -106,7 +112,7 @@ class TrustAutoLoad extends Validate
      */
     public static function checkData($control = '', $field = '')
     {
-        $companyValidate = new \app\people\validate\PeopleValidate();
+        $companyValidate = new \app\trust\validate\TrustValidate();
         $request = request()->param();
 
         /* 对传递过来的参数进行制定场景 $control 来进行检测，如果不符合规则就返回错误信息，返回函数进行后面的处理 */
@@ -126,20 +132,23 @@ class TrustAutoLoad extends Validate
      * @param array $field
      * @return array
      */
-    private static function buildRequestField($data, $field = array())
+    public static function buildRequestField($data, $field = array())
     {
         $result = array();
 
         foreach($data as $key => $row){
+            if(is_int($key)) {
+                $result[$key] = array();
+                foreach($row as $rowKey => $rowMain) {
+                    isset(self::$fieldArr[$rowKey])?$result[$key][self::$fieldArr[$rowKey]] = $rowMain : false;
+                }
+            }
             /* $field 数组内的数据是不需要对应数据库字段的额外条件，进行额外条件的查询或者分页 */
             if(!empty($field) && in_array($key, $field)){
-
                 $fieldArr[$key] = $row;
             }
-
             isset(self::$fieldArr[$key])?$result[self::$fieldArr[$key]] = $row : false;
         }
-
         return $result;
     }
 }

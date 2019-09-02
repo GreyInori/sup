@@ -8,10 +8,9 @@
 
 namespace app\trust\controller\api;
 
-use app\trust\model\TrustModel;
 use think\Controller;
 use think\Db;
-use app\trust\model\TrustModel as TrustMode;
+use app\trust\model\TrustModel as TrustModel;
 use app\trust\controller\TrustAutoLoad as TrustAutoload;
 
 /**
@@ -20,11 +19,6 @@ use app\trust\controller\TrustAutoLoad as TrustAutoload;
  */
 class TrustMain extends Controller
 {
-    public static function toTrustList()
-    {
-
-    }
-
     /**
      * 执行委托单添加方法
      * @param $data
@@ -41,10 +35,75 @@ class TrustMain extends Controller
         }
         $trust = $data['trust'];
         $trust['trust_id'] = $uuid[0];
+        if(isset($trust['input_time'])) {
+            $trust['input_time'] = strtotime($trust['input_time']);
+        }
         /* 进行企业以及企业详细信息的添加操作 */
         Db::startTrans();
         try{
-            Db::table('su_company')->insert($trust);
+            Db::table('su_trust')->insert($trust);
+            self::fetchTrustUpload($data);
+            Db::commit();
+            return array('uid'=>$uuid[0]);
+        }catch(\Exception $e) {
+            Db::rollback();
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * 执行委托单修改方法
+     * @param $data
+     * @return array|string
+     * @throws \think\exception\DbException
+     */
+    public static function toTrustEdit($data)
+    {
+        $group = new TrustAutoLoad();
+        $data = $group->toGroup($data);
+        $uuid = self::trustAlreadyCreat($data, 1);
+        if(!is_array($uuid)) {
+            return $uuid;
+        }
+        $trust = $data['trust'];
+        if(isset($trust['input_time'])) {
+            $trust['input_time'] = strtotime($trust['input_time']);
+        }
+        if(isset($trust['trust_id'])) {
+            unset($trust['trust_id']);
+        }
+        /* 进行企业以及企业详细信息的添加操作 */
+        Db::startTrans();
+        try{
+            Db::table('su_trust')->where('trust_id',$uuid[0])->update($trust);
+            self::fetchTrustUpload($data);
+            Db::commit();
+            return array('uid'=>$uuid[0]);
+        }catch(\Exception $e) {
+            Db::rollback();
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * 执行委托单删除操作
+     * @param $data
+     * @return array|string
+     * @throws \think\exception\DbException
+     */
+    public static function toTrustDel($data)
+    {
+        $group = new TrustAutoLoad();
+        $data = $group->toGroup($data);
+        $uuid = self::trustAlreadyCreat($data, 1);
+        if(!is_array($uuid)) {
+            return $uuid;
+        }
+        /* 进行企业以及企业详细信息的添加操作 */
+        Db::startTrans();
+        try{
+            Db::table('su_trust')->where('trust_id',$uuid[0])->update(['show_type'=>0]);
+            self::fetchTrustUpload($data);
             Db::commit();
             return array('uid'=>$uuid[0]);
         }catch(\Exception $e) {
@@ -63,23 +122,70 @@ class TrustMain extends Controller
     public static function toTrustMaterialAdd($data)
     {
         $group = new TrustAutoLoad();
+        $list = $data;
         $data = $group->toGroup($data);
         $uuid = self::trustAlreadyCreat($data,1);
         if(!is_array($uuid)) {
             return $uuid;
         }
-        $trust = $data['trust'];
-        $trust['trust_id'] = $uuid[0];
-        /* 进行企业以及企业详细信息的添加操作 */
+        /* 根据传递的值创建委托单记录详细插入数据 */
+        $trustMaterial = self::fetchTrustMaterial($list,$uuid[0]);
+        if(!is_array($trustMaterial)) {
+            return $trustMaterial;
+        }
+        /* 执行默认值添加操作 */
         Db::startTrans();
         try{
-            Db::table('su_company')->insert($trust);
+            Db::table('su_trust_list_default')->insertAll($trustMaterial);
             Db::commit();
             return array('uid'=>$uuid[0]);
         }catch(\Exception $e) {
             Db::rollback();
             return $e->getMessage();
         }
+    }
+
+    /**
+     * 生成委托单记录插入数据方法
+     * @param $list
+     * @param $uuid
+     * @return array|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function fetchTrustMaterial($list, $uuid)
+    {
+        $result = array();
+        if(!isset($list['save'])) {
+            return '请传递委托单记录数据';
+        }
+        $save = Db::table('su_trust_list_default')
+            ->where('trust_id',$uuid)
+            ->field(['save_id'])
+            ->order('save_id','DESC')
+            ->limit(0,1)
+            ->select();
+        $saveId = 1;
+        if(!empty($save)) {
+            $saveId += $save[0]['save_id'];
+        }
+        foreach($list['save'] as $key => $row) {
+            $result[$key] = array(
+                'trial_id' => $row['trial_id'],
+                'trial_default_value' => $row['trial_default_value'],
+                'trial_default_token' => $row['trial_default_token'],
+                'trial_verify' => $row['trial_verify'],
+                'trust_id' => $uuid,
+                'save_id' => $saveId
+            );
+        }
+        return $result;
+    }
+
+    public static function fetchTrustUpload($data)
+    {
+
     }
 
     /**
@@ -93,22 +199,67 @@ class TrustMain extends Controller
     {
         $uuid = md5(uniqid(mt_rand(),true));
         if($token == 0){
-            return $uuid;
+            return array($uuid);
         }
         if(!isset($data['trust'])) {
             return '请传递需要添加的委托信息';
         }
         /* 检测企业是否以及存在，如果不存在，就通过 uniqid 生成唯一id返回给方法调用 */
-        $company = $data['trust'];
+        $trust = $data['trust'];
         if($token == 1){
-            $list = TrustModel::get(['trust_id' => $company['trust_id']]);
+            $list = TrustModel::get(['trust_id' => $trust['trust_id']]);
         }
         /* 检测委托是否存在并如果是修改之类的操作的话就需要返回查询出来的委托id进行返回 */
         if(!empty($list) && $token == 1){
-            return array($company['trust_id']);
+            return array($trust['trust_id']);
         }elseif($token ==  1){
             return '查无此委托,请传递正确的委托单号';
         }
         return array($uuid);
+    }
+    /**
+     * 转换查询结果内字段方法
+     * @param $list
+     * @return array
+     */
+    public static function fieldChange($list)
+    {
+        $result = array();
+        $field = new TrustAutoLoad();
+        $field = $field::$fieldArr;        // 用于比较转换的数组字段
+        /* 如果是索引数组的话就需要对数组内所有数据的字段进行转换，否则就直接对数组内值进行转换 */
+        if(!self::is_assoc($list)) {
+            foreach($list as $key => $row) {
+                $result[$key] = self::toFieldChange($row, $field);
+            }
+        }else {
+            $result = self::toFieldChange($list, $field);
+        }
+        return $result;
+    }
+
+    /**
+     * 把数据库字段转换为前端传递的字段返回
+     * @param $list
+     * @param $check
+     * @return array
+     */
+    private static function toFieldChange($list, $check)
+    {
+        $result = array();
+        foreach($list as $key => $row) {
+            $result[array_search($key, $check)] = $row;
+        }
+        return $result;
+    }
+
+    /**
+     * 检测数组是否为索引数组
+     * @param $arr
+     * @return bool
+     */
+    private static function is_assoc($arr)
+    {
+        return array_keys($arr) !== range(0, count($arr) - 1);
     }
 }

@@ -21,7 +21,7 @@ class TrustValidate extends  Validate
     );
 
     protected $rule = array(
-        'trust' => 'require|alphaDash',   // 委托单号
+        'trust' => 'alphaDash',   // 委托单号
         'trustNumber' => 'alphaDash',   // 委托单编号
         'serial' => 'number',   // 流水号
         'preCompany' => 'chsDash',   // 预检测机构
@@ -51,6 +51,8 @@ class TrustValidate extends  Validate
 
     protected  $scene = array(
         'list' => array('engineering','trust','serial','preCompany','inputCompany','testName','trustCode','project','customCompany','input','price','submit','print','witness','sample','testing','report','cancellation','allow','result'),
-        'trustAdd' => array('trust','serial','preCompany','inputCompany','materialName','project','testName','customCompany','testType','material','input','price','engineering','processing'),
+        'trustAdd' => array('serial','preCompany','inputCompany','materialName','project','testName','customCompany','testType','material','input','price','engineering','processing'),
+        'trusEdit' => array('trust','serial','preCompany','inputCompany','materialName','project','testName','customCompany','testType','material','input','price','engineering','processing'),
+        'trusDel' => array('trust'),
     );
 }

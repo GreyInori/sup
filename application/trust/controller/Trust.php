@@ -39,6 +39,8 @@ class Trust extends Controller
         if(!is_array($list)) {
             return self::returnMsg(500,'fail',$list);
         }
+        $change = new TrustMain();
+        $list = $change::fieldChange($list);
         return self::returnMsg(200,'success',$list);
     }
 
@@ -50,7 +52,7 @@ class Trust extends Controller
     public function postTrustAdd()
     {
         /* 检测传递的参数是否符合企业添加的规范，如果不符合就返回错误信息 */
-        $data = FieldCheck::checkData('add');
+        $data = FieldCheck::checkData('trustAdd');
         if(!is_array($data)){
             return self::returnMsg(500,'fail',$data);
         }
@@ -63,10 +65,58 @@ class Trust extends Controller
         }
     }
 
-    public function postTrustMaterialAdd()
+    /**
+     * 修改委托单方法
+     * @return false|string
+     * @throws \think\exception\DbException
+     */
+    public function postTrustEdit()
     {
         /* 检测传递的参数是否符合企业添加的规范，如果不符合就返回错误信息 */
-        $data = FieldCheck::checkData('trustMaterialAdd');
+        $data = FieldCheck::checkData('trustEdit');
+        if(!is_array($data)){
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 执行企业添加方法，如果成功的话就返回企业的id，否则返回错误信息 */
+        $list = TrustMain::toTrustEdit($data);
+        if(is_array($list)){
+            return self::returnMsg(200, 'success', $list['uid']);
+        }else{
+            return self::returnMsg(500,'fail',$list);
+        }
+    }
+
+    /**
+     * 删除委托单方法
+     * @return false|string
+     * @throws \think\exception\DbException
+     */
+    public function postTrustDel()
+    {
+        /* 检测传递的参数是否符合删除委托单的规范，如果不符合就返回错误信息 */
+        $data = FieldCheck::checkData('trustDel');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 执行企业添加方法，如果成功的话就返回企业的id，否则返回错误信息 */
+        $list = TrustMain::toTrustDel($data);
+        if(is_array($list)){
+            return self::returnMsg(200, 'success', $list['uid']);
+        }else{
+            return self::returnMsg(500,'fail',$list);
+        }
+    }
+
+    /**
+     * 委托单详细记录信息添加方法
+     * @return false|string
+     * @throws \think\exception\DbException
+     */
+    public function postTrustMaterialAdd()
+    {
+        $data = request()->param();
+        /* 检测传递的参数是否符合企业添加的规范，如果不符合就返回错误信息 */
+        $data = FieldCheck::buildRequestField($data);
         if(!is_array($data)){
             return self::returnMsg(500,'fail',$data);
         }
