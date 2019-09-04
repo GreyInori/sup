@@ -13,13 +13,18 @@ use think\Db;
 use app\engineer\model\EngineerModel as EngineerModel;
 use app\engineer\controller\EngineerAutoLoad as EngineerAutoLoad;
 use app\engineer\controller\api\EngineerCheck as EngineerCheck;
+
 /**
  * Class EngineerMain
  * @package app\engineer\controller
  */
 class EngineerMain extends Controller
 {
+    // +----------------------------------------------------------------------
+    // | 工程相关
+    // +----------------------------------------------------------------------
     /**
+     * 执行工程添加操作
      * @param $data
      * @return array|string
      * @throws \think\exception\DbException
@@ -42,18 +47,20 @@ class EngineerMain extends Controller
         if(!is_array($people)) {
             return $people;
         }
-        $check['engineer'] = $value['engineer'];
-        $check['divide'] = $value['divide'];
+        $check['engineer'] = $value;
+//        $check['divide'] = $value['divide'];
         $check['engineer']['engineering_id'] = $uuid[0];
         $check['engineer']['input_time'] = $people['input_time'];
-        $check['engineer']['input_person'] = $people['input_person'];
+//        $check['engineer']['input_person'] = $people['input_person'];
         $check['engineer']['contract_code'] = self::creatCode();      // 生成工程编号
+        $company = self::createDivide($check['engineer']['contract_code'], $uuid[0]);
         /* 进行工程以及工程详细信息添加等操作 */
         Db::startTrans();
         try{
             Db::table('su_engineering')->insert($check['engineer']);
-            Db::table('su_engineering_divide')->insertAll($check['divide']);
+            Db::table('su_engineering_divide')->insertAll($company);
             self::engineerMainCheck($check, $uuid[0]);
+
             Db::commit();
             return array('uid'=>$uuid[0]);
         }catch(\Exception $e) {
@@ -131,9 +138,9 @@ class EngineerMain extends Controller
         $uuid = $uuid[0];
         Db::startTrans();
         try{
-            Db::table('su_engineering')->where('engineering_id',$uuid)->delete();
-            Db::table('su_engineering_divide')->where('engineering_id',$uuid)->delete();
-            self::mainDel($uuid);
+            Db::table('su_engineering')->where('engineering_id',$uuid)->update(['show_type'=>0]);
+//            Db::table('su_engineering_divide')->where('engineering_id',$uuid)->delete();
+//            self::mainDel($uuid);
             Db::commit();
             return array('success');
         }catch(\Exception $e){
@@ -181,6 +188,274 @@ class EngineerMain extends Controller
     }
 
     /**
+     *
+     * @param $data
+     * @return false|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function fetchEngineerDivide($data)
+    {
+        /* 把传递过来的数据根据数据表进行分组，用于后续插入和检测等操作 */
+        $group = new EngineerAutoLoad();
+        $check = $group->toGroup($data);
+        $list = Db::table('su_engineering_divide')
+                    ->alias('sed')
+                    ->join('su_divide sd','sd.divide_id = sed.divide_id')
+                    ->where('sed.engineering_id',$check['engineer']['engineering_id'])
+                    ->field(['sed.member_id','sed.divide_user','sd.divide_name'])
+                    ->select();
+        return $list;
+    }
+
+    /**
+     * 根据企业账号密码获取对应的企业详情
+     * @return array|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function fetchDivideEngineer()
+    {
+        $data = request()->param();
+        if(!isset($data['divideUser'])) {
+            return '请传递企业账号';
+        }
+        if(!isset($data['dividePass'])) {
+            return '请传递企业密码';
+        }
+        $list = Db::table('su_engineering_divide')
+            ->where(['divide_user'=>$data['divideUser'],'divide_passwd'=>md5($data['dividePass'])])
+            ->field(['engineering_id'])
+            ->select();
+        if(empty($list)) {
+            return '账号或密码错误，请检查';
+        }
+        $engineer = array('engineer'=>$list[0]['engineering_id']);
+        $main = self::toMain($engineer);
+        return $main;
+    }
+    // +----------------------------------------------------------------------
+    // | 地面基础类型相关
+    // +----------------------------------------------------------------------
+    /**
+     * 获取地面基础类型列表
+     * @return false|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function fetchFoundations()
+    {
+        $list = Db::table('su_foundations_type')
+                ->where(['show_type'=>1])
+                ->field(['type_id as foundations','type_name foundationsName'])
+                ->select();
+        return $list;
+    }
+
+    /**
+     * 执行地面基础类型添加方法
+     * @return int|array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toFoundationsAdd()
+    {
+        $data = request()->param();
+        if(!isset($data['foundationsName'])) {
+            return '清传递需要添加的地面基础类型名';
+        }
+        $list = Db::table('su_foundations_type')
+                ->where(['show_type'=>1,'type_name'=>$data['foundationsName']])
+                ->field(['type_id'])
+                ->select();
+        if(!empty($list)) {
+            return '当前地面基础类型已经存在,请检查传递的地面基础类型名';
+        }
+        $add = array('type_name' => $data['foundationsName']);
+        try {
+            $add = Db::table('su_foundations_type')
+                ->insertGetId($add);
+            return array($add);
+        }catch(\Exception $e){
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * 执行地面基础类型修改操作
+     * @return false|\PDOStatement|array|string|\think\Collection|\think\db\Query
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toFoundationsEdit()
+    {
+        $data = request()->param();
+        if(!isset($data['foundationsName'])) {
+            return '清传递需要修改的地面基础类型名';
+        }
+        if(!isset($data['foundations'])) {
+            return '请传递需要修改的地面基础类型id';
+        }
+        $list = Db::table('su_foundations_type')
+            ->where(['show_type'=>1,'type_id'=>$data['foundations']])
+            ->field(['type_id'])
+            ->select();
+        if( empty($list)) {
+            return '当前地面基础类型不存在,请检查传递的地面基础id';
+        }
+        $update = array('type_name' => $data['foundationsName']);
+        try{
+            $list = Db::table('su_foundations_type')->where(['type_id'=>$data['foundations']])->update($update);
+            return array($list);
+        }catch(\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * 地面基础类型删除操作
+     * @return false|int|\PDOStatement|string|array|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toFoundationsDel()
+    {
+        $data = request()->param();
+        if(!isset($data['foundations'])) {
+            return '请传递需要修改的地面基础类型id';
+        }
+        $list = Db::table('su_foundations_type')
+            ->where(['show_type'=>1,'type_id'=>$data['foundations']])
+            ->field(['type_id'])
+            ->select();
+        if(empty($list)) {
+            return '当前地面基础类型不存在,请检查传递的地面基础id';
+        }
+        try{
+            $list = Db::table('su_foundations_type')->where(['type_id'=>$data['foundations']])->update(['show_type'=>0]);
+            return array($list);
+        }catch(\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+    // +----------------------------------------------------------------------
+    // | 工程类型相关
+    // +----------------------------------------------------------------------
+    /**
+     * 获取工程类型列表
+     * @return false|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function fetchEngineerType()
+    {
+        $list = Db::table('su_engineering_type')
+            ->where(['show_type'=>1])
+            ->field(['type_id as engineerType','type_name engineerTypeName'])
+            ->select();
+        return $list;
+    }
+
+    /**
+     * 执行工程类型添加方法
+     * @return int|array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toEngineerTypeAdd()
+    {
+        $data = request()->param();
+        if(!isset($data['engineerTypeName'])) {
+            return '清传递需要添加的工程类型名';
+        }
+        $list = Db::table('su_engineering_type')
+            ->where(['show_type'=>1,'type_name'=>$data['engineerTypeName']])
+            ->field(['type_id'])
+            ->select();
+        if(!empty($list)) {
+            return '当前工程类型已经存在,请检查传递的工程类型名';
+        }
+        $add = array('type_name' => $data['engineerTypeName']);
+        try {
+            $add = Db::table('su_engineering_type')
+                ->insertGetId($add);
+            return array($add);
+        }catch(\Exception $e){
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * 执行工程类型修改操作
+     * @return false|\PDOStatement|array|string|\think\Collection|\think\db\Query
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toEngineerTypeEdit()
+    {
+        $data = request()->param();
+        if(!isset($data['engineerTypeName'])) {
+            return '清传递需要修改的工程类型名';
+        }
+        if(!isset($data['engineerType'])) {
+            return '请传递需要修改的工程类型id';
+        }
+        $list = Db::table('su_engineering_type')
+            ->where(['show_type'=>1,'type_id'=>$data['engineerType']])
+            ->field(['type_id'])
+            ->select();
+        if( empty($list)) {
+            return '当前工程类型不存在,请检查传递的工程类型id';
+        }
+        $update = array('type_name' => $data['engineerTypeName']);
+        try{
+            $list = Db::table('su_engineering_type')->where(['type_id'=>$data['engineerType']])->update($update);
+            return array($list);
+        }catch(\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * 工程类型删除操作
+     * @return false|int|\PDOStatement|string|array|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toEngineerTypeDel()
+    {
+        $data = request()->param();
+        if(!isset($data['engineerType'])) {
+            return '请传递需要删除的工程类型id';
+        }
+        $list = Db::table('su_engineering_type')
+            ->where(['show_type'=>1,'type_id'=>$data['engineerType']])
+            ->field(['type_id'])
+            ->select();
+        if(empty($list)) {
+            return '当前工程类型不存在,请检查传递的工程类型id';
+        }
+        try{
+            $list = Db::table('su_engineering_type')->where(['type_id'=>$data['engineerType']])->update(['show_type'=>0]);
+            return array($list);
+        }catch(\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+    // +----------------------------------------------------------------------
+    // | 辅助类型相关
+    // +----------------------------------------------------------------------
+    /**
      * 获取工程内成员列表数据
      * @param $uid
      * @return array
@@ -212,7 +487,7 @@ class EngineerMain extends Controller
         $company = Db::table('su_engineering_divide')
                     ->alias('sed')
                     ->join('su_divide sd','sd.divide_id = sed.divide_id')
-                    ->join('su_company sc','sc.company_id = sed.member_id')
+                    ->join('su_company sc','sc.company_id = sed.member_id','left')
                     ->join('su_company_main scm','scm.company_id = sc.company_id','left')
                     ->field(['sd.divide_field','sc.company_id','sc.company_number','sc.company_full_name','scm.company_corporation','sc.company_linkman','sc.company_linkman_mobile'])
                     ->where('sed.engineering_id',$uid)
@@ -276,13 +551,13 @@ class EngineerMain extends Controller
      * @throws \think\Exception
      * @throws \think\exception\PDOException
      */
-    private static function mainDel($uuid)
-    {
-        Db::table('su_engineering_main')->where('engineering_id',$uuid)->delete();
-        Db::table('su_engineering_reckoner')->where('engineering_id',$uuid)->delete();
-        Db::table('su_engineering_child')->where('engineering_id',$uuid)->delete();
-        return 'success';
-    }
+//    private static function mainDel($uuid)
+//    {
+//        Db::table('su_engineering_main')->where('engineering_id',$uuid)->delete();
+//        Db::table('su_engineering_reckoner')->where('engineering_id',$uuid)->delete();
+//        Db::table('su_engineering_child')->where('engineering_id',$uuid)->delete();
+//        return 'success';
+//    }
 
     /**
      * 获取工程对应的详细人员以及企业数据列表
@@ -311,6 +586,65 @@ class EngineerMain extends Controller
         $people = self::fetchPeopleList($whereStr['people']);
         $mainList = array_merge($company,$people);
         return $mainList;
+    }
+
+    /**
+     * 创建工程下的分工企业数组
+     * @param $code
+     * @param $engineer
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function createDivide($code, $engineer)
+    {
+        $list = Db::table('su_divide')
+                    ->where('divide_field','LIKE','%_company')
+                    ->field(['divide_id','divide_name','divide_field'])
+                    ->select();
+        $company = array();
+        foreach($list as $key => $row) {
+            $company[$key] = array(
+                'engineering_id' => $engineer,
+                'divide_id' => $row['divide_id'],
+                'divide_user' => self::creatCompanyCode($row['divide_field'],$code),
+                'divide_passwd' => md5('123456')
+            );
+        }
+        return $company;
+    }
+
+    /**
+     * 根据字段生成各公司的码用户名
+     * @param $field
+     * @param $code
+     * @return mixed|string
+     */
+    private static function creatCompanyCode($field, $code)
+    {
+        $token = '';
+        switch($field) {
+            case 'build_company':
+                $token = 'JS';
+                break;
+            case 'construction_company':
+                $token = 'SG';
+                break;
+            case 'supervise_company' :
+                $token = 'JL';
+                break;
+            case 'design_company':
+                $token = 'SJ';
+                break;
+            case 'survey_company':
+                $token = 'KC';
+                break;
+        }
+        $name = str_replace('G',$token, $code);
+        $rand = rand(10,99);
+        $name .= $rand;
+        return $name;
     }
 
     /**
@@ -391,8 +725,8 @@ class EngineerMain extends Controller
     private static function creatCode()
     {
         $str = 'G';
-        $timeStr = date('Ymd');
-        $rand = rand(100000,999999);
+        $timeStr = date('ymd');
+        $rand = rand(1000,9999);
         return $str.$timeStr.$rand;
     }
 
@@ -459,7 +793,7 @@ class EngineerMain extends Controller
             $result['engineer'][$key] = $value;
         }
         $result['divide'] = self::divideChange($result['divide']);
-        return $result;
+        return $result['engineer'];
     }
 
     /**
@@ -542,5 +876,51 @@ class EngineerMain extends Controller
             return 1;
         }
         return 0;
+    }
+
+    /**
+     * 转换查询结果内字段方法
+     * @param $list
+     * @return array
+     */
+    public static function fieldChange($list)
+    {
+        $result = array();
+        $field = new EngineerAutoLoad();
+        $field = $field::$fieldArr;        // 用于比较转换的数组字段
+        /* 如果是索引数组的话就需要对数组内所有数据的字段进行转换，否则就直接对数组内值进行转换 */
+        if(!self::is_assoc($list)) {
+            foreach($list as $key => $row) {
+                $result[$key] = self::toFieldChange($row, $field);
+            }
+        }else {
+            $result = self::toFieldChange($list, $field);
+        }
+        return $result;
+    }
+
+    /**
+     * 把数据库字段转换为前端传递的字段返回
+     * @param $list
+     * @param $check
+     * @return array
+     */
+    private static function toFieldChange($list, $check)
+    {
+        $result = array();
+        foreach($list as $key => $row) {
+            $result[array_search($key, $check)] = $row;
+        }
+        return $result;
+    }
+
+    /**
+     * 检测数组是否为索引数组
+     * @param $arr
+     * @return bool
+     */
+    private static function is_assoc($arr)
+    {
+        return array_keys($arr) !== range(0, count($arr) - 1);
     }
 }

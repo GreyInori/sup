@@ -98,6 +98,8 @@ class Engineer extends Controller
         if(!is_array($list)) {
             return self::returnMsg(500,'fail',$list);
         }
+        $change = new EngineerMain();
+        $list = $change::fieldChange($list);
         return self::returnMsg(200,'success',$list);
     }
 
@@ -117,6 +119,171 @@ class Engineer extends Controller
         }
         /* 获取企业详细数据，如果有抛出异常的话就返回错误信息 */
         $list = EngineerMain::toMain($data);
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        return self::returnMsg(200,'success',$list);
+    }
+
+    /**
+     * 根据工程id获取该工程下的成员公司
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getEngineerDivide()
+    {
+        $data = FieldCheck::checkData('divide');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 获取企业详细数据，如果有抛出异常的话就返回错误信息 */
+        $list = EngineerMain::fetchEngineerDivide($data);
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        $list = EngineerMain::fieldChange($list);
+        return self::returnMsg(200,'success',$list);
+    }
+
+    /**
+     * 根据企业账号密码获取对应的企业详情
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getDivideEngineer()
+    {
+        $data = EngineerMain::fetchDivideEngineer();
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        $data = EngineerMain::fieldChange($data);
+        return self::returnMsg(200,'success',$data);
+    }
+    // +----------------------------------------------------------------------
+    // | 地面基础类型相关
+    // +----------------------------------------------------------------------
+    /**
+     * 工程类型列表
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getFoundation()
+    {
+        $list = EngineerMain::fetchFoundations();
+        return self::returnMsg(200,'success',$list);
+    }
+
+    /**
+     * 工程类型添加方法
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function postFoundationAdd()
+    {
+        $list = EngineerMain::toFoundationsAdd();
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        return self::returnMsg(200,'success',$list);
+    }
+
+    /**
+     * 工程类型修改方法
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function postFoundationEdit()
+    {
+        $list = EngineerMain::toFoundationsEdit();
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        return self::returnMsg(200,'success',$list);
+    }
+
+    /**
+     * 工程类型删除方法
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function postFoundationDel()
+    {
+        $list = EngineerMain::toFoundationsDel();
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        return self::returnMsg(200,'success',$list);
+    }
+
+    /**
+     * 获取工程量类型列表
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getEngineerType()
+    {
+        $list = EngineerMain::fetchEngineerType();
+        return self::returnMsg(200,'success',$list);
+    }
+    // +----------------------------------------------------------------------
+    // | 地面基础类型相关
+    // +----------------------------------------------------------------------
+    /**
+     * 地面基础类型添加方法
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function postEngineerTypeAdd()
+    {
+        $list = EngineerMain::toEngineerTypeAdd();
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        return self::returnMsg(200,'success',$list);
+    }
+
+    /**
+     * 地面基础类型修改方法
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function postEngineerTypeEdit()
+    {
+        $list = EngineerMain::toEngineerTypeEdit();
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        return self::returnMsg(200,'success',$list);
+    }
+
+    /**
+     * 地面基础类型删除方法
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function postEngineerTypeDel()
+    {
+        $list = EngineerMain::toEngineerTypeDel();
         if(!is_array($list)) {
             return self::returnMsg(500,'fail',$list);
         }

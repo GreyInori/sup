@@ -25,7 +25,7 @@ class CompanyValidate extends Validate
         'pass' => 'require',                     // 企业密码
         'company' => 'require|alphaDash',             // 企业账号
         'name' => 'require|chsDash',                    // 企业名称
-        'uniform' => 'alphaNum',     // 社会统一认证编号
+        'uniform' => 'alphaNum',              // 社会统一认证编号
         'linkMan' => 'chsDash',                // 联系人
         'mobile' => 'mobile',                    // 联系电话
         'check' => 'require|number',        // 验证码
@@ -99,5 +99,6 @@ class CompanyValidate extends Validate
         'add' => ['form','name','uniform','business','start','end','capital','character','corporationMobile','website','fax','area','regAddr','postal','AD','rules','profile','linkman','mobile','contact','email'],
         'edit' => ['form','uuid','name','uniform','business','start','end','capital','character','corporationMobile','website','fax','area','regAddr','postal','AD','rules','profile','linkman','mobile','contact','email'],
         'del' => ['uuid'],
+        'id' => ['company'],
     );
 }

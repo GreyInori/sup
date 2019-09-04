@@ -36,15 +36,18 @@ class EngineerSearch extends Controller
         $where = new EngineerWhere();
         $whereArr = $where->where;
         $where = $where->getWhereArray($search);
+        $where['se.show_type'] = 1;
         /* 根据预先写好的查询条件获取需要获取到的字段信息 */
         $field = array();
         foreach($whereArr as $whereKey => $whereRow) {
             array_push($field, $whereKey);
         }
+        array_push($field,'set.type_name');
         /* 执行企业列表查询 */
         try{
             $list = Db::table('su_engineering')
                 ->alias('se')
+                ->join('su_engineering_type set','se.engineering_type = set.type_id')
                 ->field($field)
                 ->where($where)
                 ->limit($page[0], $page[1])

@@ -43,7 +43,7 @@ class CompanySearch extends Controller
             $list = Db::table('su_company')
                 ->alias('sc')
                 ->join('su_company_main scm','sc.company_id = scm.company_id','LEFT')
-                ->field(['sc.company_number','sc.company_full_name','sc.company_linkman','scm.company_corporation','scm.company_corporation_mobile'])
+                ->field(['sc.company_id','sc.company_number','sc.company_mobile','sc.company_full_name','sc.company_linkman','scm.company_corporation','scm.company_corporation_mobile'])
                 ->where($where)
                 ->limit($page[0], $page[1])
                 ->select();

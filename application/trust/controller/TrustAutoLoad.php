@@ -51,6 +51,14 @@ class TrustAutoLoad extends Validate
         'trialValue' => 'trial_default_value',
         'trialToken' => 'trial_default_token',
         'trialVerify' => 'trial_verify',
+        'fileId' => 'file_id',
+        'filePath' => 'file_file',
+        'fileDepict' => 'file_depict',
+        'fileTime' => 'file_time',
+        'fileCode' => 'file_code',
+        'UploadPeople' => 'upload_people',
+        'imgType' => 'type_name',
+        'witnessPeople' => 'witness_people',
     );
 
     /**
@@ -58,7 +66,7 @@ class TrustAutoLoad extends Validate
      * 给指定字段数据根据数据表区别分组
      */
     public static $fieldGroup = array(
-        'trust' => array('testing_type','processing_type','engineering_id','trust_id','serial_number','company_full_name','testing_name','project_name','custom_company','pre_testing_company','input_testing_company','testing_type','testing_material','input_time','testing_price','is_submit','is_print','is_witness','is_sample','is_testing','is_cancellation','is_allow','testing_result'),
+        'trust' => array('witnessPeople','testing_type','processing_type','engineering_id','trust_id','serial_number','company_full_name','testing_name','project_name','custom_company','pre_testing_company','input_testing_company','testing_type','testing_material','input_time','testing_price','is_submit','is_print','is_witness','is_sample','is_testing','is_cancellation','is_allow','testing_result'),
         'default' => array('default_id','trial_id','trial_default_value','trial_default_token','trial_verify','trust_id')
     );
     public static $listField = array(

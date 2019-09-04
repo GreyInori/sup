@@ -39,6 +39,7 @@ class EngineerValidate extends Validate
         'witness' => 'array',   // 见证人员
         'makeup' => 'array',   // 填单人员
         'sampling' => 'array',    // 取样人员
+        'foundationsName' => 'chsDash',   // 地面基础类型名
     );
 
     protected $message = array(
@@ -67,13 +68,18 @@ class EngineerValidate extends Validate
         'witness.array' => '传递见证人员不符合规范',
         'makeup.array' => '传递填单人员不符合规范',
         'sampling.array' => '传递取样人员不符合规范',
+        'foundationsName.chsDash' => '传递地面基础类型不符合规范',
     );
 
     protected $scene = array(
-        'add' => ['company','name','type','from','level','area','foundations','site','underground','CCAD','address','build','supervise','construction','survey','design','witness','makeup','sampling'],     // 工程录入
+        'add' => ['name','type','from','level','area','foundations','site','underground','CCAD','address','build','supervise','construction','survey','design','witness','makeup','sampling'],     // 工程录入
         'edit' => ['engineer','name','type','from','level','area','foundations','site','underground','CCAD','address','build','supervise','construction','survey','design','witness','makeup','sampling'],
         'del' =>['engineer'],           // 工程删除
         'list' => ['from','area','address'],     // 工程查询
         'main' => ['engineer'],      // 工程详情
+        'divide' => ['engineer'],      // 工程相关成员账号
+        'foundationsAdd' => ['foundationsName'],   // 地面基础类型添加
+        'foundationsEdit' => ['foundations','foundationsName'],   // 地面基础类型修改
+        'foundationsDel' => ['foundations'],   // 地面基础类型删除
     );
 }

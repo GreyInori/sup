@@ -10,26 +10,93 @@
 </body>
 <script>
     $.ajax({
-        url : 'http://localhost/trust/TrustAdd',
+        // url : 'http://localhost/material/StandardEdit',
+        url : 'http://localhost/engineer/DivideEngineer',
+        // url : 'http://localhost/engineer/EngineerTypeDel',
         // url : 'https://apiserer1.bangninyou.com/version/user/Products?aithorization=89577f2a6a943243dff4929aeafb0b7b,123',
         // url : 'https://apiserer1.bangninyou.com/version/homepage/Products?aithorization=89577f2a6a943243dff4929aeafb0b7b,123',
-        type : 'post',
+        type : 'get',
         async : true,
         data : {
+            'divideUser' : 'JS190904176060',
+            'dividePass' : '123456',
+            'engineerType' : 5,
+            'engineerTypeName' : '上水道工程',
+            'processTypeName' : '施工方处理',
+            'processType' : 1,
+            'testTypeName' : '现场检测',
+            'testType' : 1,
+            'foundations' : 1,
+            'standard' : 2,
+            'standardNumber' : 'YSH02',   // 检测标准编号
+            'companyName' : '儒雅随和',  // 企业名称
+            // 'company' : 'c643cc681a5b0aa13a6597bcf166199e',  // 企业id
+            'standardCode' : 'YSH',   // 试验代号
+            'standardType' : '天降',   // 试验类别
+            'standardFrom' : 'YSH',   // 所检项目
+            'basisNumber' : 'YSH 145-2013',    // 检测依据编号
+            'basis' : 'YSH 145-2013《天降》',   // 检测依据
+            'determineNumber' : 'YSH 145-2013',   // 判定标准编号
+            'determine' : 'YSH 145-2013《天降》',   // 判定标准
+            'engineer' : 'e376a12cd3749aefc14f23fd5a9753a6',
+            // 'company' : '19505aa4ca626483e9962a0398524bc4',    // 录入人id
+            'name' : '神力陨石工程',           // 工程名称
+            'type' : 1,                         // 工程类型
+            'from' : 'sedfsdfsdfds',           // 所属质监站
+            'level' : 'asdasfasdasd',           // 所属质监等级编号
+            'area' : 1,                          // 工程区域
+            'foundations' : 1,                // 地面基础类型
+            'site' : 55.1,                      // 建筑面积
+            'underground' : 55.1,                   // 地下室面积
+            'CCAD' : 55.1,                       // 人防工程面积
+            'address' : '浙江温州',
+            // 'pass' : '123456',
+            // 'company' : '19505aa4ca626483e9962a0398524bc4',
+            // 'uuid' : '2008f23efa4d32d23440ecc9225e03aa',   // 企业id
+            // 'form' : 1,     // 企业种类，是否检测机构，1检测机构，2非检测机构
+            // 'name' : '13857643649',     // 企业用户名
+            // 'uniform' : 'wqedsadasda',    // 社会统一认证编号
+            // 'business' : 'dfgfdhdfghdfgh',   // 营业执照编号
+            // 'start' : '2010-1-1',   // 营业执照有效期始
+            // 'end' : '2019-1-1',   // 营业执照有效期止
+            // 'capital' : '150',            // 注册资本
+            // 'character' : '1',         // 企业经济性质
+            // 'corporationMobile' : '13857643699',      // 企业法人联系电话
+            // 'website' : 'http://www.grey.com',     // 企业网址
+            // 'fax' : '',     // 企业传真
+            // 'area' : 10101,    // 企业地区
+            // 'regAddr' : '浙江温州',    // 工商注册地办公地址
+            // 'postal' : '325612',     // 工商注册地邮编
+            // 'AD' : '浙江温州行政',   // 工商注册地行政主管部门
+            // 'rules' : '我觉得不行',   // 企业章程
+            // 'profile' : '都听我的一个人说了算',   // 企业简介
+            // 'linkman' : '陨石',   // 联系人
+            // 'mobile' : '13857646399',   // 联系电话
+            // 'contact' : '上门联系',   // 其他联系方式
+            // 'email' : '976067482@qq.com',   // 企业邮箱
+            // 'record' : 0,
+            // 'company' : '13857643649',
+            // 'name' : '儒雅随和检测公司',
+            // 'uniform' : 'sadhasihdasd',
+            // 'linkman' : '儒雅随和',
+            // 'mobile' : '13857643649',
+            // 'contact' : '上门联系',
+            // 'pass' : '888888',
+            // 'accept' : 1,
             // 'area' : '10122',
             // 'cate' : '86',
-            'trust' : '6517ce343edf949af0f5944da3734b62',
-            'materialName' : '陨石撞陨石',
-            'project' : '砸tmd',
-            'customCompany' : '儒雅随和公司',
-            'preCompany' : '儒雅随和公司',
-            'inputCompany' : '儒雅随和公司',
-            'testType' : '1',
-            'material' : '3',
-            'input' : '2019-1-1',
-            'price' : '5',
-            'engineering' : '3271e961902c266676029f35156ba03a',
-            'openid' : 'odW581cdBBiWo-9Zv0GAfyG4JNGU',
+            // 'trust' : '786c9da0d40697e9f695cd84b3eadff1',
+            // 'materialName' : '陨石撞陨石',
+            // 'project' : '砸tmd',
+            // 'customCompany' : '儒雅随和公司',
+            // 'preCompany' : '儒雅随和公司',
+            // 'inputCompany' : '儒雅随和公司',
+            // 'testType' : '1',
+            // 'material' : '3',
+            // 'input' : '2019-1-1',
+            // 'price' : '5',
+            // 'engineering' : '3271e961902c266676029f35156ba03a',
+            // 'openid' : 'odW581cdBBiWo-9Zv0GAfyG4JNGU',
             // 'processing' : '1',
             // 'materialType' : 8,
             // 'material' : '陨石砸陨石',
@@ -87,27 +154,27 @@
             // 'page' : [0,1],
             // 'code' : 'G',
             // 'company' : '2008f23efa4d32d23440ecc9225e03aa',
-            // 'engineer' : '0ff7ddf1cf95f1212cd8b97c70a07596',
+            // 'engineer' : '9fa41e38209248edba0ab84c6c777d7d',
             // 'people' : 'a25164d94658c6f757edabf157af5e77',
-            // 'name' : '神力陨石天降工程',
-            // 'type' : 1,
             // 'person' : '随和',
-            // 'from' : 'sedfsdfsdfds',
-            // 'level' : 'asdasfasdasd',
-            // 'area' : 1,
-            // 'foundations' : 1,
-            // 'site' : 55.1,
-            // 'underground' : 55.1,
-            // 'CCAD' : 55.1,
-            // 'address' : '浙江温州',
-            // 'build' : '随和',
-            // 'supervise' : '随和',
-            // 'construction' : '随和',
-            // 'survey' : '随和',
-            // 'design' : '随和',
-            // 'witness' : '陨',
-            // 'makeup' : '陨',
-            // 'sampling' : '陨',
+            // 'name' : '神力陨石天降',           // 工程名称
+            // 'type' : '建筑工程',                         // 工程类型
+            // 'from' : 'sedfsdfsdfds',           // 所属质监站
+            // 'level' : 'asdasfasdasd',           // 所属质监等级编号
+            // 'area' : 1,                          // 工程区域
+            // 'foundations' : 1,                // 地面基础类型
+            // 'site' : 55.1,                      // 建筑面积
+            // 'underground' : 55.1,                   // 地下室面积
+            // 'CCAD' : 55.1,                       // 人防工程面积
+            // 'address' : '浙江温州',                     // 工程地点
+            // 'build' : '儒雅随和', // 建设单位
+            // 'supervise' : '儒雅随和',   // 监理单位
+            // 'construction' : '儒雅随和', // 施工单位
+            // 'survey' : '儒雅随和', // 勘察单位
+            // 'design' : '儒雅随和',  // 设计单位
+            // 'witness' : '陨石',        // 见证人员
+            // 'makeup' : '陨石', // 填单人员
+            // 'sampling' : '陨石',  // 取样人员
         },
         success : function(msg) {
             msg = JSON.parse(msg);

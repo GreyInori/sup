@@ -45,6 +45,11 @@ class EngineerAutoLoad extends Controller
         'sampling' => 'sampling_people',
         'person' => 'input_person',
         'input' => 'input_type',
+        'typeName' => 'type_name',
+        'member' => 'member_id',
+        'divideUser' => 'divide_user',
+        'divideName' => 'divide_name',
+        'dividePass' => 'divide_passwd'
     );
 
     /**

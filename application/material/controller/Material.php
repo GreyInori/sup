@@ -159,7 +159,7 @@ class Material extends Controller
     }
 
     /**
-     * 检测价格添加方法
+     * 检测价格修改方法
      * @return false|string
      * @throws \think\exception\DbException
      */
@@ -325,7 +325,7 @@ class Material extends Controller
     }
 
     /**
-     * 分类添加方法
+     * 分类修改方法
      * @return false|string
      * @throws \think\exception\DbException
      */
@@ -621,6 +621,10 @@ class Material extends Controller
         }
     }
 
+    /**
+     * 检测项目字段默认值添加方法
+     * @return false|string
+     */
     public function postMaterialDefaultAdd()
     {
         /* 检测传递参数是否符合规范 */
@@ -659,7 +663,7 @@ class Material extends Controller
     }
 
     /**
-     * 检测羡慕字段默认值删除方法
+     * 检测项目字段默认值删除方法
      * @return false|string
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException

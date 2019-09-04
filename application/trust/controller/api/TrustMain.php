@@ -19,7 +19,14 @@ use app\trust\controller\TrustAutoLoad as TrustAutoload;
  */
 class TrustMain extends Controller
 {
-
+    /**
+     * 根据委托单号获取委托单对应的图片信息方法
+     * @param $data
+     * @return array|false|mixed|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public static function toTrustUploadList($data)
     {
         $group = new TrustAutoLoad();
@@ -29,7 +36,62 @@ class TrustMain extends Controller
             return $uuid;
         }
         $uuid = $uuid[0];
+        $UploadList = Db::table('su_status_file')
+                            ->alias('ssf')
+                            ->join('su_testing_file_type stft','stft.type_id=ssf.file_type')
+                            ->where(['ssf.trust_id'=>$uuid])
+                            ->field(['ssf.file_id','ssf.file_file','ssf.file_depict','ssf.file_time','ssf.file_code','ssf.upload_people','stft.type_name'])
+                            ->order('stft.type_id')
+                            ->select();
 
+        if(empty($UploadList)) {
+            return '当前委托单所属分类尚未存在图片上传规则，请检查传递的委托单id';
+        }
+        return $UploadList;
+    }
+
+    /**
+     * 获取监理人对应的委托单列表方法
+     * @return array|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toPersonTrust()
+    {
+        $data = request()->param();
+        if(!isset($data['name'])) {
+            return '请传递监理人用户名';
+        }
+        if(!isset($data['pass'])) {
+            return '请传递监理人密码';
+        }
+        /* 根据传递的账号和密码，判断在创建工程时有无创建对应的账号密码用户，如果有就拿工程名和id获取委托单列表 */
+        $list = Db::table('su_engineering_divide')
+                ->alias('sed')
+                ->join('su_engineering se','se.engineering_id = sed.engineering_id')
+                ->where(['divide_name'=>$data['name'],'divide_passwd'=>md5($data['pass'])])
+                ->field(['se.engineering_id','se.engineering_name'])
+                ->select();
+        if(empty($list)) {
+            return '当前监理人账号下尚未分配工程，请检查或者联系管理员';
+        }
+        /* 获取指定的委托单列表，并处理成前端传递过来的格式返回出去 */
+        $trust = Db::table('su_trust')
+                    ->where(['engineering_id'=>$list[0]['engineering_id']])
+                    ->field(['trust_id','trust_code','testing_name'])
+                    ->select();
+        if(empty($trust)) {
+            return '当前工程下尚未创建委托单，请检查或联系管理员';
+        }
+        $result = array();
+
+        foreach($trust as $key => $row) {
+            $row['engineering_name'] = $list[0]['engineering_name'];
+            $row = self::fieldChange($row);
+            array_push($result,$row);
+        }
+        return $result;
     }
 
     /**

@@ -59,6 +59,8 @@ class Company extends Controller
         if(!is_array($list)) {
             return self::returnMsg(500,'fail',$list);
         }
+        $change = new CompanyMain();
+        $list = $change::fieldChange($list);
         return self::returnMsg(200,'success',$list);
     }
 
@@ -141,6 +143,29 @@ class Company extends Controller
         $list = CompanyMain::toMain($data);
         if(is_array($list)){
             return self::returnMsg(200, 'success', $list);
+        }else{
+            return self::returnMsg(500,'fail',$list);
+        }
+    }
+
+    /**
+     * 根据账号和密码获取企业id
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getCompanyId()
+    {
+        /* 检测传递的参数是否符合企业添加的规范，如果不符合就返回错误信息 */
+        $data = FieldCheck::checkData('id');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 执行企业详细信息查看，如果成功的话就返回企业的详细信息，否则返回错误信息 */
+        $list = CompanyMain::toCompanyId($data);
+        if(is_array($list)){
+            return self::returnMsg(200, 'success', $list['uid']);
         }else{
             return self::returnMsg(500,'fail',$list);
         }

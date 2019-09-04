@@ -23,12 +23,12 @@ class EngineerCheck extends Controller
     {
         /* 根据传入的人员id生成录入时间录入人等数据 */
         $people = new \app\company\model\companyModel();
-        $peopleList = $people::get($data['company']['company_id']);
-        if(empty($peopleList)) {
-            return '查无此企业id，请检查传递的企业id';
-        }
+//        $peopleList = $people::get($data['company']['company_id']);
+//        if(empty($peopleList)) {
+//            return '查无此企业id，请检查传递的企业id';
+//        }
         $data['input_time'] = time();
-        $data['input_person'] = $peopleList['company_full_name'];
+//        $data['input_person'] = $peopleList['company_full_name'];
         return $data;
     }
 
