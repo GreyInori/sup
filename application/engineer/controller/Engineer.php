@@ -12,6 +12,7 @@ use think\Controller;
 use \app\api\controller\Send;
 use \app\engineer\controller\EngineerAutoLoad as FieldCheck;
 use \app\engineer\controller\api\EngineerMain as EngineerMain;
+use \app\engineer\controller\api\DivideMain as DivideMain;
 use \app\engineer\controller\api\EngineerSearch as EngineerSearch;
 
 /**
@@ -160,8 +161,120 @@ class Engineer extends Controller
         if(!is_array($data)) {
             return self::returnMsg(500,'fail',$data);
         }
-        $data = EngineerMain::fieldChange($data);
         return self::returnMsg(200,'success',$data);
+    }
+
+    /**
+     * 根据账号密码获取对应的企业id
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getDivideCompanyId()
+    {
+        $data = EngineerMain::toDivideCompanyId();
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        return self::returnMsg(200,'success',$data);
+    }
+
+    /**
+     * 给企业添加指定成员
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function postEngineerDivideAdd()
+    {
+        $data = EngineerMain::toEngineerDivideAdd();
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        return self::returnMsg(200,'success',$data);
+    }
+
+    /**
+     * 给工程内成员分配指定的参与企业
+     * @return false|string
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     * @throws \think\exception\PDOException
+     */
+    public function postAllowDivide()
+    {
+        $data = EngineerMain::toAllowDivide();
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        return self::returnMsg(200,'success',$data);
+    }
+    // +----------------------------------------------------------------------
+    // | 成员公司相关
+    // +----------------------------------------------------------------------
+    /**
+     * 获取成员公司列表
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getDivide()
+    {
+        $list = DivideMain::fetchDivide();
+        return self::returnMsg(200,'success',$list);
+    }
+
+    /**
+     * 成员公司添加
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function postDivideAdd()
+    {
+        $list = DivideMain::toDivideAdd();
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        return self::returnMsg(200,'success',$list);
+    }
+
+    /**
+     * 成员公司修改
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function postDivideEdit()
+    {
+        $list = DivideMain::toDivideEdit();
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        return self::returnMsg(200,'success',$list);
+    }
+
+    /**
+     * 成员公司删除
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function postDivideDel()
+    {
+        $list = DivideMain::toDivideDel();
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        return self::returnMsg(200,'success',$list);
     }
     // +----------------------------------------------------------------------
     // | 地面基础类型相关

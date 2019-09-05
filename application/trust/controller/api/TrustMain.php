@@ -10,8 +10,9 @@ namespace app\trust\controller\api;
 
 use think\Controller;
 use think\Db;
-use app\trust\model\TrustModel as TrustModel;
-use app\trust\controller\TrustAutoLoad as TrustAutoload;
+use \app\trust\model\TrustModel as TrustModel;
+use \app\trust\controller\TrustAutoLoad as TrustAutoload;
+use \app\lib\controller\Picture;
 
 /**
  * Class TrustMain
@@ -19,6 +20,7 @@ use app\trust\controller\TrustAutoLoad as TrustAutoload;
  */
 class TrustMain extends Controller
 {
+    use Picture;
     /**
      * 根据委托单号获取委托单对应的图片信息方法
      * @param $data
@@ -40,7 +42,7 @@ class TrustMain extends Controller
                             ->alias('ssf')
                             ->join('su_testing_file_type stft','stft.type_id=ssf.file_type')
                             ->where(['ssf.trust_id'=>$uuid])
-                            ->field(['ssf.file_id','ssf.file_file','ssf.file_depict','ssf.file_time','ssf.file_code','ssf.upload_people','stft.type_name'])
+                            ->field(['ssf.file_id','ssf.file_file','ssf.file_depict','ssf.file_type','ssf.file_time','ssf.file_code','ssf.upload_people','stft.type_name'])
                             ->order('stft.type_id')
                             ->select();
 
@@ -186,6 +188,21 @@ class TrustMain extends Controller
             Db::rollback();
             return $e->getMessage();
         }
+    }
+
+
+    public static function toTrustUpload($data)
+    {
+        $group = new TrustAutoload();
+        $data = $group->toGroup($data);
+        $file = Db::table('su_status_file')
+                ->where('file_id',$data['upload']['file_id'])
+                ->field(['file_id'])
+                ->select();
+        if(empty($list)) {
+            return '查无此委托单检测项目图片信息, 请检查传递的图片id';
+        }
+        $pic = self::
     }
 
     /**

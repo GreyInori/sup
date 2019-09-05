@@ -74,6 +74,9 @@ class EngineerWhere extends Controller
                 $resultWhere[$valueKey] = $valueRow;
             }
         }
+        if(isset($where['company_id'])) {
+            $resultWhere['engineering_id'] = self::fetchDivideEngineer($where['company_id']);
+        }
         return $resultWhere;
     }
 
@@ -212,5 +215,31 @@ class EngineerWhere extends Controller
             return 1;
         }
         return $list[0]['type_id'];
+    }
+
+    /**
+     * 根据企业id获取相关的所有工程的id
+     * @param $company
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    private static function fetchDivideEngineer($company)
+    {
+        $list = Db::table('su_engineering_divide')
+                    ->where('member_id',$company)
+                    ->field(['engineering_id'])
+                    ->group('engineering_id')
+                    ->select();
+        if(empty($list)) {
+            return array('=',0);
+        }
+        $whereStr = "";
+        foreach($list as $key => $row) {
+            $whereStr .= "{$row['engineering_id']},";
+        }
+        $whereStr = rtrim($whereStr,',');
+        return array('IN',$whereStr);
     }
 }

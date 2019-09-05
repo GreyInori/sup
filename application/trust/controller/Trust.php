@@ -107,6 +107,20 @@ class Trust extends Controller
         return self::returnMsg(200,'success',$list);
     }
 
+
+    public function postTrustUploadAdd()
+    {
+        $data = FieldCheck::checkData('trustUploadAdd');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        $list = TrustMain::toTrustUpload($data);
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        return self::returnMsg(200,'success',$list);
+    }
+
     /**
      * 删除委托单方法
      * @return false|string

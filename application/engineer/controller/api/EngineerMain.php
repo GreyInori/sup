@@ -34,14 +34,13 @@ class EngineerMain extends Controller
         /* 把传递过来的数据根据数据表进行分组，用于后续插入和检测等操作 */
         $group = new EngineerAutoLoad();
         $check = $group->toGroup($data);
-
         /* 检测当前工程是否已经存在 */
         $uuid = self::engineerAlreadyCreat($check);
         if(!is_array($uuid)) {
             return $uuid;
         }
         $inputCheck = new EngineerCheck();                // 传参是否在数据库内存在检测类
-        $value = self::engineerValueCreat($check['engineer'],$uuid[0]);
+        $value = self::engineerValueCreat($check['engineer'],$uuid[0]);      // 检测传递的参数是否存在，如果存在就返回传递过来的参数
         /* 进行人员检测，如果存在该人员就返回人员信息以及时间信息用于添加 */
         $people = $inputCheck::peopleCheck($check);
         if(!is_array($people)) {
@@ -53,14 +52,20 @@ class EngineerMain extends Controller
         $check['engineer']['input_time'] = $people['input_time'];
 //        $check['engineer']['input_person'] = $people['input_person'];
         $check['engineer']['contract_code'] = self::creatCode();      // 生成工程编号
-        $company = self::createDivide($check['engineer']['contract_code'], $uuid[0]);
+        /* 如果传递了企业id的话，那么这个企业id就是施工的id，进行指定单位成员分配 */
+        if(isset($check['engineer']['company_id'])) {
+            $company = self::createDivide($check['engineer']['contract_code'], $uuid[0],$check['engineer']['company_id']);
+            unset($check['engineer']['company_id']);
+        }else {
+            $company = self::createDivide($check['engineer']['contract_code'], $uuid[0]);
+        }
+
         /* 进行工程以及工程详细信息添加等操作 */
         Db::startTrans();
         try{
             Db::table('su_engineering')->insert($check['engineer']);
             Db::table('su_engineering_divide')->insertAll($company);
             self::engineerMainCheck($check, $uuid[0]);
-
             Db::commit();
             return array('uid'=>$uuid[0]);
         }catch(\Exception $e) {
@@ -90,7 +95,7 @@ class EngineerMain extends Controller
         $value = self::engineerValueCreat($check['engineer'],$uuid[0]);
         $check['engineer'] = $value['engineer'];
         $check['engineer']['engineering_id'] = $uuid[0];
-        $check['divide'] = $value['divide'];
+//        $check['divide'] = $value['divide'];
 //        $inputCheck = new EngineerCheck();                // 传参是否在数据库内存在检测类
         /* 检测传递过来的人员列表是否存在，如果数据库内不存在就返回错误信息 */
 //        $listCheck = $inputCheck::listCheck($check);
@@ -107,8 +112,8 @@ class EngineerMain extends Controller
         Db::startTrans();
         try{
             Db::table('su_engineering')->where('engineering_id',$uuid[0])->update($check['engineer']);
-            Db::table('su_engineering_divide')->where('engineering_id',$uuid[0])->delete();
-            Db::table('su_engineering_divide')->insertAll($check['divide']);
+//            Db::table('su_engineering_divide')->where('engineering_id',$uuid[0])->delete();
+//            Db::table('su_engineering_divide')->insertAll($check['divide']);
             self::engineerMainCheck($check, $uuid[0]);
             Db::commit();
             return array('uid'=>$uuid[0]);
@@ -188,7 +193,7 @@ class EngineerMain extends Controller
     }
 
     /**
-     *
+     * 根据工程id获取工程成员列表
      * @param $data
      * @return false|\PDOStatement|string|\think\Collection
      * @throws \think\db\exception\DataNotFoundException
@@ -204,7 +209,7 @@ class EngineerMain extends Controller
                     ->alias('sed')
                     ->join('su_divide sd','sd.divide_id = sed.divide_id')
                     ->where('sed.engineering_id',$check['engineer']['engineering_id'])
-                    ->field(['sed.member_id','sed.divide_user','sd.divide_name'])
+                    ->field(['sed.member_id','sed.divide_user','sd.divide_name','su.divide_id'])
                     ->select();
         return $list;
     }
@@ -232,9 +237,126 @@ class EngineerMain extends Controller
         if(empty($list)) {
             return '账号或密码错误，请检查';
         }
-        $engineer = array('engineer'=>$list[0]['engineering_id']);
+        $engineer = array('engineering_id'=>$list[0]['engineering_id']);
         $main = self::toMain($engineer);
         return $main;
+    }
+
+    /**
+     * 根据账号密码获取相对应的企业id
+     * @return array|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toDivideCompanyId()
+    {
+        $data = request()->param();
+        if(!isset($data['divideUser'])) {
+            return '请传递企业账号';
+        }
+        if(!isset($data['dividePass'])) {
+            return '请传递企业密码';
+        }
+        $list = Db::table('su_engineering_divide')
+            ->where(['divide_user'=>$data['divideUser'],'divide_passwd'=>md5($data['dividePass'])])
+            ->field(['member_id'])
+            ->select();
+        if(empty($list)) {
+            return '账号或密码错误，请检查';
+        }
+        if($list[0]['member_id'] == null) {
+            return '该账号尚未分配到指定企业,请先完善工程信息分配企业';
+        }
+        return array($list[0]['member_id']);
+    }
+
+    /**
+     * 给工程添加指定成员方法
+     * @return int|string|array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toEngineerDivideAdd()
+    {
+        $data = request()->param();
+        if(!isset($data['engineer'])) {
+            return '请传递需要添加成员的工程id';
+        }
+        if(!isset($data['divide'])) {
+            return '请传递需要添加的成员身份';
+        }
+        /* 判断成员数据是否存在 */
+        $divide = Db::table('su_divide')
+                    ->where('divide_id',$data['divide'])
+                    ->field(['divide_field','divide_id'])
+                    ->select();
+        $engineer = Db::table('su_engineering')
+                        ->where('engineering_id',$data['engineer'])
+                        ->field(['contract_code'])
+                        ->select();
+        if(empty($divide)) {
+            return '查无此成员身份，请检查出传递的成员id';
+        }
+        if(empty($engineer)) {
+            return '查无此成员身份，请检查出传递的成员id';
+        }
+        /* 根据查询结果生成用户名等数据进行操作 */
+        $divide = array(
+            'engineering_id' => $data['engineer'],
+            'divide_id' => $divide[0]['divide_id'],
+            'divide_user' => self::creatCompanyCode($divide[0]['divide_field'],$engineer[0]['contract_code']),
+            'divide_passwd' => md5('123456')
+        );
+        /* 如果传递了企业id的话，就给添加的数组增添加企业 */
+        if(isset($data['company'])) {
+            $divide['member_id'] = $data['company'];
+        }
+
+        $insert = Db::table('su_engineering_divide')->insertGetId($divide);
+        return array('divide'=>$insert,'divideUser'=>$divide['divide_user']);
+    }
+
+    /**
+     * 给工程指定成员分配企业方法
+     * @return array|string
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     * @throws \think\exception\PDOException
+     */
+    public static function toAllowDivide()
+    {
+        $data = request()->param();
+        /* 检测传递的工程成员以及企业id是否存在 */
+        if(!isset($data['divide'])) {
+            return '请传递工程参与成员id';
+        }
+        if(!isset($data['company'])) {
+            return '请传递分配的企业id';
+        }
+        $divideList = Db::table('su_engineering_divide')
+                        ->where('divide_index',$data['divide'])
+                        ->field(['engineering_id'])
+                        ->select();
+        if(empty($divideList)) {
+            return '查无此工程参与成员,请检查传递的成员id';
+        }
+        $companyList = Db::table('su_company')
+                            ->where('company_id',$data['company'])
+                            ->field(['company_id'])
+                            ->select();
+        if(empty($companyList)) {
+            return '查无此企业,请检查传递的企业id';
+        }
+        /* 根据传参生成插入修改数据数组进行修改操作 */
+        $update = array('member_id'=>$data['company']);
+        $update = Db::table('su_engineering_divide')
+                        ->where('divide_index',$data['divide'])
+                        ->update($update);
+        return array($update);
     }
     // +----------------------------------------------------------------------
     // | 地面基础类型相关
@@ -592,25 +714,33 @@ class EngineerMain extends Controller
      * 创建工程下的分工企业数组
      * @param $code
      * @param $engineer
+     * @param $companyId
      * @return array
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public static function createDivide($code, $engineer)
+    public static function createDivide($code, $engineer,$companyId = '')
     {
         $list = Db::table('su_divide')
                     ->where('divide_field','LIKE','%_company')
+                    ->where('show_type',1)
                     ->field(['divide_id','divide_name','divide_field'])
                     ->select();
         $company = array();
+        /* 根据查询出来的预设成员结果数组，给工程分配各分工账号 */
         foreach($list as $key => $row) {
             $company[$key] = array(
                 'engineering_id' => $engineer,
                 'divide_id' => $row['divide_id'],
                 'divide_user' => self::creatCompanyCode($row['divide_field'],$code),
-                'divide_passwd' => md5('123456')
+                'divide_passwd' => md5('123456'),
+                'member_id' => '',
             );
+            /* 如果创建的时候有传递企业id，那么这个企业角色就是施工单位，为施工单位角色指定企业 */
+            if($companyId != '' && $row['divide_id'] == 2) {
+                $company[$key]['member_id'] = $companyId;
+            }
         }
         return $company;
     }
@@ -639,6 +769,9 @@ class EngineerMain extends Controller
                 break;
             case 'survey_company':
                 $token = 'KC';
+                break;
+            case 'testing_company':
+                $token = 'CS';
                 break;
         }
         $name = str_replace('G',$token, $code);
