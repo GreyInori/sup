@@ -21,37 +21,9 @@ use \app\lib\controller\Picture;
 class TrustMain extends Controller
 {
     use Picture;
-    /**
-     * 根据委托单号获取委托单对应的图片信息方法
-     * @param $data
-     * @return array|false|mixed|\PDOStatement|string|\think\Collection
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
-     */
-    public static function toTrustUploadList($data)
-    {
-        $group = new TrustAutoLoad();
-        $data = $group->toGroup($data);
-        $uuid = self::trustAlreadyCreat($data, 1);
-        if(!is_array($uuid)) {
-            return $uuid;
-        }
-        $uuid = $uuid[0];
-        $UploadList = Db::table('su_status_file')
-                            ->alias('ssf')
-                            ->join('su_testing_file_type stft','stft.type_id=ssf.file_type')
-                            ->where(['ssf.trust_id'=>$uuid])
-                            ->field(['ssf.file_id','ssf.file_file','ssf.file_depict','ssf.file_type','ssf.file_time','ssf.file_code','ssf.upload_people','stft.type_name'])
-                            ->order('stft.type_id')
-                            ->select();
-
-        if(empty($UploadList)) {
-            return '当前委托单所属分类尚未存在图片上传规则，请检查传递的委托单id';
-        }
-        return $UploadList;
-    }
-
+    // +----------------------------------------------------------------------
+    // | 委托单相关
+    // +----------------------------------------------------------------------
     /**
      * 获取监理人对应的委托单列表方法
      * @return array|string
@@ -112,14 +84,25 @@ class TrustMain extends Controller
         }
         $trust = $data['trust'];
         $trust['trust_id'] = $uuid[0];
-        if(isset($trust['input_time'])) {
-            $trust['input_time'] = strtotime($trust['input_time']);
+//        if(isset($trust['input_time'])) {
+            $trust['input_time'] = time();
+//        }
+        /* 如果传递了检测项目id的话，就根据检测项目获取相关的检测类型id，创建检测项目类型数据 */
+        if(isset($trust['testing_material'])) {
+            $material = Db::table('su_material')->where('material_id',$trust['testing_material'])->field(['material_type'])->select();
+            $materialType = Db::table('su_material_type')->where('type_id',$material[0]['material_type'])->field(['type_pid'])->select();
+            if(!empty($materialType)) {
+                $trust['testing_type'] = $materialType[0]['type_pid'];
+            }
         }
         /* 进行企业以及企业详细信息的添加操作 */
         Db::startTrans();
         try{
             Db::table('su_trust')->insert($trust);
             $Upload = self::fetchTrustUpload($trust,$uuid[0]);
+            /* 创建委托测试过程数据 */
+            $testing = self::testingCreate($trust);
+            Db::table('su_testing_status')->insert($testing);
             if(!is_array($Upload)) {
                 return $Upload;
             }
@@ -189,50 +172,9 @@ class TrustMain extends Controller
             return $e->getMessage();
         }
     }
-
-    /**
-     * 执行图片上传方法
-     * @param $data
-     * @return array|int|string
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
-     */
-    public static function toTrustUpload($data)
-    {
-        $group = new TrustAutoload();
-        $data = $group->toGroup($data);
-        /* 检测传递过来的文件id是否存在，如果不存在就返回错误信息 */
-        $file = Db::table('su_status_file')
-                ->where('file_id',$data['upload']['file_id'])
-                ->field(['file_id'])
-                ->select();
-        if(empty($file)) {
-            return '查无此委托单检测项目图片信息, 请检查传递的图片id';
-        }
-        /* 执行图片上传操作，如果上传失败就返回错误信息，如果成功就根据传值以及当前时间创建图片文件修改数据 */
-        $pic = self::toImgUp('file','pic');
-        if(!is_array($pic)) {
-            return $pic;
-        }
-        $update = array(
-            'file_file' => $pic['pic'],
-            'file_time' => time(),
-        );
-        foreach($data['upload'] as $key => $row) {
-            $update[$key] = $row;
-        }
-        /* 执行图片上传数据修改操作 */
-        try {
-            $update = Db::table('su_status_file')
-                            ->where('file_id',$data['upload']['file_id'])
-                            ->update($update);
-            return array($update);
-        }catch(\Exception $e) {
-            return $e->getMessage();
-        }
-    }
-
+    // +----------------------------------------------------------------------
+    // | 委托记录字段相关
+    // +----------------------------------------------------------------------
     /**
      * 执行委托记录字段默认值添加方法
      * @param $data
@@ -303,7 +245,9 @@ class TrustMain extends Controller
         }
         return $result;
     }
-
+    // +----------------------------------------------------------------------
+    // | 委托单号图片相关
+    // +----------------------------------------------------------------------
     /**
      * 进行委托单号需要上传的图片添加占位操作
      * @param $data
@@ -337,12 +281,122 @@ class TrustMain extends Controller
             $uploadArr[$key] = array(
                 'trust_id' => $uuid,
                 'file_type' => $row['upload_type'],
+                'testing_process' => 2,
             );
         }
         if(!empty($uploadArr)) {
            Db::table('su_status_file')->insertAll($uploadArr);
         }
         return array(1);
+    }
+
+    /**
+     * 根据委托单号获取委托单对应的图片信息方法
+     * @param $data
+     * @return array|false|mixed|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toTrustUploadList($data)
+    {
+        $group = new TrustAutoLoad();
+        $data = $group->toGroup($data);
+        $uuid = self::trustAlreadyCreat($data, 1);
+        if(!is_array($uuid)) {
+            return $uuid;
+        }
+        $uuid = $uuid[0];
+        $UploadList = Db::table('su_status_file')
+            ->alias('ssf')
+            ->join('su_testing_file_type stft','stft.type_id=ssf.file_type')
+            ->where(['ssf.trust_id'=>$uuid])
+            ->field(['ssf.file_id','ssf.file_file','ssf.file_depict','ssf.file_type','ssf.file_time','ssf.file_code','ssf.upload_people','stft.type_name'])
+            ->order('stft.type_id')
+            ->select();
+
+        if(empty($UploadList)) {
+            return '当前委托单所属分类尚未存在图片上传规则，请检查传递的委托单id';
+        }
+        return $UploadList;
+    }
+
+    /**
+     * 执行图片上传方法
+     * @param $data
+     * @return array|int|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toTrustUpload($data)
+    {
+        $group = new TrustAutoload();
+        $data = $group->toGroup($data);
+        /* 检测传递过来的文件id是否存在，如果不存在就返回错误信息 */
+        $file = Db::table('su_status_file')
+            ->where('file_id',$data['upload']['file_id'])
+            ->field(['file_id','trust_id'])
+            ->select();
+        if(empty($file)) {
+            return '查无此委托单检测项目图片信息, 请检查传递的图片id';
+        }
+        $testing = Db::table('su_testing_status')
+            ->where('trust_id',$file[0]['trust_id'])
+            ->field(['testing_status'])
+            ->select();
+        if(empty($testing)) {
+            return '查无此检测项目信息';
+        }
+        $testUpdate = array(
+            'testing_status' => 1,
+            'sample_time' => time(),
+            'sample_pic' => 1
+        );
+        /* 执行图片上传操作，如果上传失败就返回错误信息，如果成功就根据传值以及当前时间创建图片文件修改数据 */
+        $pic = self::toImgUp('file','pic');
+        if(!is_array($pic)) {
+            return $pic;
+        }
+        $update = array(
+            'file_file' => $pic['pic'],
+            'file_time' => time(),
+        );
+        foreach($data['upload'] as $key => $row) {
+            $update[$key] = $row;
+        }
+        /* 执行图片上传数据修改操作 */
+        try {
+            $update = Db::table('su_status_file')
+                ->where('file_id',$data['upload']['file_id'])
+                ->update($update);
+            /* 进行委托检测信息修改 */
+            Db::table('su_testing_status')
+                ->where('trust_id',$file[0]['trust_id'])
+                ->update($testUpdate);
+            return array($update);
+        }catch(\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+    // +----------------------------------------------------------------------
+    // | 辅助相关
+    // +----------------------------------------------------------------------
+    /**
+     * 创建委托测试单数组
+     * @param $trust
+     * @return array
+     */
+    private static function testingCreate($trust)
+    {
+        $insert = array(
+            'supervision_id' => (date('Ymdhi').rand(100,999)),
+            'trust_progress' => md5(uniqid(mt_rand(),true)),
+            'engineering_id' => $trust['engineering_id'],
+            'trust_id' => $trust['trust_id'],
+            'sample_time' => time()
+        );
+        return $insert;
     }
 
     /**
