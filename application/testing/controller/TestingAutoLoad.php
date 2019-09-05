@@ -17,20 +17,54 @@ class TestingAutoLoad extends Controller
      * @var array
      */
     public static $fieldArr = array(
-        'supervision' => 'supervision_id',
-        'preCompany' => 'pre_testing_company',
-        'inputCompany' => 'input_testing_company',
-        'testingType' => 'type_name',
-        'testingName' => 'material_name',
-        '' => '',
-        'trustCode' => 'trust_code',
-        'engineerName' => 'engineering_name',
-        'customCompany' => 'company_full_name',
-        'inputTime' => 'input_time',
-        'status' => 'testing_status',
-        '' => '',
-        '' => '',
-        '' => '',
+        'supervision' => 'sts.supervision_id',
+        'preCompany' => 'st.pre_testing_company',
+        'inputCompany' => 'st.input_testing_company',
+        'testingType' => 'smt.type_name',
+        'testingName' => 'sm.material_name',
+        'trustCode' => 'st.trust_code',
+        'engineerName' => 'se.engineering_name',
+        'customCompany' => 'sc.custom_company',
+        'inputTime' => 'st.input_time',
+        'status' => 'sts.testing_status',
+        'isSample' => 'sts.sample_pic',
+        'isScene' => 'sts.scene_pic',
+        'isSceneVideo' => 'sts.scene_video',
+        'isData' => 'sts.data_file',
+        'isCurve' => 'sts.curve_file',
+        'isVideo' => 'sts.video_file',
+        'isReport' => 'sts.testing_report',
+        'isChange' => 'sts.testing_change',
+        'isError' => 'sts.testing_error',
+        'isGatherChange' => 'sts.gather_change',
+        'isUnsaved' => 'sts.gather_unsaved',
+        'isRenewal' => 'sts.gather_renewal',
+        'isRepeatTesting' => 'sts.repeat_testing',
+        'isRepeatReport' => 'sts.repeat_report',
+        'isUnsigned' => 'sts.tester_unsigned',
+        'isAbsent' => 'sts.tester_absent',
+        'receiveTime' => 'sts.receive_time',
+        'testingTime' => 'sts.testing_time',
+        'dataUploadTime' => 'sts.data_upload_time',
+        'dataUploadTD' => 'sts.data_upload_TD',
+        'reportTime' => 'sts.report_time',
+        'reportUploadTime' => 'sts.report_upload_time',
+        'reportUploadTD' => 'sts.report_upload_TD',
+        'testingProcess' => 'sts.sts.testing_process',
+        'company' => 'company_id',
+    );
+    public static $fieldGroup = array(
+        'testing' => array('sts.supervision_id','st.pre_testing_company','st.input_testing_company'
+        ,'smt.type_name','sm.material_name'
+        ,'st.trust_code','se.engineering_name'
+        ,'sc.company_full_name','st.input_time','sts.testing_status','sts.sample_pic'
+        ,'sts.scene_pic','sts.scene_video','sts.data_file','sts.curve_file','sts.video_file'
+        ,'sts.testing_report','sts.testing_change'
+        ,'sts.testing_error','sts.gather_change','sts.gather_unsaved'
+        ,'sts.gather_renewal','sts.repeat_testing','sts.repeat_report'
+        ,'sts.tester_unsigned','sts.tester_absent','sts.receive_time','sts.testing_time'
+        ,'sts.data_upload_time','sts.data_upload_TD','sts.report_time'
+        ,'sts.report_upload_time','sts.report_upload_TD','sts.testing_process','company_id'),
     );
 
     /**

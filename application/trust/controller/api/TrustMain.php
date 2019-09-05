@@ -95,6 +95,7 @@ class TrustMain extends Controller
                 $trust['testing_type'] = $materialType[0]['type_pid'];
             }
         }
+        $trust['trust_code'] = self::creatCode();
         /* 进行企业以及企业详细信息的添加操作 */
         Db::startTrans();
         try{
@@ -349,7 +350,7 @@ class TrustMain extends Controller
             return '查无此检测项目信息';
         }
         $testUpdate = array(
-            'testing_status' => 1,
+            'testing_process' => 2,
             'sample_time' => time(),
             'sample_pic' => 1
         );
@@ -382,6 +383,18 @@ class TrustMain extends Controller
     // +----------------------------------------------------------------------
     // | 辅助相关
     // +----------------------------------------------------------------------
+    /**
+     * 生成工程编号方法
+     * @return string
+     */
+    private static function creatCode()
+    {
+        $str = 'WT';
+        $timeStr = date('ymd');
+        $rand = rand(100,999);
+        return $str.$timeStr.$rand;
+    }
+
     /**
      * 创建委托测试单数组
      * @param $trust
@@ -428,6 +441,7 @@ class TrustMain extends Controller
         }
         return array($uuid);
     }
+
     /**
      * 转换查询结果内字段方法
      * @param $list
