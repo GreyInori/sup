@@ -57,7 +57,7 @@ class TestingAutoLoad extends Controller
         'testing' => array('sts.supervision_id','st.pre_testing_company','st.input_testing_company'
         ,'smt.type_name','sm.material_name'
         ,'st.trust_code','se.engineering_name'
-        ,'sc.company_full_name','st.input_time','sts.testing_status','sts.sample_pic'
+        ,'st.custom_company','st.input_time','sts.testing_status','sts.sample_pic'
         ,'sts.scene_pic','sts.scene_video','sts.data_file','sts.curve_file','sts.video_file'
         ,'sts.testing_report','sts.testing_change'
         ,'sts.testing_error','sts.gather_change','sts.gather_unsaved'

@@ -20,7 +20,7 @@ class TestingWhere extends Controller
         'sts.supervision_id' => ['sts.supervision_id','LIKE','code%'],
         'st.pre_testing_company' => ['st.pre_testing_company','LIKE','%code%'],
         'st.input_testing_company' => ['st.input_testing_company','LIKE','%code%'],
-        'smt.type_name' => ['st.smt.type_name','LIKE','code%'],
+        'st.type_name' => ['st.smt.type_name','LIKE','code%'],
         'sm.material_name' => ['sm.material_name','LIKE','%code%'],
         'st.trust_code' => ['st.trust_code','LIKE','%code%'],
         'se.engineering_name' => ['se.engineering_name','LIKE','%code%'],

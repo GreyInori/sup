@@ -46,9 +46,14 @@ class TestingMain extends Controller
      */
     private static function toFieldChange($list, $check)
     {
+        $checkArr = array();
+        foreach ($check as $key => $row) {
+            $field = strchr($row,'.');
+            $checkArr[$key] = ltrim($field,'.');
+        }
         $result = array();
         foreach($list as $key => $row) {
-            $result[array_search($key, $check)] = $row;
+            $result[array_search($key, $checkArr)] = $row;
         }
         return $result;
     }

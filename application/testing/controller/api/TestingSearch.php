@@ -36,10 +36,10 @@ class TestingSearch extends Controller
         $page = self::pageInit($search);
         $where = new TestingWhere();
         $where = $where->getWhereArray($search);
+        $where['st.show_type'] = 1;
         if(empty($where)) {
             return '请传递正确的查询条件';
         }
-        $where['st.show_type'] = 1;
 
         if(isset($search['show'])){
             $where['st.show_type'] = $search['show'];
@@ -62,13 +62,16 @@ class TestingSearch extends Controller
                 $where['engineering_id'] = array('=',0);
             }
         }
-
+        $key = array_search('company_id',$field);
+        unset($field[$key]);
         /* 执行企业列表查询 */
         try{
             $list = Db::table('su_testing_status')
                 ->alias('sts')
                 ->join('su_trust st','st.trust_id = sts.trust_id')
+                ->join('su_engineering se','se.engineering_id = st.engineering_id')
                 ->join('su_material sm','sm.material_id = st.testing_material')
+                ->join('su_material_type smt','smt.type_id = st.testing_type')
                 ->field($field)
                 ->where($where)
                 ->limit($page[0], $page[1])
