@@ -190,19 +190,47 @@ class TrustMain extends Controller
         }
     }
 
-
+    /**
+     * 执行图片上传方法
+     * @param $data
+     * @return array|int|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public static function toTrustUpload($data)
     {
         $group = new TrustAutoload();
         $data = $group->toGroup($data);
+        /* 检测传递过来的文件id是否存在，如果不存在就返回错误信息 */
         $file = Db::table('su_status_file')
                 ->where('file_id',$data['upload']['file_id'])
                 ->field(['file_id'])
                 ->select();
-        if(empty($list)) {
+        if(empty($file)) {
             return '查无此委托单检测项目图片信息, 请检查传递的图片id';
         }
-        $pic = self::
+        /* 执行图片上传操作，如果上传失败就返回错误信息，如果成功就根据传值以及当前时间创建图片文件修改数据 */
+        $pic = self::toImgUp('file','pic');
+        if(!is_array($pic)) {
+            return $pic;
+        }
+        $update = array(
+            'file_file' => $pic['pic'],
+            'file_time' => time(),
+        );
+        foreach($data['upload'] as $key => $row) {
+            $update[$key] = $row;
+        }
+        /* 执行图片上传数据修改操作 */
+        try {
+            $update = Db::table('su_status_file')
+                            ->where('file_id',$data['upload']['file_id'])
+                            ->update($update);
+            return array($update);
+        }catch(\Exception $e) {
+            return $e->getMessage();
+        }
     }
 
     /**

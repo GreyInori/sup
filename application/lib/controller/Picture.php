@@ -39,44 +39,6 @@ trait Picture
     {
 
     }
-	
-		protected function companyImgUp($filePath = '', $requestPath = '')
-		{
-			/* 加载上传的图片，并进行图片处理 */
-			if('' == $requestPath){
-
-				$requestPath = 'file';
-			}
-
-			$image = request()->file($requestPath);
-
-			if(!is_object($image)){
-
-				$image = $image[$requestPath];
-			}
-
-			$data = $image->validate(['ext'=>'png,jpeg,jpg,gif,bmp'])->move(ROOT_PATH.'public'.DS.'static'.DS.'images'.DS.$filePath.DS);
-
-			if(!$data){
-
-				return self::returnMsg(500,'fail',$image->getError());
-			}
-			/* 保存图片并获取图片完整路径 */
-			$fileName = $data->getSaveName();
-
-			// $file  = ROOT_PATH.'public'.DS.'static'.DS.'images'.DS.$filePath.DS.$fileName;
-			/* 缩放图片并保存删除源文件，返回图片路径 */
-			// $image = \think\Image::open(ROOT_PATH.'public'.DS.'static'.DS.'images'.DS.$filePath.DS.$fileName);
-
-			// $del = unlink($file);
-
-			// $image->save($file);
-
-			$fileName = "/static/images/{$filePath}/{$fileName}";
-
-			return $fileName;
-		}
-
 
     /**
      * 执行图片上传方法
@@ -92,14 +54,12 @@ trait Picture
         /* 判断上传的文件是否符规范，如果是就丢到制定的目录下 */
         $image = request()->file($pic);
         $data = $image->validate(['ext'=>'png,jpg,jpeg,gif,bmp'])->move(ROOT_PATH.'public'.DS.'static'.DS.'images'.DS.$path.DS);
-
         if(!$data){
             return $image->getError();
         }
         /* 图片上传成功后返回图片路径数组，因为返回字符串的话会被方法直接当做错误结果返回 */
         $fileName = $data->getSaveName();
         $fileName = "/static/images/{$data}/{$fileName}";
-
         return array('pic'=>$fileName);
     }
 }

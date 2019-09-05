@@ -107,7 +107,13 @@ class Trust extends Controller
         return self::returnMsg(200,'success',$list);
     }
 
-
+    /**
+     * 委托单图片上传操作
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public function postTrustUploadAdd()
     {
         $data = FieldCheck::checkData('trustUploadAdd');
