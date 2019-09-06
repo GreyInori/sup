@@ -6,199 +6,267 @@
     <script type="text/javascript" src="/jquery.js"></script>
 </head>
 <body>
-
+    <input type="file" id="img">
+    <input type="file" id="main">
+    <button onclick="fileUp()">点击</button>
 </body>
 <script>
-    $.ajax({
-        // url : 'http://localhost/material/StandardEdit',
-        // url : 'http://localhost/engineer/DivideEngineer',
-        url : 'http://localhost/engineer/EngineerDivide',
-        url : 'http://localhost/engineer/Divide',
-        url : 'http://localhost/engineer/DivideAdd',
-        url : 'http://localhost/engineer/DivideEdit',
-        url : 'http://localhost/engineer/DivideDel',
-        url : 'http://localhost/engineer/DivideDel',
-        url : 'http://localhost/engineer/EngineerDivideAdd',
-        url : 'http://localhost/engineer/AllowDivide',
-        url : 'http://localhost/engineer/EngineerList',
-        url : 'http://localhost/engineer/DivideCompanyId',
-        url : 'http://localhost/engineer/EngineerAdd',
-        url : 'http://localhost/trust/TrustList',
-        url : 'http://localhost/trust/TrustUpload',
-        url : 'http://localhost/trust/TrustAdd',
-        url : 'http://localhost/testing/TestingList',
-        // url : 'https://apiserer1.bangninyou.com/version/user/Products?aithorization=89577f2a6a943243dff4929aeafb0b7b,123',
-        // url : 'https://apiserer1.bangninyou.com/version/homepage/Products?aithorization=89577f2a6a943243dff4929aeafb0b7b,123',
-        type : 'get',
-        async : true,
-        data : {
-            // 'divide' : 55,
-            // 'trust' : '786c9da0d40697e9f695cd84b3eadff1',
-            // 'divideName' : '弟中弟单位',
-            // 'divideField' : 'didi_company',
-            // 'divideUser' : 'CS190905299340',
-            // 'dividePass' : '123456',
-            // 'engineerType' : 5,
-            // 'engineerTypeName' : '上水道工程',
-            // 'processTypeName' : '施工方处理',
-            // 'processType' : 1,
-            // 'testTypeName' : '现场检测',
-            // 'testType' : 1,
-            // 'foundations' : 1,
-            // 'standard' : 2,
-            // 'standardNumber' : 'YSH02',   // 检测标准编号
-            // 'companyName' : '儒雅随和',  // 企业名称
-            // 'company' : 'c643cc681a5b0aa13a6597bcf166199e',  // 企业id
-            // 'standardCode' : 'YSH',   // 试验代号
-            // 'standardType' : '天降',   // 试验类别
-            // 'standardFrom' : 'YSH',   // 所检项目
-            // 'basisNumber' : 'YSH 145-2013',    // 检测依据编号
-            // 'basis' : 'YSH 145-2013《天降》',   // 检测依据
-            // 'determineNumber' : 'YSH 145-2013',   // 判定标准编号
-            // 'determine' : 'YSH 145-2013《天降》',   // 判定标准
-            // 'engineer' : '43cfc90ccb8878a2b79e1d508e5967f0',
-            // 'company' : '19505aa4ca626483e9962a0398524bc4',    // 录入人id
-            // 'name' : '神力陨石上水道工程',           // 工程名称
-            // 'type' : 1,                         // 工程类型
-            // 'from' : 'sedfsdfsdfds',           // 所属质监站
-            // 'level' : 'asdasfasdasd',           // 所属质监等级编号
-            // 'area' : 1,                          // 工程区域
-            // 'foundations' : 1,                // 地面基础类型
-            // 'site' : 55.1,                      // 建筑面积
-            // 'underground' : 55.1,                   // 地下室面积
-            // 'CCAD' : 55.1,                       // 人防工程面积
-            // 'address' : '浙江温州',
-            // 'pass' : '123456',
-            // 'company' : '19505aa4ca626483e9962a0398524bc4',
-            // 'uuid' : '2008f23efa4d32d23440ecc9225e03aa',   // 企业id
-            // 'form' : 1,     // 企业种类，是否检测机构，1检测机构，2非检测机构
-            // 'name' : '13857643649',     // 企业用户名
-            // 'uniform' : 'wqedsadasda',    // 社会统一认证编号
-            // 'business' : 'dfgfdhdfghdfgh',   // 营业执照编号
-            // 'start' : '2010-1-1',   // 营业执照有效期始
-            // 'end' : '2019-1-1',   // 营业执照有效期止
-            // 'capital' : '150',            // 注册资本
-            // 'character' : '1',         // 企业经济性质
-            // 'corporationMobile' : '13857643699',      // 企业法人联系电话
-            // 'website' : 'http://www.grey.com',     // 企业网址
-            // 'fax' : '',     // 企业传真
-            // 'area' : 10101,    // 企业地区
-            // 'regAddr' : '浙江温州',    // 工商注册地办公地址
-            // 'postal' : '325612',     // 工商注册地邮编
-            // 'AD' : '浙江温州行政',   // 工商注册地行政主管部门
-            // 'rules' : '我觉得不行',   // 企业章程
-            // 'profile' : '都听我的一个人说了算',   // 企业简介
-            // 'linkman' : '陨石',   // 联系人
-            // 'mobile' : '13857646399',   // 联系电话
-            // 'contact' : '上门联系',   // 其他联系方式
-            // 'email' : '976067482@qq.com',   // 企业邮箱
-            // 'record' : 0,
-            // 'company' : '13857643649',
-            // 'name' : '儒雅随和检测公司',
-            // 'uniform' : 'sadhasihdasd',
-            // 'linkman' : '儒雅随和',
-            // 'mobile' : '13857643649',
-            // 'contact' : '上门联系',
-            // 'pass' : '888888',
-            // 'accept' : 1,
-            // 'area' : '10122',
-            // 'cate' : '86',
-            // 'trust' : '786c9da0d40697e9f695cd84b3eadff1',
-            // 'materialName' : '陨石撞陨石',
-            // 'project' : '砸tmd',
-            // 'customCompany' : '儒雅随和公司',
-            // 'preCompany' : '儒雅随和公司',
-            // 'inputCompany' : '儒雅随和公司',
-            // 'testType' : '1',
-            // 'material' : '3',
-            // 'input' : '2019-1-1',
-            // 'price' : '5',
-            // 'engineering' : '3271e961902c266676029f35156ba03a',
-            // 'openid' : 'odW581cdBBiWo-9Zv0GAfyG4JNGU',
-            // 'processing' : '1',
-            // 'materialType' : 8,
-            // 'material' : '陨石砸陨石',
-            // 'block' : 1,
-            // 'trust' : '',
-            // 'save' : [],
-            // 'trial' : 2,
-            // 'materialId' : 3,
-            // 'trialName' : '陨石梆脆软硬',
-            // 'trialDepict' : '从项',
-            // 'trialHint' : '不得行',
-            // 'trialCustomHint' : '非常不得行',
-            // 'defaultValue' : '砸水水水水测试',
-            // 'defaultVerify' : 1,
-            // 'defaultToken' : 1,
-            // 'default' : 3,
-            // 'blockId' : 6,
-            // 'block' : 1,
-            // 'upload' : 4,
-            // 'type' : 1,
-            // 'typeParent' : '2',
-            // 'typeName' : '陨石不砸地检测',
-            // 'priceId' : 1,
-            // 'fileId' : '5',
-            // 'company' : '2008f23efa4d32d23440ecc9225e03aa',
-            // 'companyName' : '不儒雅随和公司',
-            // 'fileNumber' : 'JAS/JS010-23-12',
-            // 'material' : '陨石法',
-            // 'standardCode' : 'YSH',
-            // 'valid' : 1,
-            // 'standardNumber' : 'YSH02',
-            // 'standard' : '1',
-            // 'standardNumber' : 'YSH02',
-            // 'standardCompany' : '儒雅随和',
-            // 'standardCode' : 'DYSH',
-            // 'standardType' : '陨石',
-            // 'standardFrom' : 'DYSH',
-            // 'price' : '50',
-            // 'remarks' : '检测石头检测',
-            // 'tag' : 0,
-            // 'end' : 1,
-            // 'basisNumber' : 'JGJ 145-2013',
-            // 'basis' : 'JGJ 145-2013 《混凝土》',
-            // 'determineNumber' : 'JGJ 145-2013',
-            // 'determine' : 'JGJ 145-2013 《混凝土》',
-            // 'user' : '1231',
-            // 'pass' : '1234',
-            // 'name': '陨石',
-            // 'idCard' : '330382199601196319',
-            // 'mobile': '13857643643',
-            // 'check' : 111,
-            // 'name' : '不儒雅随和公司',
-            // 'corporation' : '陨石',
-            // 'record' : 0,
-            // 'page' : [0,1],
-            // 'code' : 'G',
-            // 'company' : '2008f23efa4d32d23440ecc9225e03aa',
-            // 'engineer' : '9fa41e38209248edba0ab84c6c777d7d',
-            // 'people' : 'a25164d94658c6f757edabf157af5e77',
-            // 'person' : '随和',
-            // 'name' : '神力陨石天降',           // 工程名称
-            // 'type' : '建筑工程',                         // 工程类型
-            // 'from' : 'sedfsdfsdfds',           // 所属质监站
-            // 'level' : 'asdasfasdasd',           // 所属质监等级编号
-            // 'area' : 1,                          // 工程区域
-            // 'foundations' : 1,                // 地面基础类型
-            // 'site' : 55.1,                      // 建筑面积
-            // 'underground' : 55.1,                   // 地下室面积
-            // 'CCAD' : 55.1,                       // 人防工程面积
-            // 'address' : '浙江温州',                     // 工程地点
-            // 'build' : '儒雅随和', // 建设单位
-            // 'supervise' : '儒雅随和',   // 监理单位
-            // 'construction' : '儒雅随和', // 施工单位
-            // 'survey' : '儒雅随和', // 勘察单位
-            // 'design' : '儒雅随和',  // 设计单位
-            // 'witness' : '陨石',        // 见证人员
-            // 'makeup' : '陨石', // 填单人员
-            // 'sampling' : '陨石',  // 取样人员
-        },
-        success : function(msg) {
-            msg = JSON.parse(msg);
-            console.log(msg);
-        },
-        error : function () {}
-    });
+    function fileUp() {
+        var pic = new FormData();
+        pic.append('file', 25);
+        pic.append('fileCode', 111);
+        pic.append('fileDepict', '嗦不粗话了');
+        pic.append('UploadPeople', '陨石');
+        pic.append('pic', document.getElementById('img').files[0]);
+        $.ajax({
+            url: 'http://localhost/material/StandardEdit',
+            url: 'http://localhost/engineer/DivideEngineer',
+            url: 'http://localhost/engineer/EngineerDivide',
+            url: 'http://localhost/engineer/Divide',
+            url: 'http://localhost/engineer/DivideAdd',
+            url: 'http://localhost/engineer/DivideEdit',
+            url: 'http://localhost/engineer/DivideDel',
+            url: 'http://localhost/engineer/DivideDel',
+            url: 'http://localhost/engineer/EngineerDivideAdd',
+            url: 'http://localhost/engineer/AllowDivide',
+            url: 'http://localhost/engineer/EngineerList',
+            url: 'http://localhost/engineer/DivideCompanyId',
+            url: 'http://localhost/engineer/EngineerAdd',
+            url: 'http://localhost/trust/TrustList',
+            url: 'http://localhost/trust/TrustUpload',
+            url: 'http://localhost/trust/TrustAdd',
+            url: 'http://localhost/testing/TestingList',
+            url: 'http://localhost/trust/PersonTrust',
+            url: 'http://localhost/engineer/DivideCompanyId',
+            url: 'http://localhost/material/StandardDel',
+            url: 'http://localhost/material/PriceList',
+            url: 'http://localhost/material/PriceAdd',
+            url: 'http://localhost/material/PriceEdit',
+            url: 'http://localhost/material/PriceDel',
+            url: 'http://localhost/material/FileList',
+            url: 'http://localhost/material/FileAdd',
+            url: 'http://localhost/material/FileEdit',
+            url: 'http://localhost/material/FileDel',
+            url: 'http://localhost/material/TypeList',
+            url: 'http://localhost/material/TypeAdd',
+            url: 'http://localhost/material/TypeEdit',
+            url: 'http://localhost/material/TypeDel',
+            url: 'http://localhost/material/BlockList',
+            url: 'http://localhost/material/BlockAdd',
+            url: 'http://localhost/material/BlockEdit',
+            url: 'http://localhost/material/BlockDel',
+            url: 'http://localhost/material/MaterialList',
+            url: 'http://localhost/material/MaterialAdd',
+            url: 'http://localhost/material/MaterialEdit',
+            url: 'http://localhost/material/MaterialDel',
+            url: 'http://localhost/material/MaterialField',
+            url: 'http://localhost/material/MaterialFieldAdd',
+            url: 'http://localhost/material/MaterialFieldEdit',
+            url: 'http://localhost/material/MaterialFieldDel',
+            url: 'http://localhost/material/MaterialDefaultAdd',
+            url: 'http://localhost/material/MaterialDefaultEdit',
+            url: 'http://localhost/material/MaterialDefaultDel',
+            url: 'http://localhost/trust/TrustAdd',
+            url: 'http://localhost/trust/TrustEdit',
+            url: 'http://localhost/trust/TrustDel',
+            url: 'http://localhost/trust/TrustMaterialAdd',
+            url: 'http://localhost/trust/PersonTrust',
+            url: 'http://localhost/trust/TrustUpload',
+            url: 'http://localhost/trust/TrustUploadAdd',
+            // url : 'https://apiserer1.bangninyou.com/version/user/Products?aithorization=89577f2a6a943243dff4929aeafb0b7b,123',
+            // url : 'https://apiserer1.bangninyou.com/version/homepage/Products?aithorization=89577f2a6a943243dff4929aeafb0b7b,123',
+            type: 'post',
+            contentType : false,
+            processData : false,
+            data : pic,
+            // data: {
+                // 'standard' : 2,
+                // 'divide' : 55,
+                // 'trust': '786c9da0d40697e9f695cd84b3eadff1',
+                // 'divideName' : '弟中弟单位',
+                // 'divideField' : 'didi_company',
+                // 'divideUser': 'SG190905327973',
+                // 'dividePass': '123456',
+                // 'engineerType' : 5,
+                // 'engineerTypeName' : '上水道工程',
+                // 'processTypeName' : '施工方处理',
+                // 'processType' : 1,
+                // 'testTypeName' : '现场检测',
+                // 'testType' : 1,
+                // 'foundations' : 1,
+                // 'standard' : 2,
+                // 'standardNumber' : 'YSH02',   // 检测标准编号
+                // 'companyName' : '儒雅随和',  // 企业名称
+                // 'company' : 'c643cc681a5b0aa13a6597bcf166199e',  // 企业id
+                // 'standardCode' : 'YSH',   // 试验代号
+                // 'standardType' : '天降',   // 试验类别
+                // 'standardFrom' : 'YSH',   // 所检项目
+                // 'basisNumber' : 'YSH 145-2013',    // 检测依据编号
+                // 'basis' : 'YSH 145-2013《天降》',   // 检测依据
+                // 'determineNumber' : 'YSH 145-2013',   // 判定标准编号
+                // 'determine' : 'YSH 145-2013《天降》',   // 判定标准
+                // 'engineer' : '43cfc90ccb8878a2b79e1d508e5967f0',
+                // 'company' : '19505aa4ca626483e9962a0398524bc4',    // 录入人id
+                // 'name' : '神力陨石上水道工程',           // 工程名称
+                // 'type' : 1,                         // 工程类型
+                // 'from' : 'sedfsdfsdfds',           // 所属质监站
+                // 'level' : 'asdasfasdasd',           // 所属质监等级编号
+                // 'area' : 1,                          // 工程区域
+                // 'foundations' : 1,                // 地面基础类型
+                // 'site' : 55.1,                      // 建筑面积
+                // 'underground' : 55.1,                   // 地下室面积
+                // 'CCAD' : 55.1,                       // 人防工程面积
+                // 'address' : '浙江温州',
+                // 'pass' : '123456',
+                // 'company' : '19505aa4ca626483e9962a0398524bc4',
+                // 'uuid' : '2008f23efa4d32d23440ecc9225e03aa',   // 企业id
+                // 'form' : 1,     // 企业种类，是否检测机构，1检测机构，2非检测机构
+                // 'name' : '13857643649',     // 企业用户名
+                // 'uniform' : 'wqedsadasda',    // 社会统一认证编号
+                // 'business' : 'dfgfdhdfghdfgh',   // 营业执照编号
+                // 'start' : '2010-1-1',   // 营业执照有效期始
+                // 'end' : '2019-1-1',   // 营业执照有效期止
+                // 'capital' : '150',            // 注册资本
+                // 'character' : '1',         // 企业经济性质
+                // 'corporationMobile' : '13857643699',      // 企业法人联系电话
+                // 'website' : 'http://www.grey.com',     // 企业网址
+                // 'fax' : '',     // 企业传真
+                // 'area' : 10101,    // 企业地区
+                // 'regAddr' : '浙江温州',    // 工商注册地办公地址
+                // 'postal' : '325612',     // 工商注册地邮编
+                // 'AD' : '浙江温州行政',   // 工商注册地行政主管部门
+                // 'rules' : '我觉得不行',   // 企业章程
+                // 'profile' : '都听我的一个人说了算',   // 企业简介
+                // 'linkman' : '陨石',   // 联系人
+                // 'mobile' : '13857646399',   // 联系电话
+                // 'contact' : '上门联系',   // 其他联系方式
+                // 'email' : '976067482@qq.com',   // 企业邮箱
+                // 'record' : 0,
+                // 'company' : '13857643649',
+                // 'name' : '儒雅随和检测公司',
+                // 'uniform' : 'sadhasihdasd',
+                // 'linkman' : '儒雅随和',
+                // 'mobile' : '13857643649',
+                // 'contact' : '上门联系',
+                // 'pass' : '888888',
+                // 'accept' : 1,
+                // 'area' : '10122',
+                // 'cate' : '86',
+                // 'trust': '74c05b81de8e80c528686cf9912738ce',
+                // 'save': [
+                //     {
+                //         'trial': 3,
+                //         'trialVerify': 1,
+                //         'trialValue': '砸地测试',
+                //         'trialToken': 1,
+                //         'default': 1,
+                //     },
+                //     {
+                //         'trial': 3,
+                //         'trialVerify': 1,
+                //         'trialValue': '砸水测试',
+                //         'trialToken': 1,
+                //         'default': 2,
+                //     }
+                // ],
+                // 'materialName' : '陨石撞石头',
+                // 'project' : '砸tmd',
+                // 'customCompany' : '儒雅随和公司',
+                // 'preCompany' : '儒雅随和公司',
+                // 'inputCompany' : '儒雅随和公司',
+                // 'testType' : '1',
+                // 'material' : '3',
+                // // 'input' : '2019-1-1',
+                // 'price' : '5',
+                // 'engineering' : '3271e961902c266676029f35156ba03a',
+                // 'openid' : 'odW581cdBBiWo-9Zv0GAfyG4JNGU',
+                // 'processing' : '1',
+                // 'materialType' : 7,
+                // 'material' : '陨石砸陨石砸石头',
+                // 'block' : 1,
+                // 'standardCode' : 'YSH',
+                // 'trust' : '',
+                // 'save' : [],
+                // 'trial' : 7,
+                // 'materialId' : 3,
+                // 'trialName' : '陨石梆软软软',
+                // 'trialDepict' : '从项',
+                // 'trialHint' : '不得行',
+                // 'trialCustomHint' : '非常不得行',
+                // 'defaultValue' : '砸水水水水测试',
+                // 'defaultVerify' : 1,
+                // 'defaultToken' : 1,
+                // 'default' : 4,
+                // 'blockId' : 7,
+                // 'block' : 1,
+                // 'upload' : 1,
+                // 'type' : 1,
+                // 'typeParent' : '2',
+                // 'typeName' : '陨石不砸不砸石头检测',
+                // 'priceId' : 3,
+                // 'fileId' : '7',
+                // 'compansy' : '2008f23efa4d32d23440ecc9225e03aa',
+                // 'companyName' : '不儒雅随和公司',
+                // 'fileNumber' : 'JAS/JS010-23-12',
+                // 'material' : '法',
+                // 'standardCode' : 'YSH',
+                // 'valid' : 1,
+                // 'standardNumber' : 'YSH04',
+                // 'standard' : '1',
+                // 'standardNumber' : 'YSH04',
+                // 'standardCompany' : '儒雅随和',
+                // 'standardCode' : 'DYSH',
+                // 'standardType' : '陨石',
+                // 'standardFrom' : 'DYSH',
+                // 'price' : '50',
+                // 'remarks' : '检测石头检测',
+                // 'tag' : 0,
+                // 'end' : 1,
+                // 'basisNumber' : 'JGJ 145-2013',
+                // 'basis' : 'JGJ 145-2013 《混凝土》',
+                // 'determineNumber' : 'JGJ 145-2013',
+                // 'determine' : 'JGJ 145-2013 《混凝土》',
+                // 'user' : '1231',
+                // 'pass' : '1234',
+                // 'name': '陨石',
+                // 'idCard' : '330382199601196319',
+                // 'mobile': '13857643643',
+                // 'check' : 111,
+                // 'name' : '不儒雅随和公司',
+                // 'corporation' : '陨石',
+                // 'record' : 0,
+                // 'page' : [0,1],
+                // 'code' : 'G',
+                // 'company' : '2008f23efa4d32d23440ecc9225e03aa',
+                // 'engineer' : '9fa41e38209248edba0ab84c6c777d7d',
+                // 'people' : 'a25164d94658c6f757edabf157af5e77',
+                // 'person' : '随和',
+                // 'name' : '神力陨石天降',           // 工程名称
+                // 'type' : '建筑工程',                         // 工程类型
+                // 'from' : 'sedfsdfsdfds',           // 所属质监站
+                // 'level' : 'asdasfasdasd',           // 所属质监等级编号
+                // 'area' : 1,                          // 工程区域
+                // 'foundations' : 1,                // 地面基础类型
+                // 'site' : 55.1,                      // 建筑面积
+                // 'underground' : 55.1,                   // 地下室面积
+                // 'CCAD' : 55.1,                       // 人防工程面积
+                // 'address' : '浙江温州',                     // 工程地点
+                // 'build' : '儒雅随和', // 建设单位
+                // 'supervise' : '儒雅随和',   // 监理单位
+                // 'construction' : '儒雅随和', // 施工单位
+                // 'survey' : '儒雅随和', // 勘察单位
+                // 'design' : '儒雅随和',  // 设计单位
+                // 'witness' : '陨石',        // 见证人员
+                // 'makeup' : '陨石', // 填单人员
+                // 'sampling' : '陨石',  // 取样人员
+            // },
+            success: function (msg) {
+                msg = JSON.parse(msg);
+                console.log(msg);
+            },
+            error: function () {
+            }
+        });
+    }
 </script>
 </html>

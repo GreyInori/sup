@@ -177,7 +177,7 @@ class Engineer extends Controller
         if(!is_array($data)) {
             return self::returnMsg(500,'fail',$data);
         }
-        return self::returnMsg(200,'success',$data);
+        return self::returnMsg(200,'success',$data[0]);
     }
 
     /**

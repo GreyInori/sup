@@ -80,10 +80,69 @@ class Trust extends Controller
         /* 执行企业添加方法，如果成功的话就返回企业的id，否则返回错误信息 */
         $list = TrustMain::toTrustEdit($data);
         if(is_array($list)){
+            return self::returnMsg(200, 'success', $list);
+        }else{
+            return self::returnMsg(500,'fail',$list);
+        }
+    }
+
+    /**
+     * 删除委托单方法
+     * @return false|string
+     * @throws \think\exception\DbException
+     */
+    public function postTrustDel()
+    {
+        /* 检测传递的参数是否符合删除委托单的规范，如果不符合就返回错误信息 */
+        $data = FieldCheck::checkData('trustDel');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 执行企业添加方法，如果成功的话就返回企业的id，否则返回错误信息 */
+        $list = TrustMain::toTrustDel($data);
+        if(is_array($list)){
+            return self::returnMsg(200, 'success', $list);
+        }else{
+            return self::returnMsg(500,'fail',$list);
+        }
+    }
+
+    /**
+     * 委托单详细记录信息添加方法
+     * @return false|string
+     * @throws \think\exception\DbException
+     */
+    public function postTrustMaterialAdd()
+    {
+        $data = request()->param();
+        /* 检测传递的参数是否符合企业添加的规范，如果不符合就返回错误信息 */
+        $data = FieldCheck::buildRequestField($data);
+        if(!is_array($data)){
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 执行企业添加方法，如果成功的话就返回企业的id，否则返回错误信息 */
+        $list = TrustMain::toTrustMaterialAdd($data);
+        if(is_array($list)){
             return self::returnMsg(200, 'success', $list['uid']);
         }else{
             return self::returnMsg(500,'fail',$list);
         }
+    }
+
+    /**
+     * 根据监理人账号密码获取相对应的委托单方法
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getPersonTrust()
+    {
+        $list = TrustMain::toPersonTrust();
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        return self::returnMsg(200,'success',$list);
     }
 
     /**
@@ -127,64 +186,6 @@ class Trust extends Controller
         return self::returnMsg(200,'success',$list);
     }
 
-    /**
-     * 删除委托单方法
-     * @return false|string
-     * @throws \think\exception\DbException
-     */
-    public function postTrustDel()
-    {
-        /* 检测传递的参数是否符合删除委托单的规范，如果不符合就返回错误信息 */
-        $data = FieldCheck::checkData('trustDel');
-        if(!is_array($data)) {
-            return self::returnMsg(500,'fail',$data);
-        }
-        /* 执行企业添加方法，如果成功的话就返回企业的id，否则返回错误信息 */
-        $list = TrustMain::toTrustDel($data);
-        if(is_array($list)){
-            return self::returnMsg(200, 'success', $list['uid']);
-        }else{
-            return self::returnMsg(500,'fail',$list);
-        }
-    }
-
-    /**
-     * 委托单详细记录信息添加方法
-     * @return false|string
-     * @throws \think\exception\DbException
-     */
-    public function postTrustMaterialAdd()
-    {
-        $data = request()->param();
-        /* 检测传递的参数是否符合企业添加的规范，如果不符合就返回错误信息 */
-        $data = FieldCheck::buildRequestField($data);
-        if(!is_array($data)){
-            return self::returnMsg(500,'fail',$data);
-        }
-        /* 执行企业添加方法，如果成功的话就返回企业的id，否则返回错误信息 */
-        $list = TrustMain::toTrustMaterialAdd($data);
-        if(is_array($list)){
-            return self::returnMsg(200, 'success', $list['uid']);
-        }else{
-            return self::returnMsg(500,'fail',$list);
-        }
-    }
-
-    /**
-     * 根据监理人账号密码获取相对应的委托单方法
-     * @return false|string
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
-     */
-    public function getPersonTrust()
-    {
-        $list = TrustMain::toPersonTrust();
-        if(!is_array($list)) {
-            return self::returnMsg(500,'fail',$list);
-        }
-        return self::returnMsg(200,'success',$list);
-    }
     // +----------------------------------------------------------------------
     // | 检测类型相关
     // +----------------------------------------------------------------------

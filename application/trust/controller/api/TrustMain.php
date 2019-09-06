@@ -34,18 +34,19 @@ class TrustMain extends Controller
     public static function toPersonTrust()
     {
         $data = request()->param();
-        if(!isset($data['name'])) {
+        if(!isset($data['divideUser'])) {
             return '请传递监理人用户名';
         }
-        if(!isset($data['pass'])) {
+        if(!isset($data['dividePass'])) {
             return '请传递监理人密码';
         }
         /* 根据传递的账号和密码，判断在创建工程时有无创建对应的账号密码用户，如果有就拿工程名和id获取委托单列表 */
         $list = Db::table('su_engineering_divide')
                 ->alias('sed')
                 ->join('su_engineering se','se.engineering_id = sed.engineering_id')
-                ->where(['divide_name'=>$data['name'],'divide_passwd'=>md5($data['pass'])])
-                ->field(['se.engineering_id','se.engineering_name'])
+                ->join('su_divide sd','sd.divide_id = sed.divide_id')
+                ->where(['divide_user'=>$data['divideUser'],'divide_passwd'=>md5($data['dividePass'])])
+                ->field(['se.engineering_id','se.engineering_name','sd.divide_name','sd.divide_id'])
                 ->select();
         if(empty($list)) {
             return '当前监理人账号下尚未分配工程，请检查或者联系管理员';
@@ -139,9 +140,9 @@ class TrustMain extends Controller
         /* 进行企业以及企业详细信息的添加操作 */
         Db::startTrans();
         try{
-            Db::table('su_trust')->where('trust_id',$uuid[0])->update($trust);
+            $update = Db::table('su_trust')->where('trust_id',$uuid[0])->update($trust);
             Db::commit();
-            return array('uid'=>$uuid[0]);
+            return array($update);
         }catch(\Exception $e) {
             Db::rollback();
             return $e->getMessage();
@@ -165,9 +166,9 @@ class TrustMain extends Controller
         /* 进行企业以及企业详细信息的添加操作 */
         Db::startTrans();
         try{
-            Db::table('su_trust')->where('trust_id',$uuid[0])->update(['show_type'=>0]);
+            $delete = Db::table('su_trust')->where('trust_id',$uuid[0])->update(['show_type'=>0]);
             Db::commit();
-            return array('uid'=>$uuid[0]);
+            return array($delete);
         }catch(\Exception $e) {
             Db::rollback();
             return $e->getMessage();
@@ -186,7 +187,8 @@ class TrustMain extends Controller
     public static function toTrustMaterialAdd($data)
     {
         $group = new TrustAutoLoad();
-        $list = $data;
+        $list = request()->param();
+        unset($list['action']);
         $data = $group->toGroup($data);
         $uuid = self::trustAlreadyCreat($data,1);
         if(!is_array($uuid)) {
@@ -200,9 +202,9 @@ class TrustMain extends Controller
         /* 执行默认值添加操作 */
         Db::startTrans();
         try{
-            Db::table('su_trust_list_default')->insertAll($trustMaterial);
+            $insert = Db::table('su_trust_list_default')->insertAll($trustMaterial);
             Db::commit();
-            return array('uid'=>$uuid[0]);
+            return array('uid'=>$insert);
         }catch(\Exception $e) {
             Db::rollback();
             return $e->getMessage();
@@ -236,10 +238,11 @@ class TrustMain extends Controller
         }
         foreach($list['save'] as $key => $row) {
             $result[$key] = array(
-                'trial_id' => $row['trial_id'],
-                'trial_default_value' => $row['trial_default_value'],
-                'trial_default_token' => $row['trial_default_token'],
-                'trial_verify' => $row['trial_verify'],
+                'trial_default_value' => $row['trialValue'],
+                'trial_default_token' => $row['trialToken'],
+                'default_id' => $row['default'],
+                'trial_verify' => $row['trialVerify'],
+                'trial_id' => $row['trial'],
                 'trust_id' => $uuid,
                 'save_id' => $saveId
             );
@@ -282,7 +285,6 @@ class TrustMain extends Controller
             $uploadArr[$key] = array(
                 'trust_id' => $uuid,
                 'file_type' => $row['upload_type'],
-                'testing_process' => 2,
             );
         }
         if(!empty($uploadArr)) {
@@ -367,6 +369,7 @@ class TrustMain extends Controller
             $update[$key] = $row;
         }
         /* 执行图片上传数据修改操作 */
+        Db::startTrans();
         try {
             $update = Db::table('su_status_file')
                 ->where('file_id',$data['upload']['file_id'])
@@ -375,8 +378,10 @@ class TrustMain extends Controller
             Db::table('su_testing_status')
                 ->where('trust_id',$file[0]['trust_id'])
                 ->update($testUpdate);
-            return array($update);
+            Db::commit();
+            return array($update['file_file']);
         }catch(\Exception $e) {
+            Db::rollback();
             return $e->getMessage();
         }
     }

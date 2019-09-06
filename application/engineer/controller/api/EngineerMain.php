@@ -259,16 +259,18 @@ class EngineerMain extends Controller
             return '请传递企业密码';
         }
         $list = Db::table('su_engineering_divide')
-            ->where(['divide_user'=>$data['divideUser'],'divide_passwd'=>md5($data['dividePass'])])
-            ->field(['member_id'])
+            ->alias('sed')
+            ->join('su_divide sd','sd.divide_id = sed.divide_id')
+            ->where(['sed.divide_user'=>$data['divideUser'],'sed.divide_passwd'=>md5($data['dividePass'])])
+            ->field(['sed.member_id as company','sed.divide_id as divide','sd.divide_name as divideName'])
             ->select();
         if(empty($list)) {
             return '账号或密码错误，请检查';
         }
-        if($list[0]['member_id'] == null) {
+        if($list[0]['company'] == null) {
             return '该账号尚未分配到指定企业,请先完善工程信息分配企业';
         }
-        return array($list[0]['member_id']);
+        return array($list[0]);
     }
 
     /**

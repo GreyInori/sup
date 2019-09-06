@@ -59,6 +59,6 @@ class TrustValidate extends  Validate
         'trustEdit' => array('trust','serial','preCompany','inputCompany','materialName','project','testName','customCompany','testType','material','input','price','engineering','processing'),
         'trustDel' => array('trust'),
         'trustUploadList' => array('trust'),
-        'trustUploadAdd' => array('file','code','people','depict',''),
+        'trustUploadAdd' => array('file','code','people','depict'),
     );
 }

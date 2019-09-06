@@ -66,6 +66,7 @@ class TrustAutoLoad extends Validate
         'file' => 'file_id',
         'record' => 'record_id',
         'materialType' => 'type_id',
+        'engineerName' => 'engineering_name',
     );
 
     /**

@@ -39,6 +39,21 @@ class PriceMain extends Controller
         if(isset($price['price_id'])) {
             unset($price['price_id']);
         }
+        /* 根据传递的检测类别以及检测项目名获取对应的id，进行添加操作 */
+        $material = Db::table('su_material')
+                        ->where('material_name',$price['testing_type'])
+                        ->field(['material_id'])
+                        ->select();
+        if(!empty($material)) {
+            $price['material_id'] = $material[0]['material_id'];
+        }
+        $item = Db::table('su_testing_item')
+                    ->where('item_name',$price['testing_from'])
+                    ->field(['item_id'])
+                    ->select();
+        if(!empty($item)) {
+            $price['item_id'] = $item[0]['item_id'];
+        }
         /* 进行企业以及企业详细信息的添加操作 */
         Db::startTrans();
         try{
@@ -68,6 +83,25 @@ class PriceMain extends Controller
             return $uuid;
         }
         $price = $data['price'];
+        /* 根据传递的检测类别以及检测项目名获取对应的id，进行添加操作 */
+        if(isset($price['testing_type'])) {
+            $material = Db::table('su_material')
+                ->where('material_name',$price['testing_type'])
+                ->field(['material_id'])
+                ->select();
+            if(!empty($material)) {
+                $price['material_id'] = $material[0]['material_id'];
+            }
+        }
+        if(isset($price['testing_from'])) {
+            $item = Db::table('su_testing_item')
+                ->where('item_name',$price['testing_from'])
+                ->field(['item_id'])
+                ->select();
+            if(!empty($item)) {
+                $price['item_id'] = $item[0]['item_id'];
+            }
+        }
         /* 进行企业以及企业详细信息的添加操作 */
         Db::startTrans();
         try{
