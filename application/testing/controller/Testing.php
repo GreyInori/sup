@@ -9,6 +9,7 @@
 namespace app\testing\controller;
 
 use app\testing\controller\api\ErrorSearch as ErrorSearch;
+use app\testing\controller\api\ReportSearch;
 use think\Controller;
 use \app\testing\controller\api\TestingSearch as TestingSearch;
 use \app\testing\controller\api\TestingMain as TestingMain;
@@ -85,6 +86,46 @@ class Testing extends Controller
         if(!is_array($list)) {
             return self::returnMsg(500,'fail',$list);
         }
+        $change = new TestingMain();
+        $list = $change::fieldChange($list);
+        return self::returnMsg(200,'success',$list);
+    }
+
+    /**
+     * 报告上传方法
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function postReportUpload()
+    {
+        $data = FieldCheck::checkData('reportUpload');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        $list = TestingMain::toReportUpload($data);
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        return self::returnMsg(200,'success',$list);
+    }
+
+    /**
+     * 获取测试报告列表
+     * @return false|string
+     */
+    public function getReportList()
+    {
+        $data = FieldCheck::checkData('reportList');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        $list = ReportSearch::toList($data);
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        /* 把查询结果的字段转换为前端传递过来的字段数据 */
         $change = new TestingMain();
         $list = $change::fieldChange($list);
         return self::returnMsg(200,'success',$list);

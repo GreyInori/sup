@@ -53,7 +53,7 @@ trait Picture
         }
         /* 判断上传的文件是否符规范，如果是就丢到制定的目录下 */
         $image = request()->file($pic);
-        $data = $image->validate(['ext'=>'png,jpg,jpeg,gif,bmp'])->move(ROOT_PATH.'public'.DS.'static'.DS.'images'.DS.$path.DS);
+        $data = $image->validate(['ext'=>'png,jpg,jpeg,gif,bmp,pdf'])->move(ROOT_PATH.'public'.DS.'static'.DS.'images'.DS.$path.DS);
         if(!$data){
             return $image->getError();
         }

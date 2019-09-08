@@ -26,6 +26,9 @@ class TestingValidate extends  Validate
         'response' => 'chsDash',   // 异常回复
         'trust' => 'require',   // 委托单号
         'errorId' => 'number',   // 异常id
+        'testName' => 'chsDash',   // 检测项目名称
+        'reportMain' => 'chsDash',   // 检测报告
+        'reportNumber' => 'alphaDash',   // 报告编号
     );
 
     protected $message = array();
@@ -34,5 +37,7 @@ class TestingValidate extends  Validate
         'list' => array('supervision'),
         'postErr' => array('error','trust'),
         'errList' => array('error','response','errorId','trustCode','inputCompany'),
+        'reportUpload' => array('trust','reportMain'),
+        'reportList' => array('reportNumber','reportMain','testName',''),
     );
 }

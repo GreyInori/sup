@@ -55,7 +55,11 @@ class TestingAutoLoad extends Controller
         'response' => 'error_response',
         'error' => 'error_main',
         'errorId' => 'error_id',
+        'testName' => 'testing_name',
+        'reportNumber' => 'report_number',
+        'reportMain' => 'report_main',
     );
+
     public static $fieldGroup = array(
         'testing' => array('sts.supervision_id','st.pre_testing_company','st.input_testing_company'
         ,'smt.type_name','sm.material_name'
@@ -70,6 +74,9 @@ class TestingAutoLoad extends Controller
         ,'sts.report_upload_time','sts.report_upload_TD','sts.testing_process','company_id'),
         'error' => array(
             'ste.error_id','st.trust_code','ste.error_main','st.input_testing_company','ste.error_response'
+        ),
+        'report' => array(
+            'report_main','trust_id','report_number'
         ),
     );
 
