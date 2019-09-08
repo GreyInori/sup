@@ -52,6 +52,9 @@ class TestingAutoLoad extends Controller
         'reportUploadTD' => 'sts.report_upload_TD',
         'testingProcess' => 'sts.sts.testing_process',
         'company' => 'company_id',
+        'response' => 'error_response',
+        'error' => 'error_main',
+        'errorId' => 'error_id',
     );
     public static $fieldGroup = array(
         'testing' => array('sts.supervision_id','st.pre_testing_company','st.input_testing_company'
@@ -65,6 +68,9 @@ class TestingAutoLoad extends Controller
         ,'sts.tester_unsigned','sts.tester_absent','sts.receive_time','sts.testing_time'
         ,'sts.data_upload_time','sts.data_upload_TD','sts.report_time'
         ,'sts.report_upload_time','sts.report_upload_TD','sts.testing_process','company_id'),
+        'error' => array(
+            'ste.error_id','st.trust_code','ste.error_main','st.input_testing_company','ste.error_response'
+        ),
     );
 
     /**
@@ -114,7 +120,7 @@ class TestingAutoLoad extends Controller
      */
     public static function checkData($control = '', $field = '')
     {
-        $companyValidate = new \app\trust\validate\TrustValidate();
+        $companyValidate = new \app\testing\validate\TestingValidate();
         $request = request()->param();
 
         /* 对传递过来的参数进行制定场景 $control 来进行检测，如果不符合规则就返回错误信息，返回函数进行后面的处理 */

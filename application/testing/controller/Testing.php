@@ -8,6 +8,7 @@
 
 namespace app\testing\controller;
 
+use app\testing\controller\api\ErrorSearch as ErrorSearch;
 use think\Controller;
 use \app\testing\controller\api\TestingSearch as TestingSearch;
 use \app\testing\controller\api\TestingMain as TestingMain;
@@ -43,6 +44,47 @@ class Testing extends Controller
             return self::returnMsg(500,'fail',$list);
         }
         /* 把查询结果的字段转换为前端传递过来的字段数据 */
+        $change = new TestingMain();
+        $list = $change::fieldChange($list);
+        return self::returnMsg(200,'success',$list);
+    }
+
+    /**
+     * 上传委托单异常方法
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function postTestingError()
+    {
+        $data = FieldCheck::checkData('postErr');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        $list = TestingMain::errorUpload($data);
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        return self::returnMsg(200,'success',$list);
+    }
+
+    /**
+     * 获取异常委托单列表
+     * @return false|string
+     */
+    public function getTestingError()
+    {
+        /* 检查传递的参数是否符合规范 */
+        $data = FieldCheck::checkData('errList',['page']);
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 获取异常列表数据，如果抛出异常的话就返回错误信息 */
+        $list = ErrorSearch::toList($data);
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
         $change = new TestingMain();
         $list = $change::fieldChange($list);
         return self::returnMsg(200,'success',$list);

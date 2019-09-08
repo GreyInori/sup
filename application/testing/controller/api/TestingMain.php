@@ -9,6 +9,7 @@
 namespace app\testing\controller\api;
 
 use think\Controller;
+use think\Db;
 use \app\testing\controller\TestingAutoLoad as TestingAutoLoad;
 
 /**
@@ -17,6 +18,43 @@ use \app\testing\controller\TestingAutoLoad as TestingAutoLoad;
  */
 class TestingMain extends Controller
 {
+    /**
+     * 委托异常添加方法
+     * @param $data
+     * @return array|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function errorUpload($data)
+    {
+        $group = new TestingAutoLoad();
+        $data = $group->toGroup($data);
+        /* 检测传递的委托单号是否存在，如果不存在就返回错误信息 */
+        $list = Db::table('su_testing_status')
+                ->where('trust_id',$data['error']['trust'])
+                ->field(['trust_id'])
+                ->select();
+        if(empty($list)) {
+            return '查无此委托单,请检查传递的委托单id';
+        }
+        if(!isset($data['error']['error'])) {
+            return '请传递错误信息';
+        }
+        $insert = array(
+            'error_main' => $data['error']['error'],
+            'trust_id' => $data['error']['trust']
+        );
+        Db::startTrans();
+        try {
+            $id = Db::table('su_testing_error')->insertGetId($insert);
+            Db::table('su_testing_status')->where('trust_id',$data['error']['trust'])->update(['testing_error'=>1]);
+            return array('uid'=>$id);
+        }catch(\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
     /**
      * 转换查询结果内字段方法
      * @param $list

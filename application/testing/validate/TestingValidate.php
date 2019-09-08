@@ -22,11 +22,17 @@ class TestingValidate extends  Validate
 
     protected $rule = array(
         'supervision' => 'alphaDash',   // 平台监督号
+        'error' => 'chsDash',   // 异常信息
+        'response' => 'chsDash',   // 异常回复
+        'trust' => 'require',   // 委托单号
+        'errorId' => 'number',   // 异常id
     );
 
     protected $message = array();
 
     protected  $scene = array(
         'list' => array('supervision'),
+        'postErr' => array('error','trust'),
+        'errList' => array('error','response','errorId','trustCode','inputCompany'),
     );
 }
