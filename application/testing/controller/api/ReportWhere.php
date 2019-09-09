@@ -17,7 +17,13 @@ use think\Controller;
 class ReportWhere extends Controller
 {
     private $where = array(
-
+        'st.input_testing_company' => ['st.input_testing_company','LIKE','%code%'],
+        'smt.type_name' => ['smt.type_name','LIKE','%code%'],
+        'st.testing_name' => ['st.testing_name','LIKE','%code%'],
+        'sr.report_number' => ['st.testing_name','LIKE','%code%'],
+        'se.engineering_name' => ['se.engineering_name','LIKE','%code%'],
+        'st.testing_result' => ['st.testing_result','LIKE','%code%'],
+        'sr.report_time' => ['sr.report_time','>','time'],
     );
 
     /**
@@ -69,8 +75,10 @@ class ReportWhere extends Controller
             /* 如果查询结果是单个值的数据的话，就进行制定查询条件匹配，由于事先定义好了 LIKE 查询的条件了，就根据制定字段的条件来生成需要的查询条件 */
             if(!is_array($row)){
                 $conditions = array($where[$key][0] => array($where[$key][1]));
-                if(isset($where[$key][2])){
+                if(isset($where[$key][2]) && $where[$key][1] == 'LIKE'){
                     $row = str_replace('code',$row,$where[$key][2]);
+                }elseif(isset($where[$key][2]) && $where[$key][2] == 'time'){
+                    $row = strtotime($row);
                 }
                 array_push($conditions[$where[$key][0]], $row);
             }

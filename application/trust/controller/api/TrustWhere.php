@@ -18,9 +18,11 @@ class TrustWhere extends Controller
 {
     private $where = array(
         'trust_id' => ['st.trust_id','LIKE','code%'],
+        'trust_code' => ['st.trust_code','LIKE','code%'],
         'engineering_id' => ['st.engineering_id','='],
         'serial_number' => ['st.serial_number','LIKE','code%'],
-        'company_full_name' => ['st.input_testing_company','LIKE','%code%'],
+        'input_testing_company' => ['st.input_testing_company','LIKE','%code%'],
+        'pre_testing_company' => ['st.pre_testing_company','LIKE','%code%'],
         'testing_name' => ['st.testing_name','LIKE','%code%'],
         'project_name' => ['st.project_name','LIKE','%code%'],
         'custom_company' => ['st.custom_company','LIKE','%code%'],
@@ -87,6 +89,8 @@ class TrustWhere extends Controller
                 $conditions = array($where[$key][0] => array($where[$key][1]));
                 if(isset($where[$key][2])){
                     $row = str_replace('code',$row,$where[$key][2]);
+                }elseif(isset($where[$key][2]) && $where[$key][2] == 'time'){
+                    $row = strtotime($row);
                 }
                 array_push($conditions[$where[$key][0]], $row);
             }

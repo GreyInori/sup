@@ -22,6 +22,7 @@ class ErrorWhere extends Controller
         'ste.error_main' => ['ste.error_main','LIKE','%code%'],
         'st.input_testing_company' => ['st.input_testing_company','LIKE','%code%'],
         'ste.error_response' => ['ste.error_response','LIKE','%code%'],
+        'sr.report_time' => ['sr.report_time','>','time']
     );
 
 

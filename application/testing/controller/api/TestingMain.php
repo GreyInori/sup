@@ -34,24 +34,25 @@ class TestingMain extends Controller
         $data = $group->toGroup($data);
         /* 检测传递的委托单号是否存在，如果不存在就返回错误信息 */
         $list = Db::table('su_testing_status')
-                ->where('trust_id',$data['error']['trust'])
+                ->where('trust_id',$data['error']['st.trust_id'])
                 ->field(['trust_id'])
                 ->select();
         if(empty($list)) {
             return '查无此委托单,请检查传递的委托单id';
         }
-        if(!isset($data['error']['error'])) {
+        if(!isset($data['error']['ste.error_main'])) {
             return '请传递错误信息';
         }
         $insert = array(
-            'error_main' => $data['error']['error'],
-            'trust_id' => $data['error']['trust']
+            'error_main' => $data['error']['ste.error_main'],
+            'trust_id' => $data['error']['st.trust_id']
         );
         Db::startTrans();
         try {
             $id = Db::table('su_testing_error')->insertGetId($insert);
-            Db::table('su_testing_status')->where('trust_id',$data['error']['trust'])->update(['testing_error'=>1]);
-            return array('uid'=>$id);
+            Db::table('su_testing_status')->where('trust_id',$data['error']['st.trust_id'])->update(['testing_error'=>1]);
+            Db::commit();
+            return array($id);
         }catch(\Exception $e) {
             return $e->getMessage();
         }
@@ -71,30 +72,30 @@ class TestingMain extends Controller
         /* 检测传递的委托单信息是否符合规范 */
         $data = $group->toGroup($data);
         $list = Db::table('su_trust')
-                ->where('',$data['report']['trust_id'])
+                ->where('trust_id',$data['report']['st.trust_id'])
                 ->field(['trust_id'])
                 ->select();
         if(empty($list)) {
             return '查无此委托单，请检查传递的委托单id';
         }
         $list = Db::table('su_report')
-                ->where('trust_id',$data['report']['trust_id'])
+                ->where('trust_id',$data['report']['st.trust_id'])
                 ->field(['report_number'])
                 ->select();
         if(!empty($list)) {
             return '当前委托单报告已经存在，请检查传递的委托单id';
         }
         $reportInsert = array(
-            'report_main' => $data['report']['report_main'],
+            'report_main' => $data['report']['sr.report_main'],
             'report_time' => time(),
-            'trust_id' => $data['report']['trust_id']
+            'trust_id' => $data['report']['st.trust_id']
         );
         /* 执行图片上传操作，如果上传失败就返回错误信息，如果成功就根据传值以及当前时间创建图片文件修改数据 */
         $file = self::toImgUp('report','pdf');
         if(!is_array($list)) {
             return $file;
         }
-        $reportInsert['report_fuke'] = $file;
+        $reportInsert['report_file'] = $file;
         /* 委托单状态修改数组创建 */
         $trustUpdate = array(
             'testing_report' => 1,
@@ -107,7 +108,7 @@ class TestingMain extends Controller
             $update = Db::table('su_report')->insertGetId($reportInsert);
             /* 委托状态修改 */
             Db::table('su_testing_status')
-                ->where('trust_id',$data['report']['trust_id'])
+                ->where('trust_id',$data['report']['st.trust_id'])
                 ->update($trustUpdate);
             Db::commit();
             return array($update);
@@ -115,6 +116,30 @@ class TestingMain extends Controller
             Db::rollback();
             return $e->getMessage();
         }
+    }
+
+    /**
+     * 根据委托单号获取委托报告数据
+     * @return false|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toResponse()
+    {
+        $data = request()->param();
+        if(!isset($data['trust'])) {
+            return '请传递委托单号';
+        }
+        $list = Db::table('su_trust')
+            ->alias('st')
+            ->join('su_report sr','sr.trust_id = st.trust_id')
+            ->join('su_material_type smt','smt.type_id = st.testing_quality')
+            ->join('su_engineering se','se.engineering_id = st.engineering_id')
+            ->field(['st.input_testing_company','st.trust_id','smt.type_name','st.testing_name','sr.report_number','se.engineering_name','sr.report_time','sr.report_file','sr.report_main'])
+            ->where('st.trust_id',$data['trust'])
+            ->select();
+        return $list;
     }
 
     /**
@@ -153,6 +178,9 @@ class TestingMain extends Controller
         }
         $result = array();
         foreach($list as $key => $row) {
+            if(strstr($key,'_time')) {
+                $row = date('Y-m-d H:i:s',$row);
+            }
             $result[array_search($key, $checkArr)] = $row;
         }
         return $result;

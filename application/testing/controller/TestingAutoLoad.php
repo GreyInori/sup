@@ -52,12 +52,17 @@ class TestingAutoLoad extends Controller
         'reportUploadTD' => 'sts.report_upload_TD',
         'testingProcess' => 'sts.sts.testing_process',
         'company' => 'company_id',
-        'response' => 'error_response',
-        'error' => 'error_main',
-        'errorId' => 'error_id',
+        'response' => 'ste.error_response',
+        'error' => 'ste.error_main',
+        'errorId' => 'ste.error_id',
         'testName' => 'testing_name',
-        'reportNumber' => 'report_number',
-        'reportMain' => 'report_main',
+        'reportNumber' => 'sr.report_number',
+        'reportMain' => 'sr.report_main',
+        'trust' => 'st.trust_id',
+        'result' => 'testing_result',
+        'reportTimes' => 'sr.report_time',
+        'materialName' => 'st.testing_name',
+        'reportFile' => 'sr.report_file'
     );
 
     public static $fieldGroup = array(
@@ -73,10 +78,10 @@ class TestingAutoLoad extends Controller
         ,'sts.data_upload_time','sts.data_upload_TD','sts.report_time'
         ,'sts.report_upload_time','sts.report_upload_TD','sts.testing_process','company_id'),
         'error' => array(
-            'ste.error_id','st.trust_code','ste.error_main','st.input_testing_company','ste.error_response'
+            'st.trust_id','ste.error_id','ste.error_id','st.trust_code','ste.error_main','st.input_testing_company','ste.error_response'
         ),
         'report' => array(
-            'report_main','trust_id','report_number'
+            'sr.report_main','st.trust_id','sr.report_number','sr.report_time'
         ),
     );
 

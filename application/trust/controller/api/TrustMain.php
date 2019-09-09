@@ -70,6 +70,46 @@ class TrustMain extends Controller
     }
 
     /**
+     * 根据企业id获取对应的委托单方法
+     * @return false|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toCompanyTrust()
+    {
+        $data = request()->param();
+        if(!isset($data['company'])) {
+            return '请传递企业id';
+        }
+        $list = Db::table('su_engineering_divide')
+                ->where('member_id',$data['company'])
+                ->field(['engineering_id'])
+                ->select();
+        if(empty($list)) {
+            return '当前企业尚未分配到工程，请检查传递的企业id';
+        }
+        $engineerStr = "";
+        foreach($list as $key => $row) {
+            $engineerStr .= "{$row['engineering_id']},";
+        }
+        $engineerStr = rtrim($engineerStr,',');
+
+        $trustList = Db::table('su_trust')
+                        ->alias('st')
+                        ->join('su_engineering se','se.engineering_id = st.engineering_id')
+                        ->where('st.engineering_id','IN',$engineerStr)
+                        ->field(['st.engineering_id','st.trust_id','st.trust_code','se.engineering_name','st.serial_number','st.testing_result','st.input_time'])
+                        ->select();
+        if(!empty($trustList)) {
+            foreach ($trustList as $key => $row) {
+                $trustList[$key]['input_time'] = date('Y-m-d H:i:s',$row['input_time']);
+            }
+        }
+        return $trustList;
+    }
+
+    /**
      * 执行委托单添加方法
      * @param $data
      * @return array|string
@@ -486,6 +526,9 @@ class TrustMain extends Controller
     {
         $result = array();
         foreach($list as $key => $row) {
+            if(strstr($key,'_time')) {
+                $row = date('Y-m-d H:i:s',$row);
+            }
             $result[array_search($key, $check)] = $row;
         }
         return $result;

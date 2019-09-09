@@ -45,6 +45,30 @@ class Trust extends Controller
     }
 
     /**
+     * 根据企业账号获取对应的委托单
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getCompanyTrust()
+    {
+        /* 检查传递参数是否符合规范 */
+        $data = FieldCheck::checkData('companyTrust',['page']);
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 获取企业列表数据，如果有抛出异常的话就返回错误信息 */
+        $list = TrustMain::toCompanyTrust();
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        $change = new TrustMain();
+        $list = $change::fieldChange($list);
+        return self::returnMsg(200,'success',$list);
+    }
+
+    /**
      * 添加委托单方法
      * @return false|string
      * @throws \think\exception\DbException

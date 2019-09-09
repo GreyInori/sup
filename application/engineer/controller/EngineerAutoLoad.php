@@ -51,6 +51,11 @@ class EngineerAutoLoad extends Controller
         'divideName' => 'divide_name',
         'dividePass' => 'divide_passwd',
         'divide' => 'divide_id',
+        'control' => 'control_id',
+        'controlChs' => 'control_chs',
+        'controlParent' => 'control_pid',
+        'controlUrl' => 'control_url',
+        'controlIcon' => 'control_icon',
     );
 
     /**

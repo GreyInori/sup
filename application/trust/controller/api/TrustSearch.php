@@ -40,7 +40,7 @@ class TrustSearch extends Controller
         try{
             $list = Db::table('su_trust')
                 ->alias('st')
-                ->field(['st.trust_id','st.serial_number','st.input_testing_company','st.testing_name','st.project_name','st.custom_company','st.input_time','st.testing_price','st.is_submit','st.is_print','st.is_witness','st.is_sample','st.is_testing','st.is_cancellation','st.is_allow','st.testing_result'])
+                ->field(['st.is_report','st.trust_id','st.serial_number','st.input_testing_company','st.testing_name','st.project_name','st.custom_company','st.input_time','st.testing_price','st.is_submit','st.is_print','st.is_witness','st.is_sample','st.is_testing','st.is_cancellation','st.is_allow','st.testing_result'])
                 ->where($where)
                 ->limit($page[0], $page[1])
                 ->select();

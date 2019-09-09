@@ -49,12 +49,14 @@ class TrustValidate extends  Validate
         'code' => 'chsDash',   // 委托单图片二维码
         'people' => 'chsDash',   // 图片上传人名
         'depict' => 'chsDash',   // 图片对应物品简介
+        'company' => 'alphaDash',    // 需要获取委托单的公司id
     );
 
     protected $message = array();
 
     protected  $scene = array(
         'list' => array('engineering','trust','serial','preCompany','inputCompany','testName','trustCode','project','customCompany','input','price','submit','print','witness','sample','testing','report','cancellation','allow','result'),
+        'companyTrust' => array('company'),
         'trustAdd' => array('serial','preCompany','inputCompany','materialName','project','testName','customCompany','testType','material','input','price','engineering','processing'),
         'trustEdit' => array('trust','serial','preCompany','inputCompany','materialName','project','testName','customCompany','testType','material','input','price','engineering','processing'),
         'trustDel' => array('trust'),

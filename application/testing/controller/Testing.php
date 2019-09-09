@@ -130,4 +130,28 @@ class Testing extends Controller
         $list = $change::fieldChange($list);
         return self::returnMsg(200,'success',$list);
     }
+
+    /**
+     * 根据委托单号获取指定的委托单报告
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getReport()
+    {
+        $data = FieldCheck::checkData('reportMain');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        $main = new TestingMain();
+        $list = $main::toResponse();
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        /* 把查询结果的字段转换为前端传递过来的字段数据 */
+//        var_dump($list);exit;
+        $list = $main::fieldChange($list);
+        return self::returnMsg(200,'success',$list);
+    }
 }

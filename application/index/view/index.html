@@ -12,12 +12,18 @@
 </body>
 <script>
     function fileUp() {
-        var pic = new FormData();
-        pic.append('file', 25);
-        pic.append('fileCode', 111);
-        pic.append('fileDepict', '嗦不粗话了');
-        pic.append('UploadPeople', '陨石');
-        pic.append('pic', document.getElementById('img').files[0]);
+        // var pic = new FormData();
+        // pic.append('error', '东西8行');
+        // pic.append('company', 'c643cc681a5b0aa13a6597bcf166199e');
+        // pic.append('trust', '74c05b81de8e80c528686cf9912738ce');
+        // pic.append('reportMain', '检测合格');
+        // pic.append('errorId', '1');
+        // pic.append('trustCode', '');
+        // pic.append('inputCompany', '');
+        // pic.append('response', '');
+        // pic.append('fileDepict', '嗦不粗话了');
+        // pic.append('UploadPeople', '陨石');
+        // pic.append('pdf', document.getElementById('img').files[0]);
         $.ajax({
             url: 'http://localhost/material/StandardEdit',
             url: 'http://localhost/engineer/DivideEngineer',
@@ -66,6 +72,7 @@
             url: 'http://localhost/material/MaterialDefaultAdd',
             url: 'http://localhost/material/MaterialDefaultEdit',
             url: 'http://localhost/material/MaterialDefaultDel',
+            url: 'http://localhost/trust/TrustList',
             url: 'http://localhost/trust/TrustAdd',
             url: 'http://localhost/trust/TrustEdit',
             url: 'http://localhost/trust/TrustDel',
@@ -74,12 +81,32 @@
             url: 'http://localhost/trust/TrustUpload',
             url: 'http://localhost/trust/TrustUploadAdd',
             url: 'http://localhost/testing/TestingError',
+            url: 'http://localhost/testing/TestingError',
+            url: 'http://localhost/testing/ReportUpload',
+            url: 'http://localhost/testing/ReportList',
+            url: 'http://localhost/testing/Report',
+            url: 'http://localhost/trust/TrustList',
+            url: 'http://localhost/engineer/DivideCompanyId',
+            // url: 'http://localhost/trust/CompanyTrust',
+            // url: 'http://localhost/trust/CompanyTrust',
             // url : 'https://apiserer1.bangninyou.com/version/user/Products?aithorization=89577f2a6a943243dff4929aeafb0b7b,123',
             // url : 'https://apiserer1.bangninyou.com/version/homepage/Products?aithorization=89577f2a6a943243dff4929aeafb0b7b,123',
             type: 'get',
-            contentType : false,
-            processData : false,
-            data : pic,
+            // contentType : false,
+            // processData : false,
+            data : {
+                'divideUser' : 'CS190905299340',   // 工程分配的账号
+                'dividePass' : '123456',
+                // 'engineering' : '3271e961902c266676029f35156ba03a',
+                // 'trust' : '74c05b81de8e80c528686cf9912738ce',
+                // 'inputCompany':'陨石',
+                // 'testingType':'陨石',
+                // 'testName':'陨石',
+                // 'engineerName':'陨石',
+                // 'result':'陨石',
+                // 'reportTimes':'2018-1-1 12:00:00',
+            },
+                // 'company' : '2008f23efa4d32d23440ecc9225e03aa'},
             // data: {
                 // 'standard' : 2,
                 // 'divide' : 55,

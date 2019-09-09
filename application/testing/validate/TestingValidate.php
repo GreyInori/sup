@@ -36,8 +36,9 @@ class TestingValidate extends  Validate
     protected  $scene = array(
         'list' => array('supervision'),
         'postErr' => array('error','trust'),
-        'errList' => array('error','response','errorId','trustCode','inputCompany'),
+        'errList' => array('error','response','errorId','inputCompany'),
         'reportUpload' => array('trust','reportMain'),
-        'reportList' => array('reportNumber','reportMain','testName',''),
+        'reportList' => array('reportNumber','reportMain','testName'),
+        'reportMain' => array('trust'),
     );
 }

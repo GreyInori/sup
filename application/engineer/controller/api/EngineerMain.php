@@ -268,9 +268,8 @@ class EngineerMain extends Controller
         if(empty($list)) {
             return '账号或密码错误，请检查';
         }
-        if($list[0]['company'] == null) {
-            return '该账号尚未分配到指定企业,请先完善工程信息分配企业';
-        }
+        $node = self::fetchNode($list[0]['divide']);
+        $list[0]['node'] = $node;
         return array($list[0]);
     }
 
@@ -588,6 +587,46 @@ class EngineerMain extends Controller
     // +----------------------------------------------------------------------
     // | 辅助类型相关
     // +----------------------------------------------------------------------
+    /**
+     * 根据角色id获取对应的权限列表
+     * @param $divide
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    private static function  fetchNode($divide)
+    {
+        $list = Db::table('su_control_node')
+                ->alias('scn')
+                ->join('su_control sc','sc.control_id = scn.control_id')
+                ->where('scn.divide_id',$divide)
+                ->field(['sc.control_id','control_chs','control_pid','control_url','control_icon'])
+                ->order('control_pid')
+                ->select();
+        if(empty($list)) {
+            return array();
+        }
+        /* 根据父类id名创建格式为 父类id => 值 的数组，用于给子类匹配 */
+        $divideParent = array();
+        $parent = Db::table('su_control')->where('control_pid',0)->field(['control_id','control_chs','control_pid','control_url','control_icon'])->select();
+        foreach($parent as $key => $value) {
+            $value = self::fieldChange($value);
+            $divideParent[$value['control']] = $value;
+            $divideParent[$value['control']]['child'] = array();
+        }
+        /* 把子类的数据塞进父类里面去 */
+        foreach($list as $key => $value) {
+            $value = self::fieldChange($value);
+            array_push($divideParent[$value['controlParent']]['child'],$value);
+        }
+        $result = array();
+        foreach ($divideParent as $row) {
+            array_push($result,$row);
+        }
+        return $result;
+    }
+
     /**
      * 工程内成员信息修改方法
      * @param $company

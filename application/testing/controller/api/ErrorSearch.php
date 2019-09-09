@@ -45,7 +45,6 @@ class ErrorSearch extends Controller
                     ->field(['ste.error_id','ste.error_main','ste.error_response','st.input_testing_company','st.trust_code'])
                     ->limit($page[0],$page[1])
                     ->select();
-
         }catch(\Exception $e) {
             return $e->getMessage();
         }
