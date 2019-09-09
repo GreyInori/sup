@@ -13,6 +13,7 @@ use think\Db;
 use app\engineer\model\EngineerModel as EngineerModel;
 use app\engineer\controller\EngineerAutoLoad as EngineerAutoLoad;
 use app\engineer\controller\api\EngineerCheck as EngineerCheck;
+use think\Exception;
 
 /**
  * Class EngineerMain
@@ -294,13 +295,14 @@ class EngineerMain extends Controller
                     ->where('divide_id',$data['divide'])
                     ->field(['divide_field','divide_id'])
                     ->select();
-        $engineer = Db::table('su_engineering')
-                        ->where('engineering_id',$data['engineer'])
-                        ->field(['contract_code'])
-                        ->select();
         if(empty($divide)) {
             return '查无此成员身份，请检查出传递的成员id';
         }
+        /* 检测指定工程是否存在，并且获取工程内指定成员角色信息用于修改 */
+        $engineer = Db::table('su_engineering')
+            ->where('engineering_id',$data['engineer'])
+            ->field(['contract_code',$divide[0]['divide_field']])
+            ->select();
         if(empty($engineer)) {
             return '查无此成员身份，请检查出传递的成员id';
         }
@@ -311,12 +313,19 @@ class EngineerMain extends Controller
             'divide_user' => self::creatCompanyCode($divide[0]['divide_field'],$engineer[0]['contract_code']),
             'divide_passwd' => md5('123456')
         );
-        /* 如果传递了企业id的话，就给添加的数组增添加企业 */
-        if(isset($data['company'])) {
-            $divide['member_id'] = $data['company'];
+        Db::startTrans();
+        try{
+            /* 如果传递了企业id的话，就给添加的数组增添加企业 */
+            if(isset($data['company'])) {
+                $divide['member_id'] = $data['company'];
+                self::updateEngineerMember($data['company'],$divide[0]['divide_field'],$data['engineer']);
+            }
+            $insert = Db::table('su_engineering_divide')->insertGetId($divide);
+        }catch(\Exception $e){
+            Db::rollback();
+            return $e->getMessage();
         }
 
-        $insert = Db::table('su_engineering_divide')->insertGetId($divide);
         return array('divide'=>$insert,'divideUser'=>$divide['divide_user']);
     }
 
@@ -579,6 +588,36 @@ class EngineerMain extends Controller
     // +----------------------------------------------------------------------
     // | 辅助类型相关
     // +----------------------------------------------------------------------
+    /**
+     * 工程内成员信息修改方法
+     * @param $company
+     * @param $field
+     * @param $engineer
+     * @throws Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     * @throws \think\exception\PDOException
+     */
+   private static function updateEngineerMember($company,$field,$engineer)
+   {
+       $company = Db::table('su_company')
+           ->where('company_id',$company)
+           ->field(['company_full_name'])
+           ->select();
+       if(empty($engineerDivide)) {
+           $update = array(
+               $field => $company[0]['company_full_name'],
+           );
+       }else{
+           $update = array(
+               $field => "{$engineerDivide[0]['divide_field']},{$company[0]['company_full_name']}"
+           );
+       }
+       Db::table('su_engineering')->where('engineering_id',$engineer)->update($update);
+   }
+
+
     /**
      * 获取工程内成员列表数据
      * @param $uid
