@@ -17,5 +17,6 @@ Route::controller('/engineer','Engineer/Engineer');
 Route::controller('/material','Material/Material');
 Route::controller('/trust','Trust/Trust');
 Route::controller('/testing','Testing/Testing');
+Route::controller('/agreement','Agreement/Agreement');
 /* 所有路由匹配不到的情况下触发 */
 Route::miss('Api/Exception/miss');

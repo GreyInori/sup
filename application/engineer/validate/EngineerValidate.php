@@ -10,6 +10,10 @@ namespace app\engineer\validate;
 
 use think\Validate;
 
+/**
+ * Class EngineerValidate
+ * @package app\engineer\validate
+ */
 class EngineerValidate extends Validate
 {
     protected $regex = array(

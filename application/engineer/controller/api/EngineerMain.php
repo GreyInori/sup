@@ -618,7 +618,9 @@ class EngineerMain extends Controller
         /* 把子类的数据塞进父类里面去 */
         foreach($list as $key => $value) {
             $value = self::fieldChange($value);
-            array_push($divideParent[$value['controlParent']]['child'],$value);
+            if(!$value['controlParent'] == 0) {
+                array_push($divideParent[$value['controlParent']]['child'],$value);
+            }
         }
         $result = array();
         foreach ($divideParent as $row) {
