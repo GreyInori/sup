@@ -156,6 +156,35 @@ class EngineerMain extends Controller
     }
 
     /**
+     * 工程审核通过方法
+     * @param $data
+     * @return array|mixed|string
+     * @throws \think\exception\DbException
+     */
+    public static function toPass($data)
+    {
+        /* 把传递过来的数据根据数据表进行分组，用于后续插入和检测等操作 */
+        $group = new EngineerAutoLoad();
+        $check = $group->toGroup($data);
+        /* 检测当前工程是否已经存在 */
+        $uuid = self::engineerAlreadyCreat($check,1);
+        if(!is_array($uuid)) {
+            return $uuid;
+        }
+        /* 如果工程已经存在，就根据返回的工程id进行删除操作 */
+        $uuid = $uuid[0];
+        Db::startTrans();
+        try{
+            Db::table('su_engineering')->where('engineering_id',$uuid)->update(['engineering_verify'=>1]);
+            Db::commit();
+            return array('success');
+        }catch(\Exception $e){
+            Db::rollback();
+            return $e->getMessage();
+        }
+    }
+
+    /**
      * 获取工程详细信息方法
      * @param $data
      * @return array|string

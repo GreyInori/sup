@@ -12,6 +12,8 @@ use think\Controller;
 use think\Db;
 use \app\agreement\controller\AgreementAutoLoad as AgreementAutoLoad;
 use \app\agreement\model\AgreementModel as AgreementModel;
+use \app\lib\controller\Picture;
+
 
 /**
  * Class AgreementMain
@@ -19,6 +21,7 @@ use \app\agreement\model\AgreementModel as AgreementModel;
  */
 class AgreementMain extends Controller
 {
+    use Picture;
     /**
      * 执行合同添加方法
      * @param $data
@@ -38,6 +41,12 @@ class AgreementMain extends Controller
         $data['agreement']['agreement_time'] = time();
         $agreement = $data['agreement'];
         $agreement['agreement_id'] = $uuid[0];
+        /* 执行图片上传操作，如果上传失败就返回错误信息，如果成功就根据传值以及当前时间创建图片文件修改数据 */
+        $pic = self::toImgUp('agreementFile','agreement');
+        if(!is_array($pic)) {
+            return $pic;
+        }
+        $agreement['agreement_file'] = $pic['pic'];
         try{
             Db::table('su_internal_agreement')->insert($agreement);
             return array('uid'=>$uuid[0]);
@@ -135,5 +144,51 @@ class AgreementMain extends Controller
         }
         $uuid = md5(uniqid(mt_rand(),true));
         return array($uuid);
+    }
+
+    /**
+     * 转换查询结果内字段方法
+     * @param $list
+     * @return array
+     */
+    public static function fieldChange($list)
+    {
+        $result = array();
+        $field = new AgreementAutoLoad();
+        $field = $field::$fieldArr;        // 用于比较转换的数组字段
+        /* 如果是索引数组的话就需要对数组内所有数据的字段进行转换，否则就直接对数组内值进行转换 */
+        if(!self::is_assoc($list)) {
+            foreach($list as $key => $row) {
+                $result[$key] = self::toFieldChange($row, $field);
+            }
+        }else {
+            $result = self::toFieldChange($list, $field);
+        }
+        return $result;
+    }
+
+    /**
+     * 把数据库字段转换为前端传递的字段返回
+     * @param $list
+     * @param $check
+     * @return array
+     */
+    private static function toFieldChange($list, $check)
+    {
+        $result = array();
+        foreach($list as $key => $row) {
+            $result[array_search($key, $check)] = $row;
+        }
+        return $result;
+    }
+
+    /**
+     * 检测数组是否为索引数组
+     * @param $arr
+     * @return bool
+     */
+    private static function is_assoc($arr)
+    {
+        return array_keys($arr) !== range(0, count($arr) - 1);
     }
 }

@@ -214,6 +214,34 @@ class TrustMain extends Controller
             return $e->getMessage();
         }
     }
+
+    /**
+     * 执行委托单收样操作
+     * @param $data
+     * @return array|string
+     * @throws \think\exception\DbException
+     *
+     */
+    public static function toTrustAllow($data)
+    {
+        $group = new TrustAutoLoad();
+        $data = $group->toGroup($data);
+        $uuid = self::trustAlreadyCreat($data, 1);
+        if(!is_array($uuid)) {
+            return $uuid;
+        }
+        /* 进行企业以及企业详细信息的添加操作 */
+        Db::startTrans();
+        try{
+            $allow = Db::table('su_trust')->where('trust_id',$uuid[0])->update(['is_allow'=>1]);
+            Db::table('su_testing_status')->where('trust_id',$uuid[0])->update(['receive_time'=>time()]);
+            Db::commit();
+            return array($allow);
+        }catch(\Exception $e) {
+            Db::rollback();
+            return $e->getMessage();
+        }
+    }
     // +----------------------------------------------------------------------
     // | 委托记录字段相关
     // +----------------------------------------------------------------------

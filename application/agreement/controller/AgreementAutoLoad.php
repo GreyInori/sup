@@ -28,6 +28,10 @@ class AgreementAutoLoad extends Controller
         'person' => 'input_person',
         'quality' => 'quality_station',
         'engineering' => 'engineering_id',
+        'engineeringName' => 'engineering_name',
+        'construction' => 'construction_company',
+        'typeName' => 'type_name',
+        'file' => 'agreement_file',
     );
 
     /**

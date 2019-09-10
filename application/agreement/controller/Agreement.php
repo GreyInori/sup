@@ -12,6 +12,7 @@ use think\Controller;
 use \app\api\controller\Send;
 use \app\agreement\controller\AgreementAutoLoad as FieldCheck;
 use \app\agreement\controller\api\AgreementMain as AgreementMain;
+use \app\agreement\controller\api\AgreementSearch as AgreementSearch;
 
 /**
  * Class Agreement
@@ -70,11 +71,11 @@ class Agreement extends Controller
             return self::returnMsg(500,'fail',$data);
         }
         /* 获取企业列表数据，如果有抛出异常的话就返回错误信息 */
-        $list = CompanySearch::toList($data);
+        $list = AgreementSearch::toList($data);
         if(!is_array($list)) {
             return self::returnMsg(500,'fail',$list);
         }
-        $change = new CompanyMain();
+        $change = new AgreementMain();
         $list = $change::fieldChange($list);
         return self::returnMsg(200,'success',$list);
     }
@@ -94,7 +95,7 @@ class Agreement extends Controller
         /* 执行合同删除方法，如果成功的话就返回删除结果，否则返回错误信息 */
         $list = AgreementMain::toDel($data);
         if(is_array($list)){
-            return self::returnMsg(200, 'success', $list);
+            return self::returnMsg(200, 'success', $list['uid']);
         }else{
             return self::returnMsg(500,'fail',$list);
         }

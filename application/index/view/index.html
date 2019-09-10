@@ -22,8 +22,11 @@
         // pic.append('inputCompany', '');
         // pic.append('response', '');
         // pic.append('fileDepict', '嗦不粗话了');
-        // pic.append('UploadPeople', '陨石');
-        // pic.append('pdf', document.getElementById('img').files[0]);
+        // pic.append('agreementType', '1');
+        // pic.append('person', '陨石');
+        // pic.append('quality', '陨石质监站');
+        // pic.append('engineering', '3271e961902c266676029f35156ba03a');
+        // pic.append('agreementFile', document.getElementById('img').files[0]);
         $.ajax({
             url: 'http://localhost/material/StandardEdit',
             url: 'http://localhost/engineer/DivideEngineer',
@@ -91,17 +94,25 @@
             // url: 'http://jiance.server2.puankang.com.cn/agreement/AgreementDel',
             // url: 'http://localhost/trust/CompanyTrust',
             // url: 'http://localhost/trust/CompanyTrust',
+            url: 'http://localhost/agreement/AgreementDel',
+            url: 'http://localhost/agreement/Agreement',
+            url: 'http://localhost/trust/TrustAllow',
+            url: 'http://localhost/engineer/EngineerPass',
             // url : 'https://apiserer1.bangninyou.com/version/user/Products?aithorization=89577f2a6a943243dff4929aeafb0b7b,123',
             // url : 'https://apiserer1.bangninyou.com/version/homepage/Products?aithorization=89577f2a6a943243dff4929aeafb0b7b,123',
-            type: 'get',
+            type: 'post',
             // contentType : false,
             // processData : false,
             data : {
                 // 'agreement' : '6a61f0f59e0d5eb23c4bbcfa9fca85fc',
                 // 'agreementType' : 1,
+                // 'typeName' : '企业',
                 // 'person' : '陨石',
                 // 'quality' : '陨石质监站',
-                // 'engineering' : '3271e961902c266676029f35156ba03a',
+                // 'agreementTime' : '2018-01-01',
+                // 'construction' : '陨石',
+                'engineer' : '3271e961902c266676029f35156ba03a',
+                // 'engineeringName' : '陨石',
                 // 'divideUser' : 'JL190905299315',   // 工程分配的账号
                 // 'dividePass' : '123456',
                 // 'engineering' : '3271e961902c266676029f35156ba03a',

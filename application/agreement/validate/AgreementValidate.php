@@ -44,5 +44,7 @@ class AgreementValidate extends Validate
     protected $scene = array(
         'add' => ['agreementNumber','agreementType','person','quality','engineering'],     // 合同添加
         'edit' => ['agreement','agreementNumber','agreementType','person','quality','engineering'],     // 合同添加
+        'del' => ['agreement'],     // 合同添加
+        'list' => ['agreementTime','person','quality'],     // 合同添加
     );
 }

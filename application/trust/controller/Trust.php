@@ -210,6 +210,21 @@ class Trust extends Controller
         return self::returnMsg(200,'success',$list);
     }
 
+    public function postTrustAllow()
+    {
+        /* 检测传递的参数是否符合删除委托单的规范，如果不符合就返回错误信息 */
+        $data = FieldCheck::checkData('trustDel');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 执行企业添加方法，如果成功的话就返回企业的id，否则返回错误信息 */
+        $list = TrustMain::toTrustAllow($data);
+        if(is_array($list)){
+            return self::returnMsg(200, 'success', $list);
+        }else{
+            return self::returnMsg(500,'fail',$list);
+        }
+    }
     // +----------------------------------------------------------------------
     // | 检测类型相关
     // +----------------------------------------------------------------------

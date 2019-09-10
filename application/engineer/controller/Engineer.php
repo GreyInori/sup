@@ -82,6 +82,25 @@ class Engineer extends Controller
     }
 
     /**
+     * 工程审核通过方法
+     * @return false|string
+     * @throws \think\exception\DbException
+     */
+    public function postEngineerPass()
+    {
+        /* 检测传递的参数是否符合录入的规范，如果不符合就返回错误信息 */
+        $data = FieldCheck::checkData('del');
+        if(!is_array($data)){
+            return self::returnMsg(500,'fail',$data);
+        }
+        $result = EngineerMain::toPass($data);
+        if(!is_array($result)) {
+            return self::returnMsg(500,'fail',$result);
+        }
+        return self::returnMsg(200,'success',$result[0]);
+    }
+
+    /**
      * 获取工程列表方法
      * @return false|string
      * @throws \think\exception\DbException
