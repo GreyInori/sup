@@ -54,18 +54,18 @@ class EngineerMain extends Controller
 //        $check['engineer']['input_person'] = $people['input_person'];
         $check['engineer']['contract_code'] = self::creatCode();      // 生成工程编号
         /* 如果传递了企业id的话，那么这个企业id就是施工的id，进行指定单位成员分配 */
-        if(isset($check['engineer']['company_id'])) {
-            $company = self::createDivide($check['engineer']['contract_code'], $uuid[0],$check['engineer']['company_id']);
-            unset($check['engineer']['company_id']);
-        }else {
-            $company = self::createDivide($check['engineer']['contract_code'], $uuid[0]);
-        }
+//        if(isset($check['engineer']['company_id'])) {
+//            $company = self::createDivide($check['engineer']['contract_code'], $uuid[0],$check['engineer']['company_id']);
+//            unset($check['engineer']['company_id']);
+//        }else {
+//            $company = self::createDivide($check['engineer']['contract_code'], $uuid[0]);
+//        }
 
         /* 进行工程以及工程详细信息添加等操作 */
         Db::startTrans();
         try{
             Db::table('su_engineering')->insert($check['engineer']);
-            Db::table('su_engineering_divide')->insertAll($company);
+//            Db::table('su_engineering_divide')->insertAll($company);
             self::engineerMainCheck($check, $uuid[0]);
             Db::commit();
             return array('uid'=>$uuid[0]);
@@ -335,26 +335,38 @@ class EngineerMain extends Controller
             return '查无此成员身份，请检查出传递的成员id';
         }
         /* 根据查询结果生成用户名等数据进行操作 */
-        $divide = array(
+        $divideUpdate = array(
             'engineering_id' => $data['engineer'],
             'divide_id' => $divide[0]['divide_id'],
             'divide_user' => self::creatCompanyCode($divide[0]['divide_field'],$engineer[0]['contract_code']),
-            'divide_passwd' => md5('123456')
         );
+        /* 如果传递了用户id等相关信息后，就根据该用户创建相关的工程成员数据 */
+        if(isset($data['user'])) {
+            $user = Db::table('su_admin')
+                        ->where('user_id',$data['user'])
+                        ->field(['user_company','user_name','user_pass'])
+                        ->select();
+            if(empty($user)) {
+                return '查无此用户，请检查传递的用户id';
+            }
+            $divideUpdate['member_id'] = $user[0]['user_company'];
+            $divideUpdate['divide_user'] = $user[0]['user_name'];
+            $divideUpdate['divide_passwd'] = $user[0]['user_pass'];
+        }
         Db::startTrans();
         try{
             /* 如果传递了企业id的话，就给添加的数组增添加企业 */
-            if(isset($data['company'])) {
-                $divide['member_id'] = $data['company'];
-                self::updateEngineerMember($data['company'],$divide[0]['divide_field'],$data['engineer']);
+            if(isset($divideUpdate['member_id'])) {
+                self::updateEngineerMember($divideUpdate['member_id'],$divide[0]['divide_field'],$data['engineer']);
             }
-            $insert = Db::table('su_engineering_divide')->insertGetId($divide);
+            $insert = Db::table('su_engineering_divide')->insertGetId($divideUpdate);
+            Db::commit();
         }catch(\Exception $e){
             Db::rollback();
             return $e->getMessage();
         }
 
-        return array('divide'=>$insert,'divideUser'=>$divide['divide_user']);
+        return array('divide'=>$insert,'divideUser'=>$divideUpdate['divide_user']);
     }
 
     /**

@@ -27,7 +27,12 @@ class AdminAutoLoad extends Controller
         'company' => 'user_company',
         'role' => 'user_role',
         'roleName' => 'role_name',
-        'companyName' => 'company_full_name'
+        'companyName' => 'company_full_name',
+        'control' => 'control_id',
+        'controlChs' => 'control_chs',
+        'controlParent' => 'control_pid',
+        'controlUrl' => 'control_url',
+        'controlIcon' => 'control_icon',
     );
 
     /**
@@ -35,7 +40,7 @@ class AdminAutoLoad extends Controller
      * 给指定字段数据根据数据表区别分组
      */
     public static $fieldGroup = array(
-        'user' => array('user_id','user_name','user_pass','user_company','user_role','role_name','company_full_name'),
+        'admin' => array('user_id','user_name','user_pass','user_company','user_role','role_name','company_full_name'),
     );
 
     /**

@@ -12,7 +12,7 @@ use think\Controller;
 use \app\api\controller\Send;
 use \app\engineer\controller\EngineerAutoLoad as FieldCheck;
 use \app\engineer\controller\api\EngineerMain as EngineerMain;
-use \app\engineer\controller\api\DivideMain as DivideMain;
+use \app\engineer\controller\api\DivideMain as DivideMain ;
 use \app\engineer\controller\api\EngineerSearch as EngineerSearch;
 
 /**

@@ -27,7 +27,7 @@ class AdminValidate extends Validate
         'company' => 'chsDash',           // 企业id
         'companyName' => 'chsDash',    // 企业名
         'role' => 'number',     // 成员角色
-        'roleName' => 'chsDash'
+        'roleName' => 'chsDash'       // 成员角色名
     );
 
     protected $message = array(
@@ -46,6 +46,6 @@ class AdminValidate extends Validate
         'add' => ['userName','userPass','company','role'],
         'edit' => ['user','userName','userPass','company','role'],
         'del' => ['user'],
-        'list' => ['userName','companyName','roleName']
+        'list' => ['companyName','roleName']
     );
 }
