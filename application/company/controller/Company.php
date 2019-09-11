@@ -21,7 +21,6 @@ use \app\company\controller\api\CompanySearch as CompanySearch;
 class Company extends Controller
 {
     use Send;
-
     /**
      * 企业注册方法
      * @return false|string

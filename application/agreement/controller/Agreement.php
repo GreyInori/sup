@@ -63,6 +63,10 @@ class Agreement extends Controller
         }
     }
 
+    /**
+     * 获取合同列表
+     * @return false|string
+     */
     public function getAgreement()
     {
         /* 检查传递参数是否符合规范 */
