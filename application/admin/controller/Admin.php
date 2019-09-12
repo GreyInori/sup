@@ -115,4 +115,20 @@ class Admin extends Controller
         }
         return self::returnMsg(200,'success',$data[0]);
     }
+
+    /**
+     * 获取管理员角色列表
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getAdminRole()
+    {
+        $data = AdminMain::toRole();
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        return self::returnMsg(200,'success',$data);
+    }
 }

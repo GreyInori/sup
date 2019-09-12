@@ -147,6 +147,24 @@ class AdminMain extends Controller
     }
 
     /**
+     * 获取管理员角色列表方法
+     * @return false|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toRole()
+    {
+        $list = Db::table('su_role')
+                    ->field(['role_id as role','role_name as roleName'])
+                    ->select();
+        if(empty($list)) {
+            return '尚未存在管理员角色';
+        }
+        return $list;
+    }
+
+    /**
      * 检测传递的用户相关信息是否有误以及是否存在方法
      * @param $data
      * @param int $token
