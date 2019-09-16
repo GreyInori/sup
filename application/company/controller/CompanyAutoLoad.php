@@ -142,7 +142,9 @@ class CompanyAutoLoad extends Controller
 
                 $fieldArr[$key] = $row;
             }
-            isset(self::$fieldArr[$key])?$result[self::$fieldArr[$key]] = $row : false;
+            if(!empty($row)) {
+                isset(self::$fieldArr[$key])?$result[self::$fieldArr[$key]] = $row : false;
+            }
         }
         return $result;
     }

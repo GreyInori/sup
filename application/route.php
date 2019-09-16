@@ -20,5 +20,6 @@ Route::controller('/testing','Testing/Testing');
 Route::controller('/agreement','Agreement/Agreement');
 Route::controller('/area','Area/Area');
 Route::controller('/admin','Admin/Admin');
+Route::controller('/qrcode','Qrcode/Qrcode');
 /* 所有路由匹配不到的情况下触发 */
 Route::miss('Api/Exception/miss');

@@ -167,7 +167,9 @@ class TestingAutoLoad extends Controller
             if(!empty($field) && in_array($key, $field)){
                 $fieldArr[$key] = $row;
             }
-            isset(self::$fieldArr[$key])?$result[self::$fieldArr[$key]] = $row : false;
+            if(!empty($row)) {
+                isset(self::$fieldArr[$key])?$result[self::$fieldArr[$key]] = $row : false;
+            }
         }
         return $result;
     }

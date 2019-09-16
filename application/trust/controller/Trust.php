@@ -210,6 +210,11 @@ class Trust extends Controller
         return self::returnMsg(200,'success',$list);
     }
 
+    /**
+     * 委托单收样方法
+     * @return false|string
+     * @throws \think\exception\DbException
+     */
     public function postTrustAllow()
     {
         /* 检测传递的参数是否符合删除委托单的规范，如果不符合就返回错误信息 */

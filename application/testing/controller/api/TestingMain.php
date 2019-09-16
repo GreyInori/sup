@@ -178,7 +178,7 @@ class TestingMain extends Controller
         }
         $result = array();
         foreach($list as $key => $row) {
-            if(strstr($key,'_time')) {
+            if(strstr($key,'_time') && is_int($row)) {
                 $row = date('Y-m-d H:i:s',$row);
             }
             $result[array_search($key, $checkArr)] = $row;

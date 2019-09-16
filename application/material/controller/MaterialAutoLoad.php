@@ -59,7 +59,6 @@ class MaterialAutoLoad extends Controller
         'defaultToken' => 'trial_default_token',
         'defaultVerify' => 'trial_verify',
         'divideName' => 'divide_name',
-        'divideName' => 'divide_name',
     );
 
     /**
@@ -153,7 +152,9 @@ class MaterialAutoLoad extends Controller
 
                 $fieldArr[$key] = $row;
             }
-            isset(self::$fieldArr[$key])?$result[self::$fieldArr[$key]] = $row : false;
+            if(!empty($row)) {
+                isset(self::$fieldArr[$key])?$result[self::$fieldArr[$key]] = $row : false;
+            }
         }
         return $result;
     }

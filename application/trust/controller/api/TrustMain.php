@@ -436,6 +436,17 @@ class TrustMain extends Controller
         foreach($data['upload'] as $key => $row) {
             $update[$key] = $row;
         }
+        /* 检测传递的二维码是否符合规范 */
+        $qrCode = Db::table('su_qrcode')
+                    ->where('qr_code',$update['file_code'])
+                    ->field(['is_use'])
+                    ->select();
+        if(empty($qrCode)) {
+            return '查无此二维码，请检查传递的二维码';
+        }
+        if($qrCode[0]['is_use'] == 1) {
+            return '当前二维码已经被使用，请检查传递的二维码';
+        }
         /* 执行图片上传数据修改操作 */
         Db::startTrans();
         try {
@@ -446,6 +457,10 @@ class TrustMain extends Controller
             Db::table('su_testing_status')
                 ->where('trust_id',$file[0]['trust_id'])
                 ->update($testUpdate);
+            /* 标记当前二维码为已使用 */
+            Db::table('su_qrcode')
+                ->where('qr_code',$update['file_code'])
+                ->update(['is_use'=>1]);
             Db::commit();
             return array($update['file_file']);
         }catch(\Exception $e) {
@@ -554,7 +569,7 @@ class TrustMain extends Controller
     {
         $result = array();
         foreach($list as $key => $row) {
-            if(strstr($key,'_time')) {
+            if(strstr($key,'_time') && is_int($row)) {
                 $row = date('Y-m-d H:i:s',$row);
             }
             $result[array_search($key, $check)] = $row;
