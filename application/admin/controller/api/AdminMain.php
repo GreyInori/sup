@@ -134,7 +134,7 @@ class AdminMain extends Controller
         $list = Db::table('su_admin')
                 ->alias('sa')
                 ->join('su_role sr','sr.role_id = sa.user_role')
-                ->join('su_company sc','sc.company_id = sa.user_company')
+                ->join('su_company sc','sc.company_id = sa.user_company','left')
                 ->where($where)
                 ->field(['sa.user_id as user','sa.user_role as role','sc.company_id as company','sc.company_full_name as companyName','sr.role_name as roleName'])
                 ->select();

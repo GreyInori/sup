@@ -233,11 +233,6 @@ class QrcodeMain extends Controller
             return $e->getMessage();
         }
     }
-
-    public static function toQrcodeCheck()
-    {
-
-    }
     // +----------------------------------------------------------------------
     // | 辅助相关
     // +----------------------------------------------------------------------

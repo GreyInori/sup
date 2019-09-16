@@ -30,6 +30,8 @@ class QrcodeValidate extends Validate
         'workName' => 'chsDash',        // 业务类型名称
         'workCode' => 'alphaDash',      // 业务类型代码
         'codeNum' => 'require|number',    // 创建的二维码的数量
+        'qrTime' => 'number',               // 二维码批次
+        'use' => 'number',                   // 二维码是否以及被使用
     );
 
     protected $message = array(
@@ -45,6 +47,8 @@ class QrcodeValidate extends Validate
         'workCode.alphaDash' => '传递的业务类型编码不符合规范',
         'codeNum.require' => '请传递需要创建的二维码数量',
         'codeNum.number' => '传递的二维码数量不符合规范',
+        'qrTime.number' => '传递的二维码批次不符合规范',
+        'use.number' => '传递的二维码是否已经被使用状态不符合规范',
     );
 
     protected $scene = array(
@@ -56,6 +60,7 @@ class QrcodeValidate extends Validate
         'workEdit' => ['work','workName','workCode'],
         'workDel' => ['work'],
         'workList' => ['workName','workCode'],
-        'qrcodeCreat' => ['company','work','codeNum']
+        'qrcodeCreat' => ['company','work','codeNum'],
+        'qrcode' => ['qrTime','workCode','companyCode','use'],
     );
 }

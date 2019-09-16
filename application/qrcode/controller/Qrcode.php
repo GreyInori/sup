@@ -8,6 +8,7 @@
 
 namespace app\qrcode\controller;
 
+use app\qrcode\controller\api\QrcodeSearch;
 use think\Controller;
 use \app\api\controller\Send;
 use \app\qrcode\controller\QrcodeAutoLoad as  FieldCheck;
@@ -212,8 +213,21 @@ class Qrcode extends Controller
         return self::returnMsg(200,'success',$list);
     }
 
-    public function postQrcodeCheck()
+    /**
+     * 查询获取二维码列表
+     * @return false|string
+     */
+    public function getQrcode()
     {
-
+        $data = FieldCheck::checkData('qrcode','page');
+        if(!is_array($data)){
+            return self::returnMsg(500,'fail',$data);
+        }
+        $list = QrcodeSearch::toList($data);
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        $list = QrcodeMain::fieldChange($list);
+        return self::returnMsg(200,'success',$list);
     }
 }

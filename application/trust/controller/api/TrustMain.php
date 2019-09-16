@@ -382,7 +382,7 @@ class TrustMain extends Controller
             ->alias('ssf')
             ->join('su_testing_file_type stft','stft.type_id=ssf.file_type')
             ->where(['ssf.trust_id'=>$uuid])
-            ->field(['ssf.file_id','ssf.file_file','ssf.file_depict','ssf.file_type','ssf.file_time','ssf.file_code','ssf.upload_people','stft.type_name'])
+            ->field(['ssf.file_id','ssf.file_file','ssf.file_depict','ssf.file_type','ssf.file_time','ssf.file_code','ssf.upload_people','stft.type_name','stft.type_depict'])
             ->order('stft.type_id')
             ->select();
 

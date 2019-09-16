@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: admin
  * Date: 2019/9/16
- * Time: 11:35
+ * Time: 17:40
  */
 
 namespace app\qrcode\controller\api;
@@ -11,20 +11,20 @@ namespace app\qrcode\controller\api;
 use think\Controller;
 
 /**
- * Class QrcodeWorkWhere
+ * Class QrcodeWhere
  * @package app\qrcode\controller\api
  */
-class QrcodeWorkWhere extends Controller
+class QrcodeWhere extends Controller
 {
     /**
-     * @var array
+     * @var array 
      */
     public $where = array(
-        'work_id' => ['work_id','='],
-        'work_name' => ['work_name','LIKE','%code%'],
-        'work_code' => ['work_code','LIKE','%code%'],
+        'company_code' => ['company_code','='],
+        'work_code' => ['work_code','='],
+        'qr_time' => ['qr_time','='],
+        'is_use' => ['is_use','='],
     );
-
     /**
      * 根据传递的参数返回指定的查询条件
      * @param array $where
@@ -76,8 +76,6 @@ class QrcodeWorkWhere extends Controller
                 $conditions = array($where[$key][0] => array($where[$key][1]));
                 if(isset($where[$key][2])){
                     $row = str_replace('code',$row,$where[$key][2]);
-                }elseif(isset($where[$key][2]) && $where[$key][2] == 'time'){
-                    $row = strtotime($row);
                 }
                 array_push($conditions[$where[$key][0]], $row);
             }
