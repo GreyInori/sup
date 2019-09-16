@@ -743,8 +743,8 @@ class MaterialMain extends Controller
         if($token == 1){
             $list = TypeModel::get(['type_id' => $type['type_id']]);
         }else{
-            $list = TypeModel::get(['type_name' => $type['type_name'],'type_pid'=>$type['type_pid']]);
-            $parent = TypeModel::get(['type_pid' => $type['type_pid']]);
+            $list = TypeModel::get(['type_name' => $type['type_name'],'type_pid'=>$type['type_pid'],'show_type'=>1]);
+            $parent = TypeModel::get(['type_pid' => $type['type_pid'],'show_type'=>1]);
         }
         /* 检测企业是否存在并如果是修改之类的操作的话就需要返回查询出来的企业id进行返回 */
         if(!empty($list) && $token == 0 && isset($parent) && !empty($parent)){

@@ -527,7 +527,7 @@ class TrustMain extends Controller
         /* 检测企业是否以及存在，如果不存在，就通过 uniqid 生成唯一id返回给方法调用 */
         $trust = $data['trust'];
         if($token == 1){
-            $list = TrustModel::get(['trust_id' => $trust['trust_id']]);
+            $list = TrustModel::get(['trust_id' => $trust['trust_id'],'show_type'=>1]);
         }
         /* 检测委托是否存在并如果是修改之类的操作的话就需要返回查询出来的委托id进行返回 */
         if(!empty($list) && $token == 1){

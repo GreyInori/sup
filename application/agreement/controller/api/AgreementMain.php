@@ -130,9 +130,9 @@ class AgreementMain extends Controller
         /* 检测企业是否以及存在，如果不存在，就通过 uniqid 生成唯一id返回给方法调用 */
         $agreement = $data['agreement'];
         if($token == 1){
-            $list = AgreementModel::get(['agreement_id' => $agreement['agreement_id']]);
+            $list = AgreementModel::get(['agreement_id' => $agreement['agreement_id'],'show_type'=>1]);
         }else{
-            $list = AgreementModel::get(['engineering_id' => $agreement['engineering_id']]);
+            $list = AgreementModel::get(['engineering_id' => $agreement['engineering_id'],'show_type'=>1]);
         }
         /* 检测企业是否存在并如果是修改之类的操作的话就需要返回查询出来的企业id进行返回 */
         if(!empty($list) && $token == 0){

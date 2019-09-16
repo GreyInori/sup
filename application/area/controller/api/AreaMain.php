@@ -155,9 +155,9 @@ class AreaMain extends Controller
         /* 检测企业是否以及存在，如果不存在，就通过 uniqid 生成唯一id返回给方法调用 */
         $area = $data['area'];
         if($token == 0){
-            $list = AreaModel::get(['area_name' => $area['area_name']]);
+            $list = AreaModel::get(['area_name' => $area['area_name'],'show_type'=>1]);
         }else{
-            $list = AreaModel::get(['area_id' => $area['area_id']]);
+            $list = AreaModel::get(['area_id' => $area['area_id'],'show_type'=>1]);
         }
         /* 检测企业是否存在并如果是修改之类的操作的话就需要返回查询出来的企业id进行返回 */
         if(!empty($list) && $token == 0){

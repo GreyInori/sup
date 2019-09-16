@@ -182,9 +182,9 @@ class AdminMain extends Controller
         /* 检测企业是否以及存在，如果不存在，就通过 uniqid 生成唯一id返回给方法调用 */
         $admin = $data['admin'];
         if($token == 0){
-            $list = AdminModel::get(['user_name' => $admin['user_name']]);
+            $list = AdminModel::get(['user_name' => $admin['user_name'],'show_type'=>1]);
         }else{
-            $list = AdminModel::get(['user_id' => $admin['user_id']]);
+            $list = AdminModel::get(['user_id' => $admin['user_id'],'show_type'=>1]);
         }
         /* 检测企业是否存在并如果是修改之类的操作的话就需要返回查询出来的企业id进行返回 */
         if(!empty($list) && $token == 0){

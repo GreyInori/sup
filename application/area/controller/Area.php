@@ -82,6 +82,10 @@ class Area extends Controller
         }
     }
 
+    /**
+     * 获取地区列表
+     * @return false|string
+     */
     public function getArea()
     {
         $data = FieldCheck::checkData('list');

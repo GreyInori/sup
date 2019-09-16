@@ -1004,9 +1004,9 @@ class EngineerMain extends Controller
         /* 检测企业是否以及存在，如果不存在，就通过 uniqid 生成唯一id返回给方法调用 */
         $company = $data['engineer'];
         if($token == 1){
-            $list = EngineerModel::get(['engineering_id' => $company['engineering_id']]);
+            $list = EngineerModel::get(['engineering_id' => $company['engineering_id'],'show_type'=>1]);
         }else{
-            $list = EngineerModel::get(['engineering_name' => $company['engineering_name']]);
+            $list = EngineerModel::get(['engineering_name' => $company['engineering_name'],'show_type'=>1]);
         }
         /* 检测工程是否存在并如果是修改之类的操作的话就需要返回查询出来的工程id进行返回 */
         if(!empty($list) && $token == 0){
