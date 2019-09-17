@@ -238,6 +238,20 @@ class Trust extends Controller
         }
     }
 
+    public function postTrustPeopleFaceCheck()
+    {
+        $data = FieldCheck::checkData('trustUploadList');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 执行图片上传操作，拿到图片的路径进行转换处理 */
+        $Upload = TrustBase::picUpload();
+        if(!is_array($Upload)) {
+            return self::returnMsg(500,'fail',$Upload);
+        }
+        $UploadBase = TrustBase::imgToBase($Upload['pic']);
+    }
+
     /**
      * 委托单收样方法
      * @return false|string
