@@ -182,6 +182,22 @@ class CompanyMain extends Controller
     }
 
     /**
+     * 获取企业经济性质方法
+     * @return false|\PDOStatement|string|\think\Collection
+     */
+    public static function toCharacter()
+    {
+        try{
+            $list = Db::table('su_company_character')
+                ->field(['character_id','character_name'])
+                ->select();
+        }catch(\Exception $e){
+            return $e->getMessage();
+        }
+        return $list;
+    }
+
+    /**
      * 获取企业详细信息方法
      * @param $data
      * @return array|string
@@ -230,7 +246,6 @@ class CompanyMain extends Controller
                         ->select();
         $main = Db::table('su_company_main')->where('company_id',$uuid[0])->field($field['main'])->select();
         $text = Db::table('su_company_text')->where('company_id',$uuid[0])->field($field['text'])->select();
-
         /* 循环查询数据，把数据库内字段转换成前端传递过来的字段进行处理，并塞进返回值数组内 */
         foreach ($company[0] as $key => $row) {
             $key = array_search($key, $check);
@@ -239,6 +254,7 @@ class CompanyMain extends Controller
             }
             $result[$key] = $row;
         }
+        /* 给返回值添加详细信息以及简介信息 */
         if(!empty($main)) {
             foreach ($main[0] as $mainKey => $mainRow) {
                 $mainKey = array_search($mainKey, $check);
@@ -251,7 +267,7 @@ class CompanyMain extends Controller
                 $result[$textKey] = $textRow;
             }
         }
-        if($result['area'] != null) {
+        if(isset($result['area']) && $result['area'] != null) {
             $area = new \app\lib\controller\Area();
             $result['area'] = $area::getAreaList($result['area']);
         }

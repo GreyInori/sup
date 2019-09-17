@@ -75,7 +75,6 @@ class AreaAutoLoad extends Controller
     {
         $companyValidate = new \app\area\validate\AreaValidate();
         $request = request()->param();
-
         /* 对传递过来的参数进行制定场景 $control 来进行检测，如果不符合规则就返回错误信息，返回函数进行后面的处理 */
         $check = $companyValidate->scene($control)->check($request);
 
@@ -102,7 +101,7 @@ class AreaAutoLoad extends Controller
 
                 $fieldArr[$key] = $row;
             }
-            if(!empty($row)) {
+            if(!empty($row) || $row !== '') {
                 isset(self::$fieldArr[$key])?$result[self::$fieldArr[$key]] = $row : false;
             }
         }

@@ -371,6 +371,7 @@ class TrustMain extends Controller
      */
     public static function toTrustUploadList($data)
     {
+        $url = request()->domain();
         $group = new TrustAutoLoad();
         $data = $group->toGroup($data);
         $uuid = self::trustAlreadyCreat($data, 1);
@@ -385,6 +386,11 @@ class TrustMain extends Controller
             ->field(['ssf.file_id','ssf.file_file','ssf.file_depict','ssf.file_type','ssf.file_time','ssf.file_code','ssf.upload_people','stft.type_name','stft.type_depict'])
             ->order('stft.type_id')
             ->select();
+        foreach($UploadList as $key => $row) {
+            if($row['file_file'] !== null) {
+                $UploadList[$key]['file_file'] = $url.$row['file_file'];
+            }
+        }
 
         if(empty($UploadList)) {
             return '当前委托单所属分类尚未存在图片上传规则，请检查传递的委托单id';
@@ -429,40 +435,42 @@ class TrustMain extends Controller
         if(!is_array($pic)) {
             return $pic;
         }
-        $update = array(
+        $updateArr = array(
             'file_file' => $pic['pic'],
             'file_time' => time(),
         );
         foreach($data['upload'] as $key => $row) {
-            $update[$key] = $row;
+            if($key != 'file_file' || $key != 'file_time')
+                $updateArr[$key] = $row;
         }
         /* 检测传递的二维码是否符合规范 */
         $qrCode = Db::table('su_qrcode')
-                    ->where('qr_code',$update['file_code'])
-                    ->field(['is_use'])
+                    ->where('qr_code',$updateArr['file_code'])
+                    ->field(['is_use','trust_id'])
                     ->select();
         if(empty($qrCode)) {
             return '查无此二维码，请检查传递的二维码';
         }
-        if($qrCode[0]['is_use'] == 1) {
+        if($qrCode[0]['is_use'] == 1 && $qrCode[0]['trust_id'] !== $file[0]['trust_id']) {
             return '当前二维码已经被使用，请检查传递的二维码';
         }
+        $url = request()->domain();
         /* 执行图片上传数据修改操作 */
         Db::startTrans();
         try {
-            $update = Db::table('su_status_file')
+            Db::table('su_status_file')
                 ->where('file_id',$data['upload']['file_id'])
-                ->update($update);
+                ->update($updateArr);
             /* 进行委托检测信息修改 */
             Db::table('su_testing_status')
                 ->where('trust_id',$file[0]['trust_id'])
                 ->update($testUpdate);
             /* 标记当前二维码为已使用 */
             Db::table('su_qrcode')
-                ->where('qr_code',$update['file_code'])
-                ->update(['is_use'=>1]);
+                ->where('qr_code',$updateArr['file_code'])
+                ->update(['is_use'=>1,'trust_id'=>$file[0]['trust_id']]);
             Db::commit();
-            return array($update['file_file']);
+            return array($url.$updateArr['file_file']);
         }catch(\Exception $e) {
             Db::rollback();
             return $e->getMessage();

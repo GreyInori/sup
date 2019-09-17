@@ -59,7 +59,7 @@ trait Picture
         }
         /* 图片上传成功后返回图片路径数组，因为返回字符串的话会被方法直接当做错误结果返回 */
         $fileName = $data->getSaveName();
-        $fileName = "/static/images/{$data}/{$fileName}";
+        $fileName = "/static/images/{$path}/{$fileName}";
         return array('pic'=>$fileName);
     }
 }

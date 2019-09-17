@@ -12,7 +12,7 @@
 </body>
 <script>
     function fileUp() {
-        // var pic = new FormData();
+        var pic = new FormData();
         // pic.append('error', '东西8行');
         // pic.append('company', 'c643cc681a5b0aa13a6597bcf166199e');
         // pic.append('trust', '74c05b81de8e80c528686cf9912738ce');
@@ -22,11 +22,16 @@
         // pic.append('inputCompany', '');
         // pic.append('response', '');
         // pic.append('fileDepict', '嗦不粗话了');
+        // pic.append('file', '25');
+        // pic.append('fileCode', '3001YS190916000000547361');
+        // pic.append('UploadPeople', '陨石');
+        pic.append('trust', '74c05b81de8e80c528686cf9912738ce');
         // pic.append('agreementType', '1');
         // pic.append('person', '陨石');
         // pic.append('quality', '陨石质监站');
         // pic.append('engineering', '3271e961902c266676029f35156ba03a');
         // pic.append('agreementFile', document.getElementById('img').files[0]);
+        pic.append('pic', document.getElementById('img').files[0]);
         $.ajax({
             url: 'http://localhost/material/StandardEdit',
             url: 'http://localhost/engineer/DivideEngineer',
@@ -121,7 +126,15 @@
             url: 'http://localhost/qrcode/QrcodeCreate',
             url: 'http://jiance.server2.puankang.com.cn/trust/TrustUpload',
             url: 'http://jiance.server2.puankang.com.cn/qrcode/Qrcode',
+            url: 'http://localhost/qrcode/Qrcode',
+            url: 'http://localhost/company/Character',
             // url: 'http://jiance.server2.puankang.com.cn/admin/AdminList',
+            url: 'http://localhost/area/Area',
+            url: 'http://jiance.server2.puankang.com.cn/trust/TrustUploadAdd',
+            url: 'http://jiance.server2.puankang.com.cn/trust/TrustUpload',
+            url: 'http://jiance.server2.puankang.com.cn/trust/TrustPeopleUpload',
+            url: 'http://jiance.server2.puankang.com.cn/company/companyList',
+            url: 'http://jiance.server2.puankang.com.cn/company/CompanyMain',
             // url: 'http://localhost/admin/AdminRole',
             // url: 'http://localhost/admin/AdminList',
             // url: 'http://jiance.server2.puankang.com.cn/admin/AdminList',
@@ -130,9 +143,13 @@
             type: 'get',
             // contentType : false,
             // processData : false,
-            data : {
-                'use' : 0,
-                'page' : [0,100],
+            data :
+                {
+                    'uuid' : '3371c043e814859c9a33318c51c71ee5',
+                },
+            //     'areaParent' : 0,
+                // 'use' : 0,
+                // 'page' : [0,100],
                 // 'trust' : '74c05b81de8e80c528686cf9912738ce',
                 // 'work' : 4,
                 // 'codeNum' : 50,
@@ -174,7 +191,7 @@
                 // 'engineerName':'陨石',
                 // 'result':'陨石',
                 // 'reportTimes':'2018-1-1 12:00:00',
-            },
+            // },
                 // 'company' : '2008f23efa4d32d23440ecc9225e03aa'},
             // data: {
                 // 'standard' : 2,

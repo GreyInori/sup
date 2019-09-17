@@ -122,7 +122,7 @@ class PeopleAutoLoad extends Controller
 
                 $fieldArr[$key] = $row;
             }
-            if(!empty($row)) {
+            if(!empty($row)  || $row !== '') {
                 isset(self::$fieldArr[$key])?$result[self::$fieldArr[$key]] = $row : false;
             }
         }

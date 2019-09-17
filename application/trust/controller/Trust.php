@@ -15,6 +15,7 @@ use \app\trust\controller\api\TrustMain as TrustMain;
 use \app\trust\controller\api\TrustSearch as TrustSearch;
 use \app\trust\controller\api\TestMain as TestMain;
 use \app\trust\controller\api\ProcessTypeMain as ProcessTypeMain;
+use app\trust\controller\api\TrustBase as TrustBase;
 
 /**
  * Class Trust
@@ -208,6 +209,33 @@ class Trust extends Controller
             return self::returnMsg(500,'fail',$list);
         }
         return self::returnMsg(200,'success',$list);
+    }
+
+    /**
+     * 上传取样人面部检测照片数据
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function postTrustPeopleUpload()
+    {
+        $data = FieldCheck::checkData('trustUploadList');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 执行图片上传操作，拿到图片的路径进行转换处理 */
+        $pic = TrustBase::picUpload();
+        if(!is_array($pic)) {
+            return self::returnMsg(500,'fail',$pic);
+        }
+        /* 进行取样人用于面部检测的照片上传 */
+        $insert = TrustBase::baseAdd($pic['pic'],$data);
+        if(!is_array($insert)) {
+            return self::returnMsg(500,'fail',$insert);
+        }else{
+            return self::returnMsg(200,'success',$insert[0]);
+        }
     }
 
     /**

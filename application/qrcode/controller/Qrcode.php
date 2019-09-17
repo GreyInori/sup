@@ -219,7 +219,7 @@ class Qrcode extends Controller
      */
     public function getQrcode()
     {
-        $data = FieldCheck::checkData('qrcode','page');
+        $data = FieldCheck::checkData('qrcode');
         if(!is_array($data)){
             return self::returnMsg(500,'fail',$data);
         }

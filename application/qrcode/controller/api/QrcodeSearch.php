@@ -47,10 +47,6 @@ class QrcodeSearch extends Controller
     private static function pageInit()
     {
         $page = request()->param();
-        if(isset($page['page'])) {
-            $page['page'] = json_decode($page['page'],256);
-        }
-
         $result = array(0,20);
         /* 如果传递数据不符合规范，就返回默认分页数据 */
         if(!isset($page['page']) || count($page['page']) != 2) {

@@ -54,6 +54,8 @@ class CompanyAutoLoad extends Controller
         'number' => 'company_number',
         'form' => 'company_form',
         'formName' => 'form_name',
+        'characterId' => 'character_id',
+        'characterName' => 'character_name',
     );
 
     /**
@@ -142,7 +144,7 @@ class CompanyAutoLoad extends Controller
 
                 $fieldArr[$key] = $row;
             }
-            if(!empty($row)) {
+            if(!empty($row) || $row !== '') {
                 isset(self::$fieldArr[$key])?$result[self::$fieldArr[$key]] = $row : false;
             }
         }

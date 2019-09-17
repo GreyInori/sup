@@ -169,4 +169,19 @@ class Company extends Controller
             return self::returnMsg(500,'fail',$list);
         }
     }
+
+    /**
+     * 获取企业经济性质
+     * @return false|string
+     */
+    public function getCharacter()
+    {
+        $list = CompanyMain::toCharacter();
+        if(is_array($list)){
+            $list = CompanyMain::fieldChange($list);
+            return self::returnMsg(200,'success',$list);
+        }else{
+            return self::returnMsg(500,'fail',$list);
+        }
+    }
 }

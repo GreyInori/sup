@@ -165,7 +165,7 @@ class TrustAutoLoad extends Validate
             if(!empty($field) && in_array($key, $field)){
                 $fieldArr[$key] = $row;
             }
-            if(!empty($row)) {
+            if(!empty($row)  || $row !== '') {
                 isset(self::$fieldArr[$key])?$result[self::$fieldArr[$key]] = $row : false;
             }
         }
