@@ -16,8 +16,8 @@ use think\Controller;
  */
 class AliFace extends Controller
 {
-    private static $akId = 'LTAI4FrwBbR9HWdL9ULpV1D4';
-    private static $akSecret = 'IabJ6iVoszRE7weyaVfmrXMaBt9R2u';
+    private static $akId = '******************';
+    private static $akSecret = '******************';
     private static $url = 'https://dtplus-cn-shanghai.data.aliyuncs.com/face/verify';
 
     /**
