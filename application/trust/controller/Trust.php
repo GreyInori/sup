@@ -16,6 +16,7 @@ use \app\trust\controller\api\TrustSearch as TrustSearch;
 use \app\trust\controller\api\TestMain as TestMain;
 use \app\trust\controller\api\ProcessTypeMain as ProcessTypeMain;
 use app\trust\controller\api\TrustBase as TrustBase;
+use \app\lib\controller\AliFace as AliFace;
 
 /**
  * Class Trust
@@ -220,6 +221,7 @@ class Trust extends Controller
      */
     public function postTrustPeopleUpload()
     {
+        $url = request()->domain();
         $data = FieldCheck::checkData('trustUploadList');
         if(!is_array($data)) {
             return self::returnMsg(500,'fail',$data);
@@ -234,10 +236,17 @@ class Trust extends Controller
         if(!is_array($insert)) {
             return self::returnMsg(500,'fail',$insert);
         }else{
-            return self::returnMsg(200,'success',$insert[0]);
+            return self::returnMsg(200,'success',$url.$pic['pic']);
         }
     }
 
+    /**
+     * 进行人脸识别
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public function postTrustPeopleFaceCheck()
     {
         $data = FieldCheck::checkData('trustUploadList');
@@ -250,6 +259,19 @@ class Trust extends Controller
             return self::returnMsg(500,'fail',$Upload);
         }
         $UploadBase = TrustBase::imgToBase($Upload['pic']);
+        TrustBase::picDel($Upload['pic']);         // 在拿到图片的base64后删除图片
+        $trustPic = TrustBase::toTrustPic($data);
+        if(!is_array($trustPic)) {
+            return self::returnMsg(500,'fail',$trustPic);
+        }
+        $trustBase = TrustBase::imgToBase($trustPic[0]['people_pic']);
+        $faceVerify = AliFace::toFaceVerify($UploadBase,$trustBase);
+        $faceVerify = json_decode($faceVerify,256);
+        if(isset($faceVerify['confidence']) && $faceVerify['confidence'] > 70){
+            return self::returnMsg(200,'success',$faceVerify);
+        }else{
+            return self::returnMsg(401,'error','人脸识别未通过');
+        }
     }
 
     /**

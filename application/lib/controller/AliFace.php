@@ -16,8 +16,8 @@ use think\Controller;
  */
 class AliFace extends Controller
 {
-    private static $akId = 'LTAI4FrwBbR9HWdL9ULpV1D4';
-    private static $akSecret = 'IabJ6iVoszRE7weyaVfmrXMaBt9R2u';
+    private static $akId = '*********************';
+    private static $akSecret = '***********************';
     private static $url = 'https://dtplus-cn-shanghai.data.aliyuncs.com/face/verify';
 
     /**
@@ -31,7 +31,7 @@ class AliFace extends Controller
         $option = self::getFaceOption($img1,$img2);
         $sign = self::getStringToSign($option);
         $signature = self::getSignature($sign);
-        $authHeader = "Dataplus".self::$akId.":".$signature;
+        $authHeader = "Dataplus ".self::$akId.":".$signature;
         $option['http']['header']['authorization'] = $authHeader;
         $option['http']['header'] = implode(
             array_map(
@@ -43,7 +43,7 @@ class AliFace extends Controller
             )
         );
         $context = stream_context_create($option);
-        $file = file_get_contents(self::$url, false, $context);
+        $file = file_get_contents(self::$url, false, $context );
         return $file;
     }
 
@@ -58,8 +58,8 @@ class AliFace extends Controller
         /* 请求参数 */
         $data = array(
             'type' => 1,
-            'content_1' => $img1,
-            'content_2' => $img2
+            'content_1' => $img1[0],
+            'content_2' => $img2[0]
         );
         /* 创建请求头数据 */
         $options = array(
@@ -68,7 +68,7 @@ class AliFace extends Controller
                     'accept'=> "application/json",
                     'content-type'=> "application/json",
                     'date'=> gmdate("D, d M Y H:i:s \G\M\T"),
-                    'authorization' => "",
+                    'authorization' => '',
                 ),
                 'method' => "POST", //可以是 GET, POST, DELETE, PUT
                 'content' => json_encode($data) //如有数据，请用json_encode()进行编码
@@ -110,7 +110,7 @@ class AliFace extends Controller
     public static function getSignature($stringToSign)
     {
         $signature = base64_encode(
-            hash_hamc(
+            hash_hmac(
                 "sha1",
                 $stringToSign,
                 self::$akSecret,

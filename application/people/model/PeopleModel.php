@@ -24,15 +24,15 @@ class PeopleModel extends Model
         // 数据库连接dsn配置
         'dsn' => '',
         // 服务器地址
-        'hostname' => '120.79.164.128',
+        'hostname' => '47.111.19.119',
         // 数据库名
-        'database' => 'supervise',
+        'database' => 'jianceplat',
         // 数据库用户名
-        'username' => 'root',
+        'username' => 'jianceplat',
         // 数据库密码
-        'password' => '123456',
+        'password' => 'DPrnycpCBZzGZ8A6',
         // 数据库连接端口
-        'hostport' => 3306,
+        'hostport' => 33900,
         // 数据库连接参数
         'params' => [],
         // 数据库默认编码采用utf-8

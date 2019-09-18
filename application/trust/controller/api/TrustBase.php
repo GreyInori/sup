@@ -21,6 +21,24 @@ class TrustBase extends Controller
     use Picture;
 
     /**
+     * 通过委托单号获取已经存在的委托单检测人员照片
+     * @param $trust
+     * @return false|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toTrustPic($trust)
+    {
+            $trust = $trust['trust_id'];
+            $pic = Db::table('su_trust_people_pic')->where('trust_id',$trust)->field(['people_pic'])->select();
+            if(empty($pic)) {
+                return '当前委托单尚未上传取样人面部照片，请联系相关人员';
+            }
+            return $pic;
+    }
+
+    /**
      * 执行取样人用于面部检测照片上传操作
      * @param $path
      * @param $trust
@@ -105,7 +123,8 @@ class TrustBase extends Controller
                     default: $img_type = 'jpg';
                         break;
                 }
-                $img_base64 = 'data:image/' . $img_type . ';base64,' . $file_content;//合成图片的base64编码
+//                $img_base64 = 'data:image/' . $img_type . ';base64,' . $file_content;//合成图片的base64编码
+                $img_base64 = $file_content;//合成图片的base64编码
             }
             fclose($fp);
         }

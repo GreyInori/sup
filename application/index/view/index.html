@@ -15,7 +15,7 @@
         var pic = new FormData();
         // pic.append('error', '东西8行');
         // pic.append('company', 'c643cc681a5b0aa13a6597bcf166199e');
-        // pic.append('trust', '74c05b81de8e80c528686cf9912738ce');
+        pic.append('trust', 'b622ce6e3267a301873c8f25482ae9fd');
         // pic.append('reportMain', '检测合格');
         // pic.append('errorId', '1');
         // pic.append('trustCode', '');
@@ -25,7 +25,7 @@
         // pic.append('file', '25');
         // pic.append('fileCode', '3001YS190916000000547361');
         // pic.append('UploadPeople', '陨石');
-        pic.append('trust', '74c05b81de8e80c528686cf9912738ce');
+        // pic.append('trust', '74c05b81de8e80c528686cf9912738ce');
         // pic.append('agreementType', '1');
         // pic.append('person', '陨石');
         // pic.append('quality', '陨石质监站');
@@ -133,20 +133,22 @@
             url: 'http://jiance.server2.puankang.com.cn/trust/TrustUploadAdd',
             url: 'http://jiance.server2.puankang.com.cn/trust/TrustUpload',
             url: 'http://jiance.server2.puankang.com.cn/trust/TrustPeopleUpload',
-            url: 'http://jiance.server2.puankang.com.cn/company/companyList',
-            url: 'http://jiance.server2.puankang.com.cn/company/CompanyMain',
+            // url: 'http://jiance.server2.puankang.com.cn/company/companyList',
+            // url: 'http://jiance.server2.puankang.com.cn/company/CompanyMain',
+            url: 'http://jiance.server2.puankang.com.cn/trust/TrustPeopleFaceCheck',
+            // url: 'http://jiance.server2.puankang.com.cn/qrcode/Qrcode',
             // url: 'http://localhost/admin/AdminRole',
             // url: 'http://localhost/admin/AdminList',
             // url: 'http://jiance.server2.puankang.com.cn/admin/AdminList',
             // url : 'https://apiserer1.bangninyou.com/version/user/Products?aithorization=89577f2a6a943243dff4929aeafb0b7b,123',
             // url : 'https://apiserer1.bangninyou.com/version/homepage/Products?aithorization=89577f2a6a943243dff4929aeafb0b7b,123',
-            type: 'get',
-            // contentType : false,
-            // processData : false,
-            data :
-                {
-                    'uuid' : '3371c043e814859c9a33318c51c71ee5',
-                },
+            type: 'post',
+            contentType : false,
+            processData : false,
+            data : pic,
+                // {
+                //     'uuid' : '3371c043e814859c9a33318c51c71ee5',
+                // },
             //     'areaParent' : 0,
                 // 'use' : 0,
                 // 'page' : [0,100],
@@ -160,6 +162,8 @@
                 // 'linkman' : '老陨石',
                 // 'mobile' : '13857643649',
                 // 'companyCode' : 3001,
+                // 'qrTime' : '190916',
+                // 'use' : 0,
                 // 'divide' : 11,   // 成员身份id
                 // 'engineer' : '43cfc90ccb8878a2b79e1d508e5967f0',   // 工程id
                 // 'user' : 1,      // 用户id
