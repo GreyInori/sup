@@ -213,6 +213,27 @@ class Trust extends Controller
     }
 
     /**
+     * 根据二维码获取对应的图片数据
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getTrustUploadForCode()
+    {
+        $data = FieldCheck::checkData('trustUploadCode');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        $list = TrustMain::toTrustUploadForCode();
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        $list = TrustMain::fieldChange($list);
+        return self::returnMsg(200,'success',$list);
+    }
+
+    /**
      * 上传取样人面部检测照片数据
      * @return false|string
      * @throws \think\db\exception\DataNotFoundException
@@ -264,6 +285,7 @@ class Trust extends Controller
         if(!is_array($trustPic)) {
             return self::returnMsg(500,'fail',$trustPic);
         }
+        /* 把后台上传的图片转换成base64跟上传的图片进行比较，如果置信度大于70就认证通过 */
         $trustBase = TrustBase::imgToBase($trustPic[0]['people_pic']);
         $faceVerify = AliFace::toFaceVerify($UploadBase,$trustBase);
         $faceVerify = json_decode($faceVerify,256);

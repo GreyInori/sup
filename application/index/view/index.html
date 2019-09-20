@@ -136,19 +136,36 @@
             // url: 'http://jiance.server2.puankang.com.cn/company/companyList',
             // url: 'http://jiance.server2.puankang.com.cn/company/CompanyMain',
             url: 'http://jiance.server2.puankang.com.cn/trust/TrustPeopleFaceCheck',
+            url: 'http://jiance.server2.puankang.com.cn/trust/TrustUploadForCode',
+            url: 'http://jiance.server2.puankang.com.cn/engineer/EngineerMain',
+            url: 'http://jiance.server2.puankang.com.cn/engineer/EngineerDivideAdd',
+            url: 'http://jiance.server2.puankang.com.cn/engineer/EngineerEdit',
+            url: 'http://jiance.server2.puankang.com.cn/admin/CompanyAdmin',
             // url: 'http://jiance.server2.puankang.com.cn/qrcode/Qrcode',
             // url: 'http://localhost/admin/AdminRole',
             // url: 'http://localhost/admin/AdminList',
             // url: 'http://jiance.server2.puankang.com.cn/admin/AdminList',
             // url : 'https://apiserer1.bangninyou.com/version/user/Products?aithorization=89577f2a6a943243dff4929aeafb0b7b,123',
             // url : 'https://apiserer1.bangninyou.com/version/homepage/Products?aithorization=89577f2a6a943243dff4929aeafb0b7b,123',
-            type: 'post',
-            contentType : false,
-            processData : false,
-            data : pic,
-                // {
-                //     'uuid' : '3371c043e814859c9a33318c51c71ee5',
-                // },
+            type: 'get',
+            // contentType : false,
+            // processData : false,
+            data :
+                {
+                    'role' : 1,
+                    // 'qrcode' : '3001YS190916000000204685',
+            //         'engineer' : '0ff7ddf1cf95f1212cd8b97c70a07596',    // 工程id
+            //             'company' : '19505aa4ca626483e9962a0398524bc4',    // 录入人id
+            // 'name' : '神力陨石天降工程',           // 工程名称
+            // 'type' : 1,                         // 工程类型
+            // 'from' : 'sedfsdfsdfds',           // 所属质监站
+            // 'level' : 'asdasfasdasd',           // 所属质监等级编号
+            // 'area' : 1,                          // 工程区域
+            // 'foundations' : 1,                // 地面基础类型
+            // 'site' : 55.1,                      // 建筑面积
+            // 'underground' : 55.1,
+        //     'uuid' : '3371c043e814859c9a33318c51c71ee5',
+                },
             //     'areaParent' : 0,
                 // 'use' : 0,
                 // 'page' : [0,100],

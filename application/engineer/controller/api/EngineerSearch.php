@@ -43,6 +43,7 @@ class EngineerSearch extends Controller
             array_push($field, $whereKey);
         }
         array_push($field,'set.type_name');
+        array_push($field,'se.engineering_id');
         /* 执行企业列表查询 */
         try{
             $list = Db::table('su_engineering')

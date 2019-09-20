@@ -18,6 +18,8 @@ class CompanyWhere extends Controller
 {
     private $where = array(
         'is_record' => ['sc.company_type','='],
+        'is_from' => ['is_from','='],
+        'company_form' => ['company_form','='],
         'company_number' => ['sc.company_number','LIKE','code%'],
         'company_full_name' => ['sc.company_full_name','LIKE','%code%'],
         'company_linkman' => ['sc.company_link_man','LIKE','%code%'],

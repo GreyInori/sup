@@ -54,7 +54,7 @@ class AreaMain extends Controller
             'area_name' => $data['area']['area_name']
         );
         try{
-            $insert = Db::table('su_area')->insertGetId($insert);
+            Db::table('su_area')->insertGetId($insert);
             return array($insert['area_id']);
         }catch(\Exception $e) {
             return $e->getMessage();

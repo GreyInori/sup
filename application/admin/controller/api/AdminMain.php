@@ -147,6 +147,30 @@ class AdminMain extends Controller
     }
 
     /**
+     * 获取绑定了企业的管理员列表
+     * @return false|\PDOStatement|string|\think\Collection
+     */
+    public static function toCompanyAdmin()
+    {
+        $data = request()->param();
+        if(!isset($data['role'])) {
+            return '请传递成员id';
+        }
+        try{
+            $list = Db::table('su_admin')
+                ->alias('sa')
+                ->join('su_role sr','sr.role_id = sa.user_role')
+                ->join('su_company sc','sc.company_id = sa.user_company')
+                ->field(['sa.user_id','sa.user_name','sa.user_company','sa.user_role','sc.company_full_name','sr.role_name'])
+                ->where('sa.user_role',$data['role'])
+                ->select();
+            return $list;
+        }catch(\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    /**
      * 获取管理员角色列表方法
      * @return false|\PDOStatement|string|\think\Collection
      * @throws \think\db\exception\DataNotFoundException

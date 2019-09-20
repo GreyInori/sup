@@ -46,10 +46,11 @@ class TrustValidate extends  Validate
         'engineering' => 'alphaDash',   // 工程id
         'processing' => 'number',   // 样品处理方式
         'file' => 'require|number',   // 委托单图片id
-        'code' => 'chsDash',   // 委托单图片二维码
+        'code' => 'alphaDash',   // 委托单图片二维码
         'people' => 'chsDash',   // 图片上传人名
         'depict' => 'chsDash',   // 图片对应物品简介
         'company' => 'alphaDash',    // 需要获取委托单的公司id
+        'qrcode' => 'alphaDash|require',    // 需要获取委托单的公司id
     );
 
     protected $message = array();
@@ -62,5 +63,6 @@ class TrustValidate extends  Validate
         'trustDel' => array('trust'),
         'trustUploadList' => array('trust'),
         'trustUploadAdd' => array('file','code','people','depict'),
+        'trustUploadCode' => array('qrcode'),
     );
 }

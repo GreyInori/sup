@@ -226,15 +226,19 @@ class TrustMain extends Controller
     {
         $group = new TrustAutoLoad();
         $data = $group->toGroup($data);
-        $uuid = self::trustAlreadyCreat($data, 1);
-        if(!is_array($uuid)) {
-            return $uuid;
+        $list = Db::table('su_status_file')->where('file_code',$data['upload']['file_code'])->field(['trust_id'])->select();
+        if(empty($list)) {
+            return '查无此二维码相关委托单,请检查传递的二维码';
+        }
+        $allow = Db::table('su_trust')->where('trust_id',$list[0]['trust_id'])->field(['is_allow'])->select();
+        if(!empty($allow) && $allow[0]['is_allow'] == 1){
+            return '当前样品已收样';
         }
         /* 进行企业以及企业详细信息的添加操作 */
         Db::startTrans();
         try{
-            $allow = Db::table('su_trust')->where('trust_id',$uuid[0])->update(['is_allow'=>1]);
-            Db::table('su_testing_status')->where('trust_id',$uuid[0])->update(['receive_time'=>time()]);
+            $allow = Db::table('su_trust')->where('trust_id',$list[0]['trust_id'])->update(['is_allow'=>1]);
+            Db::table('su_testing_status')->where('trust_id',$list[0]['trust_id'])->update(['receive_time'=>time()]);
             Db::commit();
             return array($allow);
         }catch(\Exception $e) {
@@ -392,6 +396,38 @@ class TrustMain extends Controller
             }
         }
 
+        if(empty($UploadList)) {
+            return '当前委托单所属分类尚未存在图片上传规则，请检查传递的委托单id';
+        }
+        return $UploadList;
+    }
+
+    /**
+     * 根据二维码获取二维码绑定的图片信息
+     * @return false|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toTrustUploadForCode()
+    {
+        $url = request()->domain();
+        $data = request()->param();
+        /* 根据二维码查询对应的图片文件信息 */
+        $code = $data['qrcode'];
+        $UploadList = Db::table('su_status_file')
+                          ->alias('ssf')
+                          ->join('su_testing_file_type stft','stft.type_id=ssf.file_type')
+                          ->where(['ssf.file_code'=>$code])
+                          ->field(['ssf.trust_id','ssf.file_id','ssf.file_file','ssf.file_depict','ssf.file_type','ssf.file_time','ssf.file_code','ssf.upload_people','stft.type_name','stft.type_depict'])
+                          ->order('stft.type_id')
+                         ->select();
+        /* 如果该文件数据存在图片的话，就把域名拼接到图片路径上 */
+        foreach($UploadList as $key => $row) {
+            if($row['file_file'] !== null) {
+                $UploadList[$key]['file_file'] = $url.$row['file_file'];
+            }
+        }
         if(empty($UploadList)) {
             return '当前委托单所属分类尚未存在图片上传规则，请检查传递的委托单id';
         }

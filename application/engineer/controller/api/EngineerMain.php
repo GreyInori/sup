@@ -94,7 +94,8 @@ class EngineerMain extends Controller
             return $uuid;
         }
         $value = self::engineerValueCreat($check['engineer'],$uuid[0]);
-        $check['engineer'] = $value['engineer'];
+//        var_dump($value);exit;
+        $check['engineer'] = $value;
         $check['engineer']['engineering_id'] = $uuid[0];
 //        $check['divide'] = $value['divide'];
 //        $inputCheck = new EngineerCheck();                // 传参是否在数据库内存在检测类
@@ -108,6 +109,9 @@ class EngineerMain extends Controller
         }
         if(isset($check['engineer']['contract_code'])) {
             unset($check['engineer']['contract_code']);
+        }
+        if(isset($check['engineer']['company_id'])) {
+            unset($check['engineer']['company_id']);
         }
         /* 进行工程以及工程详细信息添加等操作 */
         Db::startTrans();
@@ -199,10 +203,21 @@ class EngineerMain extends Controller
         $group = new EngineerAutoLoad();
         $check = $group->toGroup($data);
         $field = $group::$fieldGroup;
+        foreach($field['engineerMain'] as $key => $row) {
+            $field['engineerMain'][$key] = 'se.'.$row;
+        }
+        array_push($field['engineerMain'],'sem.QA_from');
+        array_push($field['engineerMain'],'sem.QA_level');
+        array_push($field['engineerMain'],'sem.site_area');
+        array_push($field['engineerMain'],'sem.underground_area');
+        array_push($field['engineerMain'],'sem.CCAD_area');
+        array_push($field['engineerMain'],'sem.engineering_address');
 
         $list = Db::table('su_engineering')
-                ->where('engineering_id',$check['engineer']['engineering_id'])
-                ->field($field['engineer'])
+                ->alias('se')
+                ->join('su_engineering_main sem','sem.engineering_id')
+                ->where('se.engineering_id',$check['engineer']['engineering_id'])
+                ->field($field['engineerMain'])
                 ->select();
         if(empty($list)) {
             return '查无此工程，请检查传递的工程id';

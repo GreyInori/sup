@@ -101,6 +101,20 @@ class Admin extends Controller
     }
 
     /**
+     * 获取绑定了企业的用户列表
+     * @return false|string
+     */
+    public function getCompanyAdmin()
+    {
+        $list = AdminMain::toCompanyAdmin();
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        $list = AdminMain::fieldChange($list);
+        return self::returnMsg(200,'success',$list);
+    }
+
+    /**
      * 根据账号密码获取管理员信息以及权限方法
      * @return false|string
      * @throws \think\db\exception\DataNotFoundException
