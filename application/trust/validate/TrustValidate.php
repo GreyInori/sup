@@ -29,7 +29,7 @@ class TrustValidate extends  Validate
         'materialName' => 'chsDash',   // 试验项目名称
         'project' => 'chsDash',   // 工程名称
         'testName' => 'chsDash',   // 试验项目名称
-        'customCompany' => 'chsDash',   // 客户单位名称
+//        'customCompany' => 'chsDash',   // 客户单位名称
         'testType' => 'number',   // 检测类型
         'material' => 'alphaDash',   // 检测内容id
         'input' => 'date',   // 填单日期
@@ -56,10 +56,10 @@ class TrustValidate extends  Validate
     protected $message = array();
 
     protected  $scene = array(
-        'list' => array('engineering','trust','serial','preCompany','inputCompany','testName','trustCode','project','customCompany','input','price','submit','print','witness','sample','testing','report','cancellation','allow','result'),
+        'list' => array('engineering','trust','serial','preCompany','inputCompany','testName','trustCode','project','input','price','submit','print','witness','sample','testing','report','cancellation','allow','result'),
         'companyTrust' => array('company'),
-        'trustAdd' => array('serial','preCompany','inputCompany','materialName','project','testName','customCompany','testType','material','input','price','engineering','processing'),
-        'trustEdit' => array('trust','serial','preCompany','inputCompany','materialName','project','testName','customCompany','testType','material','input','price','engineering','processing'),
+        'trustAdd' => array('serial','preCompany','inputCompany','materialName','project','testName','testType','material','input','price','engineering','processing'),
+        'trustEdit' => array('trust','serial','preCompany','inputCompany','materialName','project','testName','testType','material','input','price','engineering','processing'),
         'trustDel' => array('trust'),
         'trustUploadList' => array('trust'),
         'trustUploadAdd' => array('file','code','people','depict'),

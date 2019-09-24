@@ -128,6 +128,13 @@ class TrustMain extends Controller
 //        if(isset($trust['input_time'])) {
             $trust['input_time'] = time();
 //        }
+        $engineering = Db::table('su_engineering')
+                            ->where(['engineering_id'=>$data['trust']['engineering_id'],'engineering_verify'=>1])
+                            ->field(['engineering_verify'])
+                            ->select();
+        if(empty($engineering)) {
+            return '当前工程尚未审核，请等审核后再进行委托单录入操作';
+        }
         /* 如果传递了检测项目id的话，就根据检测项目获取相关的检测类型id，创建检测项目类型数据 */
         if(isset($trust['testing_material'])) {
             $material = Db::table('su_material')->where('material_id',$trust['testing_material'])->field(['material_type'])->select();
@@ -531,9 +538,6 @@ class TrustMain extends Controller
      * 创建委托测试单数组
      * @param $trust
      * @return array
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
      */
     private static function testingCreate($trust)
     {
@@ -544,11 +548,11 @@ class TrustMain extends Controller
             'trust_id' => $trust['trust_id'],
             'sample_time' => time()
         );
-        if(isset($trust['testing_material'])) {
-            $type = Db::table('su_material')->where('material_id',$trust['testing_material'])->field(['material_type'])->select();
-            $type = Db::table('su_material_type')->where('type_id',$type[0]['material_type'])->field(['type_pid'])->select();
-            $insert['testing_quality'] = $type[0]['type_pid'];
-        }
+//        if(isset($trust['testing_material'])) {
+//            $type = Db::table('su_material')->where('material_id',$trust['testing_material'])->field(['material_type'])->select();
+//            $type = Db::table('su_material_type')->where('type_id',$type[0]['material_type'])->field(['type_pid'])->select();
+//            $insert['testing_quality'] = $type[0]['type_pid'];
+//        }
         return $insert;
     }
 

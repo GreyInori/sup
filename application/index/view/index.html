@@ -141,18 +141,42 @@
             url: 'http://jiance.server2.puankang.com.cn/engineer/EngineerDivideAdd',
             url: 'http://jiance.server2.puankang.com.cn/engineer/EngineerEdit',
             url: 'http://jiance.server2.puankang.com.cn/admin/CompanyAdmin',
+            url: 'http://jiance.server2.puankang.com.cn/engineer/EngineerList',
+            url: 'http://jiance.server2.puankang.com.cn/engineer/EngineerDivideAdd',
+            url: 'http://jiance.server2.puankang.com.cn/engineer/EngineerDivideDel',
+            url: 'http://jiance.server2.puankang.com.cn/engineer/EngineerReg',
+            url: 'http://jiance.server2.puankang.com.cn/trust/TrustAdd',
+            // url: 'http://jiance.server2.puankang.com.cn/engineer/EngineerDivide',
             // url: 'http://jiance.server2.puankang.com.cn/qrcode/Qrcode',
             // url: 'http://localhost/admin/AdminRole',
             // url: 'http://localhost/admin/AdminList',
             // url: 'http://jiance.server2.puankang.com.cn/admin/AdminList',
             // url : 'https://apiserer1.bangninyou.com/version/user/Products?aithorization=89577f2a6a943243dff4929aeafb0b7b,123',
             // url : 'https://apiserer1.bangninyou.com/version/homepage/Products?aithorization=89577f2a6a943243dff4929aeafb0b7b,123',
-            type: 'get',
+            type: 'post',
             // contentType : false,
             // processData : false,
             data :
                 {
-                    'role' : 1,
+                    'materialName' : '陨石撞石头',     // 检测项目名
+                    'project' : '砸tmd',                // 工程名称
+                    'customCompany' : '儒雅随和公司',     // 客户企业
+                    'preCompany' : '儒雅随和公司',        // 预检测机构
+                    'inputCompany' : '儒雅随和公司',      // 送检测机构
+                    'testType' : '1',                   // 检测类型id，送检测，到场检测等
+                    'material' : '3',                  // 检测项目id
+                    'price' : '5',                    // 检测费
+                    'engineering' : '4ee61eab294b43ed475dc571594411a1',     // 工程id
+                    'processing' : '1',
+                    // 'divide' : 2,
+                    // 'name' : '嗦不粗话工程',
+                    // 'mobile' : '13857943645',
+                    // 'companyName' : '嗦不粗话',
+                    // 'divide' : '155',   // 成员身份id
+                    // 'engineer' : 'b1e43c81e0006e8337b9289db485fa6b',   // 工程id
+                    // 'user' : 3,      // 用户id
+                    // 'role' : 1,
+                    // 'role' : 1,
                     // 'qrcode' : '3001YS190916000000204685',
             //         'engineer' : '0ff7ddf1cf95f1212cd8b97c70a07596',    // 工程id
             //             'company' : '19505aa4ca626483e9962a0398524bc4',    // 录入人id

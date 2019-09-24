@@ -17,6 +17,7 @@ use think\Controller;
 class TestingWhere extends Controller
 {
     private $where = array(
+        'st.trust_id' => ['st.trust_id','='],
         'sts.supervision_id' => ['sts.supervision_id','LIKE','code%'],
         'st.pre_testing_company' => ['st.pre_testing_company','LIKE','%code%'],
         'st.input_testing_company' => ['st.input_testing_company','LIKE','%code%'],

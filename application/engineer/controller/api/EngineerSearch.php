@@ -37,6 +37,11 @@ class EngineerSearch extends Controller
         $whereArr = $where->where;
         $where = $where->getWhereArray($search);
         $where['se.show_type'] = 1;
+        /* 检测管理员状态，返回相关的查询条件 */
+        $whereIn = self::roleCheck($search);
+        if($whereIn) {
+            $where['se.engineering_id'] = ['IN',$whereIn];
+        }
         /* 根据预先写好的查询条件获取需要获取到的字段信息 */
         $field = array();
         foreach($whereArr as $whereKey => $whereRow) {
@@ -52,12 +57,41 @@ class EngineerSearch extends Controller
                 ->field($field)
                 ->where($where)
                 ->limit($page[0], $page[1])
+                ->order('se.input_time DESC')
                 ->select();
         }catch(\Exception $e) {
             return $e->getMessage();
         }
 //        $list = self::idToName($list, $check);
         return $list;
+    }
+
+    /**
+     * 检测当前获取列表是否为最高管理员方法，如果不是，就返回相关列表的whereIN查询条件
+     * @param $admin
+     * @return bool|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    private static function roleCheck($admin)
+    {
+        $result = '';
+        if(!isset($admin['user_name'])) {
+            return false;
+        }
+        $admin = Db::table('su_admin')->where('user_name', $admin['user_name'])->field(['user_role'])->select();
+        if(empty($admin) || $admin[0]['user_role'] == 1) {
+            return false;
+        }
+        /* 如果不是最高管理员的话，就获取当前账号相关的工程列表 */
+        $list = Db::table('su_engineering_divide')->where('divide_user',$admin['user_name'])->field(['engineering_id'])->select();
+        if(!empty($list)) {
+            foreach($list as $key => $row) {
+                $result .= "{$row['engineering_id']},";
+            }
+        }
+        return rtrim($result,',');
     }
 
     /**

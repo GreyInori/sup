@@ -57,6 +57,10 @@ class EngineerAutoLoad extends Controller
         'controlUrl' => 'control_url',
         'controlIcon' => 'control_icon',
         'user' => 'user_id',
+        'divideId' => 'divide_index',
+        'companyName' => 'company_full_name',
+        'mobile' => 'user_name',
+        'verify' => 'engineering_verify',
     );
 
     /**
@@ -65,7 +69,7 @@ class EngineerAutoLoad extends Controller
      */
     public static $fieldGroup = array(
         'main' => array('QA_from','QA_level','site_area','underground_area','CCAD_area','engineering_address'),
-        'engineer' => array('user_id','company_id','engineering_id','input_type','input_person','contract_code','engineering_name','engineering_type','engineering_area','engineering_foundations','build_company','supervise_company','construction_company','survey_company','design_company','witness_people','makeup_people','sampling_people'),
+        'engineer' => array('company_full_name','user_name','user_id','company_id','engineering_id','input_type','input_person','contract_code','engineering_name','engineering_type','engineering_area','engineering_foundations','build_company','supervise_company','construction_company','survey_company','design_company','witness_people','makeup_people','sampling_people'),
         'engineerMain' => array('engineering_id','input_type','input_person','contract_code','engineering_name','engineering_type','engineering_area','engineering_foundations','build_company','supervise_company','construction_company','survey_company','design_company','witness_people','makeup_people','sampling_people'),
         'people' => array('people_id'),
         'company' => array('company_id'),

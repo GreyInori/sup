@@ -44,6 +44,7 @@ class EngineerValidate extends Validate
         'makeup' => 'array',   // 填单人员
         'sampling' => 'array',    // 取样人员
         'foundationsName' => 'chsDash',   // 地面基础类型名
+        'mobile' => 'mobile|require',                 // 注册人账号
     );
 
     protected $message = array(
@@ -76,6 +77,7 @@ class EngineerValidate extends Validate
     );
 
     protected $scene = array(
+        'reg' => ['name','mobile'],
         'add' => ['name','type','from','level','area','foundations','site','underground','CCAD','address','build','supervise','construction','survey','design','witness','makeup','sampling'],     // 工程录入
         'edit' => ['engineer','name','type','from','level','area','foundations','site','underground','CCAD','address','build','supervise','construction','survey','design','witness','makeup','sampling'],
         'del' =>['engineer'],           // 工程删除

@@ -42,6 +42,26 @@ class Engineer extends Controller
     }
 
     /**
+     * 工程注册方法
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function postEngineerReg()
+    {
+        $data = FieldCheck::checkData('reg');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        $result = EngineerMain::toReg($data);
+        if(!is_array($result)) {
+            return self::returnMsg(500,'fail',$result);
+        }
+        return self::returnMsg(200,'success',$result['uid']);
+    }
+
+    /**
      * 工程修改方法
      * @return false|string
      * @throws \think\db\exception\DataNotFoundException
@@ -208,6 +228,22 @@ class Engineer extends Controller
     public function postEngineerDivideAdd()
     {
         $data = EngineerMain::toEngineerDivideAdd();
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        return self::returnMsg(200,'success',$data);
+    }
+
+    /**
+     * 删除工程下的指定成员数据
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function postEngineerDivideDel()
+    {
+        $data = EngineerMain::toEngineerDivideDel();
         if(!is_array($data)) {
             return self::returnMsg(500,'fail',$data);
         }

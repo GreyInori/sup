@@ -22,7 +22,7 @@ class TestingAutoLoad extends Controller
         'inputCompany' => 'st.input_testing_company',
         'testingType' => 'smt.type_name',
         'testingName' => 'sm.material_name',
-        'trustCode' => 'st.trust_code',
+        'trustCode' => 'st.trust_id',
         'engineerName' => 'se.engineering_name',
         'customCompany' => 'sc.custom_company',
         'inputTime' => 'st.input_time',

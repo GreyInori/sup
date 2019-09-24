@@ -63,6 +63,7 @@ class TestingSearch extends Controller
             }
         }
         $key = array_search('company_id',$field);
+        array_push($field,'sr.report_file');
         unset($field[$key]);
         /* 执行企业列表查询 */
         try{
@@ -72,6 +73,7 @@ class TestingSearch extends Controller
                 ->join('su_engineering se','se.engineering_id = st.engineering_id')
                 ->join('su_material sm','sm.material_id = st.testing_material')
                 ->join('su_material_type smt','smt.type_id = st.testing_type')
+                ->join('su_report sr','sr.trust_id = st.trust_id')
                 ->field($field)
                 ->where($where)
                 ->limit($page[0], $page[1])

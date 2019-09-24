@@ -13,6 +13,7 @@ use think\Db;
 use app\engineer\model\EngineerModel as EngineerModel;
 use app\engineer\controller\EngineerAutoLoad as EngineerAutoLoad;
 use app\engineer\controller\api\EngineerCheck as EngineerCheck;
+use app\company\controller\api\CompanyMain as CompanyMain;
 use think\Exception;
 
 /**
@@ -70,6 +71,49 @@ class EngineerMain extends Controller
             Db::commit();
             return array('uid'=>$uuid[0]);
         }catch(\Exception $e) {
+            Db::rollback();
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * 工程注册方法
+     * @param $data
+     * @return array|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toReg($data)
+    {
+        /* 把传递过来的数据根据数据表进行分组，用于后续插入和检测等操作 */
+        $group = new EngineerAutoLoad();
+        $check = $group->toGroup($data);
+        /* 检测当前工程是否已经存在 */
+        $uuid = self::engineerAlreadyCreat($check);
+        if(!is_array($uuid)) {
+            return $uuid;
+        }
+        /* 创建工程数据信息数组 */
+        $engineer = array(
+            'engineering_id' => $uuid[0],
+            'input_time' => time(),
+            'contract_code' => self::creatCode()
+        );
+        /* 创建工程成员信息 */
+        $admin = self::adminCheck($check['engineer'], $data['divide_id']);
+        if(!is_array($admin)){
+            return $admin;
+        }
+        $admin['engineering_id'] = $engineer['engineering_id'];
+        $admin['divide_id'] = $data['divide_id'];
+        Db::startTrans();
+        try{
+            Db::table('su_engineering')->insert($engineer);
+            Db::table('su_engineering_divide')->insert($admin);
+            Db::commit();
+            return array('uid'=>$engineer['engineering_id']);
+        }catch(\Exception $e){
             Db::rollback();
             return $e->getMessage();
         }
@@ -253,8 +297,9 @@ class EngineerMain extends Controller
         $list = Db::table('su_engineering_divide')
                     ->alias('sed')
                     ->join('su_divide sd','sd.divide_id = sed.divide_id')
+                    ->join('su_company sc','sc.company_Id = sed.member_id')
                     ->where('sed.engineering_id',$check['engineer']['engineering_id'])
-                    ->field(['sed.member_id','sed.divide_user','sd.divide_name','su.divide_id'])
+                    ->field(['sed.member_id','sed.divide_user','sd.divide_name','sd.divide_id','sed.divide_index','sc.company_full_name'])
                     ->select();
         return $list;
     }
@@ -382,6 +427,43 @@ class EngineerMain extends Controller
         }
 
         return array('divide'=>$insert,'divideUser'=>$divideUpdate['divide_user']);
+    }
+
+    /**
+     * 删除工程下指定成员方法
+     * @return array|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toEngineerDivideDel()
+    {
+        $data = request()->param();
+        if(!isset($data['divide'])) {
+            return '请传递需要删除的工程成员id';
+        }
+        if(!isset($data['engineer'])) {
+            return '请传递需要删除的工程id';
+        }
+        /* 判断成员是否存在，如果存在就进行删除操作 */
+        $list = Db::table('su_engineering_divide')
+                ->where(['divide_index'=>$data['divide'],'engineering_id'=>$data['engineer']])
+                ->field(['engineering_id','divide_id'])
+                ->select();
+        if(empty($list)) {
+            return '不存在该工程成员，请检查传递的工程成员id';
+        }
+        Db::startTrans();
+        try{
+            Db::table('su_engineering_divide')->where('divide_index',$data['divide'])->delete();
+            /* 重新分配工程下的成员企业信息 */
+            $divideList = self::engineerDivideUpdate($data['divide'],$data['engineer'],$list[0]['divide_id']);
+            Db::commit();
+            return array($divideList);
+        }catch(\Exception $e){
+            Db::rollback();
+            return $e->getMessage();
+        }
     }
 
     /**
@@ -644,6 +726,97 @@ class EngineerMain extends Controller
     // | 辅助类型相关
     // +----------------------------------------------------------------------
     /**
+     * 检测传递的用户名是否存在，如果不存在就重新创建并添加企业数据
+     * @param $admin
+     * @return array|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    private static function adminCheck($admin, $role)
+    {
+        $list = Db::table('su_admin')
+                ->where('user_name',$admin['user_name'])
+                ->field(['user_name','user_company','user_pass'])
+                ->select();
+        /* 如果用户名不存在的话就进行创建，如果存在的话就返回成员信息 */
+        if(!empty($list)) {
+            $member = array(
+                'member_id' => $list[0]['user_company'],
+                'divide_user' => $list[0]['user_name'],
+                'divide_passwd' => $list[0]['user_pass']
+            );
+        }else{
+            if(!isset($admin['company_full_name'])) {
+                return '请传递注册工程的企业名';
+            }
+            $member = array('user_name'=>$admin['user_name'],'user_pass'=>md5(123456));
+            if($role == 1) {
+                $member['role_id'] = 3;
+            }else{
+                $member['role_id'] = 4;
+            }
+            /* 生成企业存在检测规范的数组，进行企业是否存在检测 */
+            $companyId = array('company'=>$admin);
+            $company = array(
+                'company_full_name' => $admin['company_full_name'],
+                'company_id' => companyMain::companyAlreadyCreat($companyId)
+            );
+            if(!is_array($company['company_id'])) {
+                return $company['company_id'];
+            }
+            $company['company_id'] = $company['company_id'][0];
+            Db::table('su_company')->insert($company);
+            $member['user_company'] = $company['company_id'];
+            Db::table('su_admin')->insert($member);
+            $member['member_id'] = $member['user_company'];
+            unset($member['user_company']);
+        }
+        return $member;
+    }
+
+    /**
+     * 重新给指定工程分配成员数据
+     * @param $divideId
+     * @param $engineerId
+     * @param $divide
+     * @return mixed
+     * @throws Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     * @throws \think\exception\PDOException
+     */
+    private static function engineerDivideUpdate($divideId, $engineerId, $divide)
+    {
+        /* 根据成员id和成员类型id等数据获取需要修改的工程成员字段以及需要修改的值 */
+        $field = Db::table('su_divide')
+                    ->where('divide_id', $divide)
+                    ->field(['divide_field'])
+                    ->select();
+
+        $list = Db::table('su_engineering_divide')
+                ->alias('sed')
+                ->join('su_company sc','sc.company_id = sed.member_id')
+                ->where(['sed.engineering_Id'=>$engineerId,'sed.member_id'=>['<>',$divideId],'divide_id'=>$divide])
+                ->field(['sc.company_full_name'])
+                ->select();
+        /* 根据工程删除指定成员后剩下的该成员类型下的成员数据，循环拼接成新的成员数据进行修改操作 */
+        if(empty($list)) {
+            $update = array($field[0]['divide_field'] => '');
+        }else{
+            $updateStr = '';
+            foreach($list as $key => $row) {
+                $updateStr .= "{$row['company_full_name']},";
+            }
+            $update = array($field[0]['divide_field'] => rtrim($updateStr,','));
+        }
+        /* 返回值为修改后的成员信息字符串 */
+        Db::table('su_engineering')->where('engineering_id',$engineerId)->update($update);
+        return $update[$field[0]['divide_field']];
+    }
+
+    /**
      * 根据角色id获取对应的权限列表
      * @param $divide
      * @return array
@@ -690,6 +863,7 @@ class EngineerMain extends Controller
      * @param $company
      * @param $field
      * @param $engineer
+     * @return array|int|string
      * @throws Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
@@ -702,16 +876,22 @@ class EngineerMain extends Controller
            ->where('company_id',$company)
            ->field(['company_full_name'])
            ->select();
-       if(empty($engineerDivide)) {
+       /* 如果当前工程已经存在指定的工程成员的话，就用 ，号拼接已存在的以及新添加的成员企业名 */
+       $engineerDivide = Db::table('su_engineering')
+                            ->where('engineering_id',$engineer)
+                            ->field($field)
+                            ->select();
+       if(empty($engineerDivide) || $engineerDivide[0][$field] === '' || $engineerDivide[0][$field] === null) {
            $update = array(
                $field => $company[0]['company_full_name'],
            );
        }else{
            $update = array(
-               $field => "{$engineerDivide[0]['divide_field']},{$company[0]['company_full_name']}"
+               $field => "{$engineerDivide[0][$field]},{$company[0]['company_full_name']}"
            );
        }
-       Db::table('su_engineering')->where('engineering_id',$engineer)->update($update);
+       $update = Db::table('su_engineering')->where('engineering_id',$engineer)->update($update);
+       return $update;
    }
 
 

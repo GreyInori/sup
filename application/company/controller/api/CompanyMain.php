@@ -293,7 +293,7 @@ class CompanyMain extends Controller
      * @return array|string
      * @throws \think\exception\DbException
      */
-    private static function companyAlreadyCreat($data, $token = 0)
+    public static function companyAlreadyCreat($data, $token = 0)
     {
         if(!isset($data['company'])) {
             return '请传递需要添加的企业信息';
