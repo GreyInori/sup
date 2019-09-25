@@ -21,7 +21,10 @@ class TrustSearch extends Controller
     /**
      * 获取委托单列表方法
      * @param $search
-     * @return string
+     * @return false|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public static function toList($search)
     {
@@ -29,18 +32,23 @@ class TrustSearch extends Controller
         $page = self::pageInit($search);
         $where = new TrustWhere();
         $where = $where->getWhereArray($search);
-        $where['show_type'] = 1;
+        $where['st.show_type'] = 1;
         if(isset($search['show'])){
-            $where['show_type'] = $search['show'];
+            $where['st.show_type'] = $search['show'];
         }
         if(empty($where)) {
             return '请传递正确的查询条件';
+        }
+        /* 检测管理员状态，返回相关的查询条件 */
+        $whereIn = self::roleCheck($search);
+        if($whereIn) {
+            $where['st.engineering_id'] = ['IN',$whereIn];
         }
         /* 执行企业列表查询 */
         try{
             $list = Db::table('su_trust')
                 ->alias('st')
-                ->field(['st.is_report','st.trust_id','st.serial_number','st.input_testing_company','st.testing_name','st.project_name','st.custom_company','st.input_time','st.testing_price','st.is_submit','st.is_print','st.is_witness','st.is_sample','st.is_testing','st.is_cancellation','st.is_allow','st.testing_result'])
+                ->field(['st.testing_material','st.is_report','st.trust_id','st.serial_number','st.input_testing_company','st.testing_name','st.project_name','st.custom_company','st.input_time','st.testing_price','st.is_submit','st.is_print','st.is_witness','st.is_sample','st.is_testing','st.is_cancellation','st.is_allow','st.testing_result'])
                 ->where($where)
                 ->limit($page[0], $page[1])
                 ->select();
@@ -48,6 +56,34 @@ class TrustSearch extends Controller
             return $e->getMessage();
         }
         return $list;
+    }
+
+    /**
+     * 检测当前获取列表是否为最高管理员方法，如果不是，就返回相关列表的whereIN查询条件
+     * @param $admin
+     * @return bool|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    private static function roleCheck($admin)
+    {
+        $result = '';
+        if(!isset($admin['user_name'])) {
+            return false;
+        }
+        $main = Db::table('su_admin')->where('user_name', $admin['user_name'])->where('show_type',1)->field(['user_role'])->select();
+        if(empty($main) || $main[0]['user_role'] == 1) {
+            return false;
+        }
+        /* 如果不是最高管理员的话，就获取当前账号相关的工程列表 */
+        $list = Db::table('su_engineering_divide')->where('divide_user',$admin['user_name'])->field(['engineering_id'])->select();
+        if(!empty($list)) {
+            foreach($list as $key => $row) {
+                $result .= "{$row['engineering_id']},";
+            }
+        }
+        return rtrim($result,',');
     }
 
     /**

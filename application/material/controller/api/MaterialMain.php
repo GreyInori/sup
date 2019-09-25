@@ -273,6 +273,23 @@ class MaterialMain extends Controller
     // | 检测项目相关
     // +----------------------------------------------------------------------
     /**
+     * 获取所有的检测项目列表
+     * @return false|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function fetchMaterialAllList()
+    {
+        $trust = Db::table('su_trust')->where('show_type',1)->field(['testing_material'])->distinct('testing_material')->select();
+        $materialStr = "";
+        foreach($trust as $key => $row) {
+            $materialStr .= "{$row['testing_material']},";
+        }
+        $list = Db::table('su_material')->where('material_id','IN',$materialStr)->field(['material_id','material_name'])->select();
+        return $list;
+    }
+    /**
      * 检测项目列表方法
      * @param $data
      * @return false|mixed|\PDOStatement|string|\think\Collection

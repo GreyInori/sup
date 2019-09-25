@@ -25,9 +25,13 @@ use \app\lib\controller\AliFace as AliFace;
 class Trust extends Controller
 {
     use Send;
+
     /**
      * 获取指定的委托单
      * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function getTrustList()
     {

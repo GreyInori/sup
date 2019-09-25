@@ -16,7 +16,7 @@
         // pic.append('error', '东西8行');
         // pic.append('company', 'c643cc681a5b0aa13a6597bcf166199e');
         pic.append('trust', 'b622ce6e3267a301873c8f25482ae9fd');
-        // pic.append('reportMain', '检测合格');
+        pic.append('reportMain', '检测合格');
         // pic.append('errorId', '1');
         // pic.append('trustCode', '');
         // pic.append('inputCompany', '');
@@ -31,7 +31,7 @@
         // pic.append('quality', '陨石质监站');
         // pic.append('engineering', '3271e961902c266676029f35156ba03a');
         // pic.append('agreementFile', document.getElementById('img').files[0]);
-        pic.append('pic', document.getElementById('img').files[0]);
+        pic.append('pdf', document.getElementById('img').files[0]);
         $.ajax({
             url: 'http://localhost/material/StandardEdit',
             url: 'http://localhost/engineer/DivideEngineer',
@@ -146,6 +146,17 @@
             url: 'http://jiance.server2.puankang.com.cn/engineer/EngineerDivideDel',
             url: 'http://jiance.server2.puankang.com.cn/engineer/EngineerReg',
             url: 'http://jiance.server2.puankang.com.cn/trust/TrustAdd',
+            url: 'http://jiance.server2.puankang.com.cn/count/EngineerCount',
+            url: 'http://jiance.server2.puankang.com.cn/count/TrustCount',
+            url: 'http://jiance.server2.puankang.com.cn/count/ErrorCount',
+            url: 'http://jiance.server2.puankang.com.cn/count/CompanyCount',
+            url: 'http://jiance.server2.puankang.com.cn/material/MaterialAllList',
+            url: 'http://jiance.server2.puankang.com.cn/trust/TrustList',
+            url: 'http://jiance.server2.puankang.com.cn/qrcode/QrcodePng',
+            url: 'http://jiance.server2.puankang.com.cn/qrcode/QrcodeCreate',
+            url: 'http://jiance.server2.puankang.com.cn/testing/ReportUpload',
+            url: 'http://jiance.server2.puankang.com.cn/testing/Report',
+            // url: 'http://jiance.server2.puankang.com.cn/trust/TrustDel',
             // url: 'http://jiance.server2.puankang.com.cn/engineer/EngineerDivide',
             // url: 'http://jiance.server2.puankang.com.cn/qrcode/Qrcode',
             // url: 'http://localhost/admin/AdminRole',
@@ -153,21 +164,29 @@
             // url: 'http://jiance.server2.puankang.com.cn/admin/AdminList',
             // url : 'https://apiserer1.bangninyou.com/version/user/Products?aithorization=89577f2a6a943243dff4929aeafb0b7b,123',
             // url : 'https://apiserer1.bangninyou.com/version/homepage/Products?aithorization=89577f2a6a943243dff4929aeafb0b7b,123',
-            type: 'post',
+            type: 'get',
             // contentType : false,
             // processData : false,
             data :
                 {
-                    'materialName' : '陨石撞石头',     // 检测项目名
-                    'project' : '砸tmd',                // 工程名称
-                    'customCompany' : '儒雅随和公司',     // 客户企业
-                    'preCompany' : '儒雅随和公司',        // 预检测机构
-                    'inputCompany' : '儒雅随和公司',      // 送检测机构
-                    'testType' : '1',                   // 检测类型id，送检测，到场检测等
-                    'material' : '3',                  // 检测项目id
-                    'price' : '5',                    // 检测费
-                    'engineering' : '4ee61eab294b43ed475dc571594411a1',     // 工程id
-                    'processing' : '1',
+                //     'codeNum' : 10,
+                //     // 'workName' : '陨石',
+                //     'workCode' : 'YS',
+                //     'company' : '3',
+                //     'work' : 4,
+                    // 'ewmcode' : 'dgiuhsdfgdsaiofhidsfhoipsdhf',
+                    'trust' : '74c05b81de8e80c528686cf9912738ce',
+                    // 'mobile' : '13819782536',
+                    // 'materialName' : '陨石撞石头',     // 检测项目名
+                    // 'project' : '砸tmd',                // 工程名称
+                    // 'customCompany' : '儒雅随和公司',     // 客户企业
+                    // 'preCompany' : '儒雅随和公司',        // 预检测机构
+                    // 'inputCompany' : '儒雅随和公司',      // 送检测机构
+                    // 'testType' : '1',                   // 检测类型id，送检测，到场检测等
+                    // 'material' : '3',                  // 检测项目id
+                    // 'price' : '5',                    // 检测费
+                    // 'engineering' : '4ee61eab294b43ed475dc571594411a1',     // 工程id
+                    // 'processing' : '1',
                     // 'divide' : 2,
                     // 'name' : '嗦不粗话工程',
                     // 'mobile' : '13857943645',
@@ -194,11 +213,6 @@
                 // 'use' : 0,
                 // 'page' : [0,100],
                 // 'trust' : '74c05b81de8e80c528686cf9912738ce',
-                // 'work' : 4,
-                // 'codeNum' : 50,
-                // 'workName' : '陨石',
-                // 'workCode' : 'YS',
-                // 'company' : '3',
                 // 'companyName' : '台州市建设局',
                 // 'linkman' : '老陨石',
                 // 'mobile' : '13857643649',

@@ -62,11 +62,12 @@ class TestingAutoLoad extends Controller
         'result' => 'testing_result',
         'reportTimes' => 'sr.report_time',
         'materialName' => 'st.testing_name',
-        'reportFile' => 'sr.report_file'
+        'reportFile' => 'sr.report_file',
+        'mobile' => 'user_name',
     );
 
     public static $fieldGroup = array(
-        'testing' => array('sts.supervision_id','st.pre_testing_company','st.input_testing_company'
+        'testing' => array('st.trust_id','sts.supervision_id','st.pre_testing_company','st.input_testing_company'
         ,'smt.type_name','sm.material_name'
         ,'st.trust_code','se.engineering_name'
         ,'st.custom_company','st.input_time','sts.testing_status','sts.sample_pic'

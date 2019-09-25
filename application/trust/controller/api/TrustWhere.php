@@ -17,6 +17,7 @@ use think\Controller;
 class TrustWhere extends Controller
 {
     private $where = array(
+        'testing_material' => ['testing_material','='],
         'trust_id' => ['st.trust_id','LIKE','code%'],
         'trust_code' => ['st.trust_code','LIKE','code%'],
         'engineering_id' => ['st.engineering_id','='],
@@ -35,6 +36,7 @@ class TrustWhere extends Controller
         'is_testing' => ['st.is_testing','='],
         'is_cancellation' => ['st.is_cancellation','='],
         'is_allow' => ['st.is_allow','='],
+        'is_report' => ['st.is_report','='],
         'testing_result' => ['st.testing_result','LIKE','%code%'],
     );
 

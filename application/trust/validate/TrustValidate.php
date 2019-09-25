@@ -58,7 +58,7 @@ class TrustValidate extends  Validate
     protected  $scene = array(
         'list' => array('engineering','trust','serial','preCompany','inputCompany','testName','trustCode','project','input','price','submit','print','witness','sample','testing','report','cancellation','allow','result'),
         'companyTrust' => array('company'),
-        'trustAdd' => array('serial','preCompany','inputCompany','materialName','project','testName','testType','material','input','price','engineering','processing'),
+        'trustAdd' => array('serial','preCompany','inputCompany','project','testName','testType','material','input','price','engineering','processing'),
         'trustEdit' => array('trust','serial','preCompany','inputCompany','materialName','project','testName','testType','material','input','price','engineering','processing'),
         'trustDel' => array('trust'),
         'trustUploadList' => array('trust'),

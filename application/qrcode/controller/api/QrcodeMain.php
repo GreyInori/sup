@@ -221,6 +221,9 @@ class QrcodeMain extends Controller
             $numCode = self::qrcodeNumberCreat($first+$num+1);
             $insertArr[$num]['qr_code'] = $code['company'].$code['work'].$insertArr[$num]['qr_time'].$numCode.$insertArr[$num]['rand_code'];
             $insertArr[$num]['qr_number'] = $numCode;
+            /* 根据二维码编码生成对应的二维码图片，并保存到数据库 */
+            $qrcode = self::curlUrl('http://jiance.server2.puankang.com.cn/qrcode/QrcodePng', ['ewmcode'=>$insertArr[$num]['qr_code']]);
+            $insertArr[$num]['qr_path'] = self::creatFile($insertArr[$num]['qr_code'], $qrcode);
         }
         /* 执行添加操作，如果成功就返回插入的二维码列表 */
         Db::startTrans();
@@ -357,6 +360,10 @@ class QrcodeMain extends Controller
     {
         $result = array();
         foreach($list as $key => $row) {
+            if(strchr($key,'path')) {
+                $url = request()->domain();
+                $row = $url.$row;
+            }
             $result[array_search($key, $check)] = $row;
         }
         return $result;
@@ -370,5 +377,52 @@ class QrcodeMain extends Controller
     private static function is_assoc($arr)
     {
         return array_keys($arr) !== range(0, count($arr) - 1);
+    }
+
+    /**
+     * 创建文件方法
+     * @param $fileName
+     * @param $content
+     * @return int|string
+     */
+    public static function creatFile($fileName, $content)
+    {
+        /* 根据上传日期生成指定的文件夹 */
+        $time = date('Ymd');
+        $path = ROOT_PATH.'public'.DS.'static'.DS.'images'.DS.'qrcode'.DS."{$time}";
+        if(!is_dir($path)) {
+            mkdir($path,0755);
+        }
+        /* 创建文件并写入数据 */
+        $filePath = $path."/{$fileName}.jpg";
+        try{
+            $file = fopen($filePath, 'w');
+            fwrite($file, $content);
+            fclose($file);
+        }catch(\Exception $e){
+            return $e->getMessage();
+        }
+        return strchr($filePath, '/static');
+    }
+
+    /**
+     * curl地址方法
+     * @param string $url
+     * @param array $value
+     * @return bool|string
+     */
+    public static function curlUrl($url = '',$value = [])
+    {
+        $curl = curl_init();
+        /* get传输方法带值curl微信消息推送接口 */
+        if(!empty($value)){
+            $url  = $url.'?'.http_build_query($value);
+        }
+        curl_setopt($curl,CURLOPT_URL,$url);
+        curl_setopt($curl,CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($curl,CURLOPT_HEADER,0);
+        $output = curl_exec($curl);
+        curl_close($curl);
+        return($output);
     }
 }

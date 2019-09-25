@@ -1,7 +1,5 @@
 <?
 
-
-
 include "phpqrcode.php";    
 $mmshowmss=$_GET["ewmcode"];
 $errorCorrectionLevel = 'H';  // L M Q H

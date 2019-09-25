@@ -31,6 +31,7 @@ class QrcodeAutoLoad extends Controller
         'rand' => 'rand_code',
         'qrTime' => 'qr_time',
         'use' => 'is_use',
+        'path' => 'qr_path',
     );
 
     public static $fieldGroup = array(

@@ -538,6 +538,11 @@ class TrustMain extends Controller
      * 创建委托测试单数组
      * @param $trust
      * @return array
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     * @throws \think\exception\PDOException
      */
     private static function testingCreate($trust)
     {
@@ -548,11 +553,12 @@ class TrustMain extends Controller
             'trust_id' => $trust['trust_id'],
             'sample_time' => time()
         );
-//        if(isset($trust['testing_material'])) {
-//            $type = Db::table('su_material')->where('material_id',$trust['testing_material'])->field(['material_type'])->select();
-//            $type = Db::table('su_material_type')->where('type_id',$type[0]['material_type'])->field(['type_pid'])->select();
-//            $insert['testing_quality'] = $type[0]['type_pid'];
-//        }
+        /* 如果传递了检测项目的话，就给当前委托单添加对应的检测分类id */
+        if(isset($trust['testing_material'])) {
+            $type = Db::table('su_material')->where('material_id',$trust['testing_material'])->field(['material_type'])->select();
+            $type = Db::table('su_material_type')->where('type_id',$type[0]['material_type'])->field(['type_pid'])->select();
+            Db::table('su_trust')->where('trust_id',$trust['trust_id'])->update(['testing_quality'=>$type[0]['type_pid']]);
+        }
         return $insert;
     }
 

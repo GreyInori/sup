@@ -14,7 +14,8 @@ use \app\api\controller\Send;
 use \app\qrcode\controller\QrcodeAutoLoad as  FieldCheck;
 use \app\qrcode\controller\api\QrcodeMain as QrcodeMain;
 use \app\qrcode\controller\api\QrcodeCompanySearch as QrcodeCompanySearch;
-use app\qrcode\controller\api\QrcodeWorkSearch as QrcodeWorkSearch;
+use \app\qrcode\controller\api\QrcodeWorkSearch as QrcodeWorkSearch;
+use lib\QrcodeLib;
 
 /**
  * Class Qrcode
@@ -23,6 +24,20 @@ use app\qrcode\controller\api\QrcodeWorkSearch as QrcodeWorkSearch;
 class Qrcode extends Controller
 {
     use Send;
+
+    /**
+     * 生成二维码图片方法
+     */
+    public function getQrcodePng()
+    {
+        $mmshowmss=$_GET["ewmcode"];
+        $errorCorrectionLevel = 'H';  // L M Q H
+        $matrixPointSize = 10;    //1-10
+        $datas= $mmshowmss;
+        header( "Content-type: image/jpeg");
+        $qr = new QrcodeLib();
+        $qr->toQrLib($datas,false, $errorCorrectionLevel, $matrixPointSize, 1);
+    }
     // +----------------------------------------------------------------------
     // | 客户单位相关
     // +----------------------------------------------------------------------

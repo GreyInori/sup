@@ -68,6 +68,8 @@ class TrustAutoLoad extends Validate
         'materialType' => 'type_id',
         'engineerName' => 'engineering_name',
         'typeDepict' => 'type_depict',
+        'user_name' => 'user_name',
+        'mobile' => 'user_name',
     );
 
     /**

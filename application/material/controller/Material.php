@@ -449,6 +449,19 @@ class Material extends Controller
     // | 检测项目相关
     // +----------------------------------------------------------------------
     /**
+     * 获取所有检测项目列表
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getMaterialAllList()
+    {
+        $list = MaterialMain::fetchMaterialAllList();
+        $list = MaterialMain::fieldChange($list);
+        return self::returnMsg(200,'success',$list);
+    }
+    /**
      * 获取检测项目列表方法
      * @return false|string
      * @throws \think\db\exception\DataNotFoundException

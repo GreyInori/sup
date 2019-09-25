@@ -45,7 +45,8 @@ class TestingMain extends Controller
         }
         $insert = array(
             'error_main' => $data['error']['ste.error_main'],
-            'trust_id' => $data['error']['st.trust_id']
+            'trust_id' => $data['error']['st.trust_id'],
+            'error_time' => time(),
         );
         Db::startTrans();
         try {
@@ -95,7 +96,7 @@ class TestingMain extends Controller
         if(!is_array($list)) {
             return $file;
         }
-        $reportInsert['report_file'] = $file;
+        $reportInsert['report_file'] = $file['pic'];
         /* 委托单状态修改数组创建 */
         $trustUpdate = array(
             'testing_report' => 1,
@@ -110,6 +111,9 @@ class TestingMain extends Controller
             Db::table('su_testing_status')
                 ->where('trust_id',$data['report']['st.trust_id'])
                 ->update($trustUpdate);
+            Db::table('su_trust')
+                ->where('trust_id',$data['report']['st.trust_id'])
+                ->update(['is_report'=>1]);
             Db::commit();
             return array($update);
         }catch(\Exception $e) {
@@ -180,6 +184,9 @@ class TestingMain extends Controller
         foreach($list as $key => $row) {
             if(strstr($key,'_time') && is_int($row)) {
                 $row = date('Y-m-d H:i:s',$row);
+            }elseif($key == 'report_file') {
+                $url = request()->domain();
+                $row = $url.$row;
             }
             $result[array_search($key, $checkArr)] = $row;
         }
