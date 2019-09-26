@@ -90,6 +90,131 @@ class CountMain extends Controller
     }
 
     /**
+     * 获取一周异常统计数据方法
+     * @return array|mixed
+     */
+    public static function toWeekError()
+    {
+        /* 获取并且转换本周异常数据，其中0为未处理，1为已处理 */
+        $list = array(
+            self::fetchWeekErr(0),self::fetchWeekErr(1)
+        );
+        $weekArray = array(
+            self::changeWeekErr($list[0]),self::changeWeekErr($list[1])
+        );
+        $result = array(
+            'x_val' => array(array(),array()),
+            'y_val' => array(array(),array()),
+            'type_val' => ['异常结果','已处理'],
+        );
+        /* 循环根据查询转换出来的异常数据结果，插入返回值中,并且把键值为0的星期一排到最后 */
+        $result = self::makeErrResult($weekArray,0,$result);
+        $result = self::makeErrResult($weekArray,1,$result);
+        return $result;
+    }
+
+    /**
+     * 把异常数据结果转换成前端需要的格式
+     * @param $weekList
+     * @param $token
+     * @param $result
+     * @return mixed
+     */
+    private static function makeErrResult($weekList, $token, $result)
+    {
+        /* 根据$token 来判断要插入的是已处理异常数据还是未处理异常数据 */
+        foreach($weekList[$token] as $key => $row) {
+            if($key != 0) {
+                array_push($result['x_val'][$token],$row);
+                array_push($result['y_val'][$token],self::weekToChs($key));
+            }
+        }
+        array_push($result['x_val'][$token],$weekList[$token][0]);
+        array_push($result['y_val'][$token],'星期日');
+        return $result;
+    }
+
+    /**
+     * 把数据转换成星期 => 数据量的格式，并把一周数据不全，没有的则为0
+     * @param $list
+     * @return array
+     */
+    private static function changeWeekErr($list)
+    {
+        $weekArray = array();
+        /* 把查询出来的数据转换为星期 => 数据量的格式 */
+        foreach($list as $key => $row) {
+            $weekArray[$row['week']] = $row['num'];
+        }
+
+        for($i = 0; $i <= 6; $i++) {
+            if(!isset($weekArray[$i])) {
+                $weekArray[$i] = 0;
+            }
+        }
+        ksort($weekArray);
+
+        return $weekArray;
+    }
+
+    /**
+     * 获取指定范围异常数据方法
+     * @param int $token
+     * @return mixed
+     */
+    private static function fetchWeekErr($token = 0)
+    {
+        /* 生成查询范围时间 */
+        $time = time();
+        $year = date('Y',$time);
+        $mon = date('m',$time);
+        $week = date('W',$time);
+        /* 判断是要查询已处理还是未处理 */
+        if($token == 1){
+            $sql = "SELECT count(error_id) num,FROM_UNIXTIME(error_time,'%w') as week FROM su_testing_error WHERE FROM_UNIXTIME(error_time,'%Y') = {$year} AND FROM_UNIXTIME(error_time,'%c') = {$mon} AND FROM_UNIXTIME(error_time,'%u') = {$week} AND error_success = 1 GROUP BY FROM_UNIXTIME(error_time,'%j')";
+
+        }else{
+            $sql = "SELECT count(error_id) num,FROM_UNIXTIME(error_time,'%w') as week FROM su_testing_error WHERE FROM_UNIXTIME(error_time,'%Y') = {$year} AND FROM_UNIXTIME(error_time,'%c') = {$mon} AND FROM_UNIXTIME(error_time,'%u') = {$week} GROUP BY FROM_UNIXTIME(error_time,'%j')";
+        }
+        $list = Db::query($sql);
+        return $list;
+    }
+
+    /**
+     * 数字星期转换成汉字
+     * @param $week
+     * @return string
+     */
+    private static function weekToChs($week)
+    {
+        $result = '';
+        switch($week) {
+            case '0':
+                $result =  '星期日';
+                break;
+            case '1':
+                $result =  '星期一';
+                break;
+            case '2':
+                $result =  '星期二';
+                break;
+            case '3':
+                $result =  '星期三';
+                break;
+            case '4':
+                $result =  '星期四';
+                break;
+            case '5':
+                $result =  '星期五';
+                break;
+            case '6':
+                $result =  '星期六';
+                break;
+        }
+        return $result;
+    }
+
+    /**
      * @return array
      */
     private static function creatStartTime()

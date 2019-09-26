@@ -40,5 +40,6 @@ class TestingValidate extends  Validate
         'reportUpload' => array('trust','reportMain'),
         'reportList' => array('reportNumber','reportMain','testName'),
         'reportMain' => array('trust'),
+        'resErr' => array('errorId','response'),
     );
 }

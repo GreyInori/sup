@@ -22,6 +22,20 @@ use \app\lib\controller\Picture;
 class AgreementMain extends Controller
 {
     use Picture;
+
+    /**
+     * 获取合同类型列表
+     * @return false|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toAgreementType()
+    {
+        $list = Db::table('su_agreement_type')->field(['type_id agreementType','type_name as typeName'])->select();
+        return $list;
+    }
+
     /**
      * 执行合同添加方法
      * @param $data
@@ -177,6 +191,12 @@ class AgreementMain extends Controller
     {
         $result = array();
         foreach($list as $key => $row) {
+            if(strstr($key,'_time') && is_int($row)) {
+                $row = date('Y-m-d H:i:s', $row);
+            }elseif($key == 'agreement_file' && $row != '') {
+                $url = request()->domain();
+                $row = $url.$row;
+            }
             $result[array_search($key, $check)] = $row;
         }
         return $result;

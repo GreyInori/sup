@@ -103,8 +103,10 @@ class TestingWhere extends Controller
             /* 如果查询结果是单个值的数据的话，就进行制定查询条件匹配，由于事先定义好了 LIKE 查询的条件了，就根据制定字段的条件来生成需要的查询条件 */
             if(!is_array($row)){
                 $conditions = array($where[$key][0] => array($where[$key][1]));
-                if(isset($where[$key][2])){
+                if(isset($where[$key][2]) && $where[$key][1] == "LIKE"){
                     $row = str_replace('code',$row,$where[$key][2]);
+                }elseif(isset($where[$key][2]) && $where[$key][2] == 'time'){
+                    $row = strtotime($row);
                 }
                 array_push($conditions[$where[$key][0]], $row);
             }

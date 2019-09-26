@@ -42,7 +42,7 @@ class ErrorSearch extends Controller
                     ->join('su_trust st','st.trust_id = sts.trust_id')
                     ->join('su_testing_error ste','ste.trust_id = sts.trust_id')
                     ->where($where)
-                    ->field(['ste.error_id','ste.error_main','ste.error_response','st.input_testing_company','st.trust_code'])
+                    ->field(['ste.error_id','ste.error_main','ste.error_response','st.input_testing_company','st.trust_code','ste.error_time'])
                     ->limit($page[0],$page[1])
                     ->select();
         }catch(\Exception $e) {

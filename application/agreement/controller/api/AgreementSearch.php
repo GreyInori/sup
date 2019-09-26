@@ -34,7 +34,7 @@ class AgreementSearch extends Controller
                 ->alias('sia')
                 ->join('su_engineering se','se.engineering_id = sia.engineering_id')
                 ->join('su_agreement_type sat','sat.type_id = sia.agreement_type')
-                ->field(['sat.type_name','se.engineering_name','se.construction_company','sia.quality_station','sia.input_person','sia.agreement_file'])
+                ->field(['se.engineering_id','sia.agreement_time','sia.agreement_id','sat.type_name','se.engineering_name','se.construction_company','sia.quality_station','sia.input_person','sia.agreement_file'])
                 ->where($where)
                 ->limit($page[0], $page[1])
                 ->select();

@@ -23,6 +23,19 @@ class Agreement extends Controller
     use Send;
 
     /**
+     * 获取合同类型列表
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getAgreementType()
+    {
+        $list = AgreementMain::toAgreementType();
+        return self::returnMsg(200,'success',$list);
+    }
+
+    /**
      * 合同添加方法
      * @return false|string
      * @throws \think\exception\DbException

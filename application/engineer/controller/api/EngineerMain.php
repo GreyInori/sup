@@ -98,7 +98,8 @@ class EngineerMain extends Controller
         $engineer = array(
             'engineering_id' => $uuid[0],
             'input_time' => time(),
-            'contract_code' => self::creatCode()
+            'contract_code' => self::creatCode(),
+            'engineering_name' => $check['engineer']['engineering_name']
         );
         /* 创建工程成员信息 */
         $admin = self::adminCheck($check['engineer'], $data['divide_id']);
@@ -728,7 +729,8 @@ class EngineerMain extends Controller
     /**
      * 检测传递的用户名是否存在，如果不存在就重新创建并添加企业数据
      * @param $admin
-     * @return array|string
+     * @param $role
+     * @return array|mixed|string
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
@@ -746,15 +748,16 @@ class EngineerMain extends Controller
                 'divide_user' => $list[0]['user_name'],
                 'divide_passwd' => $list[0]['user_pass']
             );
+            return $member;
         }else{
             if(!isset($admin['company_full_name'])) {
                 return '请传递注册工程的企业名';
             }
             $member = array('user_name'=>$admin['user_name'],'user_pass'=>md5(123456));
             if($role == 1) {
-                $member['role_id'] = 3;
+                $member['user_role'] = 3;
             }else{
-                $member['role_id'] = 4;
+                $member['user_role'] = 4;
             }
             /* 生成企业存在检测规范的数组，进行企业是否存在检测 */
             $companyId = array('company'=>$admin);
@@ -765,14 +768,27 @@ class EngineerMain extends Controller
             if(!is_array($company['company_id'])) {
                 return $company['company_id'];
             }
-            $company['company_id'] = $company['company_id'][0];
-            Db::table('su_company')->insert($company);
-            $member['user_company'] = $company['company_id'];
-            Db::table('su_admin')->insert($member);
-            $member['member_id'] = $member['user_company'];
-            unset($member['user_company']);
+            Db::startTrans();
+            try{
+                $company['company_id'] = $company['company_id'][0];
+                Db::table('su_company')->insert($company);
+                $member['user_company'] = $company['company_id'];
+                Db::table('su_admin')->insert($member);
+                $member['member_id'] = $member['user_company'];
+                unset($member['user_company']);
+
+                Db::commit();
+                $member = array(
+                    'member_id' => $company['company_id'],
+                    'divide_user' => $member['user_name'],
+                    'divide_passwd' => $member['user_pass']
+                );
+                return $member;
+            }catch(\Exception $e) {
+                Db::rollback();
+                return $e->getMessage();
+            }
         }
-        return $member;
     }
 
     /**

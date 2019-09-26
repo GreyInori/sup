@@ -245,7 +245,7 @@ class TrustMain extends Controller
         Db::startTrans();
         try{
             $allow = Db::table('su_trust')->where('trust_id',$list[0]['trust_id'])->update(['is_allow'=>1]);
-            Db::table('su_testing_status')->where('trust_id',$list[0]['trust_id'])->update(['receive_time'=>time()]);
+            Db::table('su_testing_status')->where('trust_id',$list[0]['trust_id'])->update(['receive_time'=>time(),'testing_process'=>3]);
             Db::commit();
             return array($allow);
         }catch(\Exception $e) {

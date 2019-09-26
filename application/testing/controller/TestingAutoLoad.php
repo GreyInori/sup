@@ -22,7 +22,7 @@ class TestingAutoLoad extends Controller
         'inputCompany' => 'st.input_testing_company',
         'testingType' => 'smt.type_name',
         'testingName' => 'sm.material_name',
-        'trustCode' => 'st.trust_id',
+//        'trustCode' => 'st.trust_id',
         'engineerName' => 'se.engineering_name',
         'customCompany' => 'sc.custom_company',
         'inputTime' => 'st.input_time',
@@ -64,6 +64,8 @@ class TestingAutoLoad extends Controller
         'materialName' => 'st.testing_name',
         'reportFile' => 'sr.report_file',
         'mobile' => 'user_name',
+        'errorTime' => 'ste.error_time',
+        'trustCode' => 'st.trust_code',
     );
 
     public static $fieldGroup = array(

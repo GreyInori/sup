@@ -30,7 +30,7 @@ class QrcodeSearch extends Controller
         $where = $where->getWhereArray($search);
         try{
             $list = Db::table('su_qrcode')
-                    ->field(['company_code','work_code','qr_time','qr_code','is_use'])
+                    ->field(['company_code','work_code','qr_time','qr_code','is_use','qr_path'])
                     ->where($where)
                     ->limit($page[0],$page[1])
                     ->select();

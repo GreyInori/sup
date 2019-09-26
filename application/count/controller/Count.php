@@ -59,4 +59,9 @@ class Count extends Controller
     {
         return self::returnMsg(200,'success',CountMain::toCompanyCount());
     }
+
+    public function getWeekError()
+    {
+        return self::returnMsg(200,'success',CountMain::toWeekError());
+    }
 }

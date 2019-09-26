@@ -60,6 +60,35 @@ class TestingMain extends Controller
     }
 
     /**
+     * 回复异常方法
+     * @return array|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toErrorResponse()
+    {
+        $data = request()->param();
+        if(!isset($data['errorId'])) {
+            return '请传递异常id';
+        }
+        if(!isset($data['response'])) {
+            return '请传递异常回复信息';
+        }
+        /* 检测要回复的异常是否存在，如果不存在就返回错误信息，否则进行回复 */
+        $err = Db::table('su_testing_error')->where('error_id',$data['errorId'])->field(['error_id'])->select();
+        if(empty($err)) {
+            return '查无此异常，请检查传递的异常id';
+        }
+        try{
+            $update = Db::table('su_testing_error')->where('error_id',$data['errorId'])->update(['error_response'=>$data['response'],'error_success'=>1]);
+            return array($update);
+        }catch(\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    /**
      * 委托单报告上传方法
      * @param $data
      * @return array|int|string

@@ -71,6 +71,26 @@ class Testing extends Controller
     }
 
     /**
+     * 回复异常方法
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function postTestingErrorResponse()
+    {
+        $data = FieldCheck::checkData('resErr');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        $data = TestingMain::toErrorResponse();
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        return self::returnMsg(200,'success',$data);
+    }
+
+    /**
      * 获取异常委托单列表
      * @return false|string
      */
