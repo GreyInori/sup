@@ -118,7 +118,7 @@ class TestingMain extends Controller
         $reportInsert = array(
             'report_main' => $data['report']['sr.report_main'],
             'report_time' => time(),
-            'trust_id' => $data['report']['st.trust_id']
+            'trust_id' => $data['report']['st.trust_id'],
         );
         /* 执行图片上传操作，如果上传失败就返回错误信息，如果成功就根据传值以及当前时间创建图片文件修改数据 */
         $file = self::toImgUp('report','pdf');
@@ -131,6 +131,7 @@ class TestingMain extends Controller
             'testing_report' => 1,
             'testing_status' => '已检测',
             'report_upload_time' => time(),
+            'testing_process' => 4,
         );
         Db::startTrans();
         try{

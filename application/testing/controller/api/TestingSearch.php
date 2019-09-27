@@ -47,6 +47,7 @@ class TestingSearch extends Controller
         }
         if(!$isReport == 0) {
             $where['is_report'] = 0;
+            $where['testing_process'] = 3;
         }
         /* 如果传递了公司的话，就根据公司获取指定的工程列表，把查询条件缩小到该企业相关的项目 */
         if(isset($search['company_id'])){
