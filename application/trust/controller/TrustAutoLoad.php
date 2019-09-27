@@ -70,6 +70,11 @@ class TrustAutoLoad extends Validate
         'typeDepict' => 'type_depict',
         'user_name' => 'user_name',
         'mobile' => 'user_name',
+        'standardCode' => 'testing_code',
+        'trialName' => 'trial_name',
+        'trialDepict' => 'trial_depict',
+        'trialHint' => 'trial_default_hint',
+        'trialCustomHint' => 'trial_custom_hint',
     );
 
     /**

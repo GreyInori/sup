@@ -135,6 +135,7 @@ class TestingMain extends Controller
         );
         Db::startTrans();
         try{
+            var_dump($reportInsert);exit;
             $update = Db::table('su_report')->insertGetId($reportInsert);
             /* 委托状态修改 */
             Db::table('su_testing_status')

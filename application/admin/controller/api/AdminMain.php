@@ -239,14 +239,14 @@ class AdminMain extends Controller
             ->join('su_control sc','sc.control_id = srn.control_id')
             ->where('srn.role_id',$role)
             ->field(['sc.control_id','control_chs','control_pid','control_url','control_icon'])
-            ->order('control_pid')
+            ->order('control_index ASC,control_pid')
             ->select();
         if(empty($list)) {
             return array();
         }
         /* 根据父类id名创建格式为 父类id => 值 的数组，用于给子类匹配 */
         $divideParent = array();
-        $parent = Db::table('su_control')->where('control_pid',0)->field(['control_id','control_chs','control_pid','control_url','control_icon'])->select();
+        $parent = Db::table('su_control')->where('control_pid',0)->field(['control_id','control_chs','control_pid','control_url','control_icon'])->order('control_index ASC')->select();
         foreach($parent as $key => $value) {
             $value = self::fieldChange($value);
             $divideParent[$value['control']] = $value;
@@ -255,13 +255,15 @@ class AdminMain extends Controller
         /* 把子类的数据塞进父类里面去 */
         foreach($list as $key => $value) {
             $value = self::fieldChange($value);
-            if(!$value['controlParent'] == 0) {
+            if(!$value['controlParent'] == 0 && isset($divideParent[$value['controlParent']]) && $divideParent[$value['controlParent']] != null) {
                 array_push($divideParent[$value['controlParent']]['child'],$value);
             }
         }
         $result = array();
         foreach ($divideParent as $row) {
-            array_push($result,$row);
+            if(!empty($row['child'])) {
+                array_push($result,$row);
+            }
         }
         return $result;
     }

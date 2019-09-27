@@ -40,44 +40,73 @@ class PeopleMain extends Controller
         /* 生成人员注册时间并进行插入企业数据插入操作 */
         $data['people_register_time'] = time();
         $peopleModel = new PeopleModel();
-        $data['people_passwd'] = md5($data['people_passwd']);
+        $data['people_passwd'] = md5(123456);
+        if(isset($data['people_passwd'])) {
+            $data['people_passwd'] = md5($data['people_passwd']);
+        }
         $data['people_id'] = $already[0];
+        if(isset($data['people_birthday'])) {
+            $data['people_birthday'] = strtotime($data['people_birthday']);
+        }
+        $data['people_code'] = "P".date('Ymd').rand(10000,99999);
+        /* 进行人员注册操作，成功返回人人员id */
         try{
             $peopleModel->save($data);
+            return array('uid'=>$data['people_id']);
         }catch(\Exception $e){
             return $e->getMessage();
         }
-        return 1;
     }
 
     /**
      * 执行人员添加方法
      * @param $data
      * @return array|string
+     * @throws \think\exception\DbException
      */
     public static function toAdd($data)
     {
         /* 把传递过来的数据根据数据表进行分组，用于后续插入和检测等操作 */
         $group = new PeopleAutoLoad();
-        $data = $group->toGroup($data);
-        $uuid = md5(uniqid(mt_rand(),true));
-        $people = $data['people'];
-        $people['people_id'] = $uuid;
-        /* 进行人员以及人员详细信息的添加操作 */
+        $check = $group->toGroup($data);
+        /* 检测当前用户名是否已经存在 */
+        $already = self::peopleAlreadyCreat($check);
+        if(!is_array($already)){
+            return $already;
+        }
+        /* 生成人员注册时间并进行插入人员数据操作 */
+        $data['people_register_time'] = time();
+        $peopleModel = new PeopleModel();
+        $data['people_passwd'] = md5(123456);
+        if(isset($data['people_passwd'])) {
+            $data['people_passwd'] = md5($data['people_passwd']);
+        }
+        $data['people_id'] = $already[0];
+        if(isset($data['people_birthday'])) {
+            $data['people_birthday'] = strtotime($data['people_birthday']);
+        }
+        $data['people_code'] = "P".date('Ymd').rand(10000,99999);
+        /* 执行图片上传操作，如果成功就把图片路径塞进人员添加数据中 */
+        $sign = self::toImgUp('sign','sign');
+        $pic = self::toImgUp('people','pic');
+        if(is_array($sign)) {
+            $data['people_sign'] = $sign['pic'];
+        }
+        if(is_array($pic)) {
+            $data['people_pic'] = $pic['pic'];
+        }
+
+        /* 进行人员注册操作，成功返回人人员id */
         try{
-            Db::table('su_people')->insert($people);
-            $pic = self::picCheck($uuid);
-            if(!empty($pic)){
-                Db::table('su_people_file')->insert($pic);
-            }
-            return array('uid'=>$uuid[0]);
-        }catch(\Exception $e) {
+            $peopleModel->save($data);
+            return array('uid'=>$data['people_id']);
+        }catch(\Exception $e){
             return $e->getMessage();
         }
     }
 
     /**
-     * 执行人员添加方法
+     * 人员修改方法
      * @param $data
      * @return array|string
      * @throws \think\exception\DbException
@@ -86,49 +115,42 @@ class PeopleMain extends Controller
     {
         /* 把传递过来的数据根据数据表进行分组，用于后续插入和检测等操作 */
         $group = new PeopleAutoLoad();
-        $data = $group->toGroup($data);
-        /* 如果检测通过的话方法会返回一个索引数组，其中第一项就是生成的uuid，否则就会返回错误信息字符串 */
-        $uuid = self::PeopleAlreadyCreat($data, 1);
-        if(!is_array($uuid)) {
-            return $uuid;
+        $check = $group->toGroup($data);
+        /* 检测当前用户名是否已经存在 */
+        $already = self::peopleAlreadyCreat($check,1);
+        if(!is_array($already)){
+            return $already;
         }
-        $people = $data['people'];
-        $people['people_id'] = $uuid[0];
-        /* 进行人员以及人员详细信息的添加操作 */
+        /* 生成人员注册时间并进行插入人员数据操作 */
+        $data['people_register_time'] = time();
+        $data['people_passwd'] = md5(123456);
+        if(isset($data['people_passwd'])) {
+            $data['people_passwd'] = md5($data['people_passwd']);
+        }
+        $data['people_id'] = $already[0];
+        if(isset($data['people_birthday'])) {
+            $data['people_birthday'] = strtotime($data['people_birthday']);
+        }
+        $data['people_code'] = "P".date('Ymd').rand(10000,99999);
+        /* 执行图片上传操作，如果成功就把图片路径塞进人员添加数据中 */
+        $sign = self::toImgUp('sign','sign');
+        $pic = self::toImgUp('people','pic');
+        if(is_array($sign)) {
+            $data['people_sign'] = $sign['pic'];
+        }
+        if(is_array($pic)) {
+            $data['people_pic'] = $pic['pic'];
+        }
+
+        /* 进行人员注册操作，成功返回人人员id */
         try{
-            Db::table('su_people')->where('people_id',$uuid[0])->update($people);
-            return array('uid'=>$uuid[0]);
-        }catch(\Exception $e) {
+            $uid = $data['people_id'];
+            unset($data['people_id']);
+           Db::table('su_people')->where('people_id',$uid)->update($data);
+            return array('uid'=>$uid);
+        }catch(\Exception $e){
             return $e->getMessage();
         }
-    }
-
-    /**
-     * 检测上传的人员图片
-     * @param $uuid
-     * @return array
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
-     */
-    private static function picCheck($uuid)
-    {
-        $field = Db::table('su_people_file_type')->field(['type_id','type_en'])->select();
-        $peopleImg = array();              // 用于插入的图片数组
-        $peopleField = array();             // 需要处理的图片字段
-        $fieldCheck = array();              // 用于把图片类型的英文名比照成id
-        /* 根据数据库数据拿出需要上传的图片字段，并对应上id */
-        foreach($field[0] as $key => $row) {
-            array_push($peopleField, $row['type_en']);
-            $fieldCheck[$row['type_en']] = $row['type_id'];
-        }
-        $image = self::imgUp('people',$peopleField);
-        foreach($image as $imageKey => $imageRow) {
-            if($imageRow !== ''){
-                array_push($peopleImg,array('people_id'=>$uuid, 'people_path'=> $imageRow,'type_id'=>$fieldCheck[$imageKey]));
-            }
-        }
-        return $peopleImg;
     }
 
     /**
@@ -185,7 +207,7 @@ class PeopleMain extends Controller
         }elseif(!empty($list) && $token == 1){
             return array($people['people_id']);
         }elseif($token ==  1){
-            return '查无此企业，请检查传递的企业id';
+            return '查无此人员，请检查传递的人员id';
         }
         $uuid = md5(uniqid(mt_rand(),true));
         return array($uuid);

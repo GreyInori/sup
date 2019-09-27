@@ -1,25 +1,21 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: Administrator
- * Date: 2019/9/2
- * Time: 0:25
+ * User: admin
+ * Date: 2019/9/27
+ * Time: 9:30
  */
 
-namespace app\trust\controller\api;
+namespace app\engineer\controller\api;
 
 use think\Controller;
 use think\Db;
-use \app\trust\controller\api\TrustWhere as TrustWhere;
+use \app\engineer\controller\api\ReckonerWhere as ReckonerWhere;
 
-/**
- * Class TrustSearch
- * @package app\trust\controller\api
- */
-class TrustSearch extends Controller
+class ReckonerSearch extends Controller
 {
     /**
-     * 获取委托单列表方法
+     * 获取指定工程列表方法
      * @param $search
      * @return false|\PDOStatement|string|\think\Collection
      * @throws \think\db\exception\DataNotFoundException
@@ -30,31 +26,29 @@ class TrustSearch extends Controller
     {
         /* 初始化，根据传递的数据生成指定的分页信息以及查询条件 */
         $page = self::pageInit($search);
-        $where = new TrustWhere();
+        $where = new ReckonerWhere();
         $where = $where->getWhereArray($search);
-        $where['st.show_type'] = 1;
-        if(isset($search['show'])){
-            $where['st.show_type'] = $search['show'];
-        }
-        if(empty($where)) {
-            return '请传递正确的查询条件';
-        }
+        $where['se.show_type'] = 1;
         /* 检测管理员状态，返回相关的查询条件 */
         $whereIn = self::roleCheck($search);
         if($whereIn) {
-            $where['st.engineering_id'] = ['IN',$whereIn];
+            $where['se.engineering_id'] = ['IN',$whereIn];
         }
         /* 执行企业列表查询 */
         try{
-            $list = Db::table('su_trust')
-                ->alias('st')
-                ->field(['st.testing_material','st.is_report','st.trust_id','st.serial_number','st.input_testing_company','st.testing_name','st.project_name','st.custom_company','st.input_time','st.testing_price','st.is_submit','st.is_print','st.is_witness','st.is_sample','st.is_testing','st.is_cancellation','st.is_allow','st.testing_result'])
+            $list = Db::table('su_engineering_reckoner')
+                ->alias('ser')
+                ->join('su_engineering se','se.engineering_id = ser.engineering_id')
+                ->join('su_people sp','sp.people_id = ser.people_id')
+                ->field(['se.engineering_id','se.engineering_name','sp.people_id','sp.people_code','sp.people_name','sp.people_mobile'])
                 ->where($where)
                 ->limit($page[0], $page[1])
+                ->order('se.input_time DESC')
                 ->select();
         }catch(\Exception $e) {
             return $e->getMessage();
         }
+//        $list = self::idToName($list, $check);
         return $list;
     }
 
@@ -72,21 +66,12 @@ class TrustSearch extends Controller
         if(!isset($admin['user_name'])) {
             return false;
         }
-        $main = Db::table('su_admin')->where('user_name', $admin['user_name'])->where('show_type',1)->field(['user_role'])->select();
-        if(empty($main) || $main[0]['user_role'] == 1) {
-            return false;
-        }
-        if(isset($admin['user_name'])) {
-            $user = $admin['user_name'];
-        }elseif(isset($admin['mobile'])) {
-            $user = $admin['mobile'];
-        }
-        if(isset($user)) {
-            $list = Db::table('su_engineering_divide')->where('divide_user',$admin['user_name'])->field(['engineering_id'])->select();
-        }else{
+        $admin = Db::table('su_admin')->where('user_name', $admin['user_name'])->field(['user_role'])->select();
+        if(empty($admin) || $admin[0]['user_role'] == 1) {
             return false;
         }
         /* 如果不是最高管理员的话，就获取当前账号相关的工程列表 */
+        $list = Db::table('su_engineering_divide')->where('divide_user',$admin['user_name'])->field(['engineering_id'])->select();
         if(!empty($list)) {
             foreach($list as $key => $row) {
                 $result .= "{$row['engineering_id']},";

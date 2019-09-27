@@ -14,6 +14,7 @@ use \app\engineer\controller\EngineerAutoLoad as FieldCheck;
 use \app\engineer\controller\api\EngineerMain as EngineerMain;
 use \app\engineer\controller\api\DivideMain as DivideMain ;
 use \app\engineer\controller\api\EngineerSearch as EngineerSearch;
+use \app\engineer\controller\api\ReckonerSearch as ReckonerSearch;
 
 /**
  * Class Engineer
@@ -266,6 +267,75 @@ class Engineer extends Controller
             return self::returnMsg(500,'fail',$data);
         }
         return self::returnMsg(200,'success',$data);
+    }
+    // +----------------------------------------------------------------------
+    // | 工程结算人相关
+    // +----------------------------------------------------------------------
+    /**
+     * 获取工程结算人列表方法
+     * @return false|string
+     * @throws \think\exception\DbException
+     */
+    public function getEngineerReckonerList()
+    {
+        /* 检查传递参数是否符合规范 */
+        $data = FieldCheck::checkData('reckoner',['page']);
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 获取企业列表数据，如果有抛出异常的话就返回错误信息 */
+        $list = ReckonerSearch::toList($data);
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        $change = new EngineerMain();
+        $list = $change::fieldChange($list);
+        return self::returnMsg(200,'success',$list);
+    }
+
+    public function postEngineerReckonerAdd()
+    {
+        /* 检查传递参数是否符合规范 */
+        $data = FieldCheck::checkData('reckonerAdd');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 获取企业列表数据，如果有抛出异常的话就返回错误信息 */
+        $list = EngineerMain::reckonerAdd($data);
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        return self::returnMsg(200,'success',$list);
+    }
+
+    public function postEngineerReckonerEdit()
+    {
+        /* 检查传递参数是否符合规范 */
+        $data = FieldCheck::checkData('reckonerEdit');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 获取企业列表数据，如果有抛出异常的话就返回错误信息 */
+        $list = EngineerMain::reckonerEdit($data);
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        return self::returnMsg(200,'success',$list);
+    }
+
+    public function postEngineerReckonerDel()
+    {
+        /* 检查传递参数是否符合规范 */
+        $data = FieldCheck::checkData('reckonerDel');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 获取企业列表数据，如果有抛出异常的话就返回错误信息 */
+        $list = EngineerMain::reckonerDel($data);
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        return self::returnMsg(200,'success',$list);
     }
     // +----------------------------------------------------------------------
     // | 成员公司相关

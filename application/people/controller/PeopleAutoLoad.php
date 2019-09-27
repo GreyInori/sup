@@ -28,7 +28,7 @@ class PeopleAutoLoad extends Controller
         'mobile' => 'people_mobile',
         'professional' => 'professional_id',
         'birthday' => 'people_birthday',
-        'information' => 'people_concat_information',
+        'information' => 'people_contact_information',
         'address' => 'people_address',
         'credential' => 'people_credential_code',
         'company' => 'company_Id',
@@ -43,7 +43,7 @@ class PeopleAutoLoad extends Controller
      * 给指定字段数据根据数据表区别分组
      */
     public static $fieldGroup = array(
-        'people' => array('people_id','people_code','people_passwd','people_verify','company_id','people_sex','people_user','people_name','people_name','people_idCard','people_mobile','professional_id','people_birthday','people_concat_information','people_address','people_credential_code')
+        'people' => array('people_id','people_code','people_passwd','people_verify','company_id','people_sex','people_user','people_name','people_name','people_idCard','people_mobile','professional_id','people_birthday','people_contact_information','people_address','people_credential_code'),
     );
     /**
      * 根据预定义的分组数组，传递过来的数组进行分组

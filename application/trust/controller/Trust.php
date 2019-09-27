@@ -27,6 +27,27 @@ class Trust extends Controller
     use Send;
 
     /**
+     * 获取委托单下对应的记录数据
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getTrustSave()
+    {
+        $data = FieldCheck::checkData('trustSave');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 获取委托单下的记录数据 */
+        $list = TrustMain::toTrustSave();
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        return self::returnMsg(200,'success',$list);
+    }
+
+    /**
      * 获取指定的委托单
      * @return false|string
      * @throws \think\db\exception\DataNotFoundException

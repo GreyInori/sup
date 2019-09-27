@@ -112,6 +112,44 @@ class Testing extends Controller
     }
 
     /**
+     * 获取未上传报告的委托单列表
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getReportUploadList()
+    {
+        /* 检查传递参数是否符合规范 */
+        $data = FieldCheck::checkData('list',['page']);
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        $list = TestingSearch::toList($data,0);
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        $fieldArr = array('engineerName','inputCompany','materialName','reportMain','reportNumber','reportTime','testingType','trust');
+        /* 把查询结果的字段转换为前端传递过来的字段数据 */
+        $change = new TestingMain();
+        $list = $change::fieldChange($list);
+        /* 把查询结果转换为报告页面需要的数据字段 */
+        foreach($list as $key => $row) {
+            foreach($row as $mainKey => $mainRow) {
+                if($mainKey == 'testingName') {
+                    $list[$key]['materialName'] = $mainRow;
+                    unset($list[$key][$mainKey]);
+                }elseif(!in_array($mainKey,$fieldArr) || is_int($mainKey)) {
+                    unset($list[$key][$mainKey]);
+                }elseif($mainRow == null) {
+                    $list[$key][$mainKey] = ' ';
+                }
+            }
+        }
+        return self::returnMsg(200,'success',$list);
+    }
+
+    /**
      * 报告上传方法
      * @return false|string
      * @throws \think\db\exception\DataNotFoundException

@@ -45,6 +45,9 @@ class EngineerValidate extends Validate
         'sampling' => 'array',    // 取样人员
         'foundationsName' => 'chsDash',   // 地面基础类型名
         'mobile' => 'mobile|require',                 // 注册人账号
+        'peopleName' => 'chsDash',                 // 结算人名
+        'peopleCode' => 'alphaDash',                 // 结算人编号
+        'peopleId' => 'require|alphaDash',     // 结算人id
     );
 
     protected $message = array(
@@ -87,5 +90,9 @@ class EngineerValidate extends Validate
         'foundationsAdd' => ['foundationsName'],   // 地面基础类型添加
         'foundationsEdit' => ['foundations','foundationsName'],   // 地面基础类型修改
         'foundationsDel' => ['foundations'],   // 地面基础类型删除
+        'reckoner' => ['peopleName','peopleCode'],   // 结算人列表
+        'reckonerAdd' => ['peopleId','engineer'],   // 结算人添加
+        'reckonerEdit' => ['engineer','peopleId'],   // 结算人修改
+        'reckonerDel' => ['engineer'],   // 结算人删除
     );
 }

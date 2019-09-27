@@ -37,10 +37,11 @@ class People extends Controller
         }
         $result = PeopleMain::toRegister($data);
 
-        if($result === 1) {
-            return self::returnMsg(200,'success','注册成功');
+        if(!is_array($result)) {
+            return self::returnMsg(500,'fail',$result);
         }
-        return self::returnMsg(500,'fail',$result);
+        return self::returnMsg(200,'success',$result['uid']);
+
     }
 
     /**
@@ -65,6 +66,7 @@ class People extends Controller
     /**
      * 添加人员方法
      * @return false|string
+     * @throws \think\exception\DbException
      */
     public function postPeopleAdd()
     {
@@ -117,26 +119,6 @@ class People extends Controller
         }
         /* 执行人员添加方法，如果成功的话就返回人员的id，否则返回错误信息 */
         $list = PeopleMain::toDel($data);
-        if(is_array($list)){
-            return self::returnMsg(200, 'success', $list['uid']);
-        }else{
-            return self::returnMsg(500,'fail',$list);
-        }
-    }
-
-    /**
-     * 获取人员详细信息方法
-     * @return false|string
-     */
-    public function getPeopleMain()
-    {
-        /* 检测传递的参数是否符合人员添加的规范，如果不符合就返回错误信息 */
-        $data = FieldCheck::checkData('del');
-        if(!is_array($data)) {
-            return self::returnMsg(500,'fail',$data);
-        }
-        /* 执行人员详细信息查看，如果成功的话就返回人员的详细信息，否则返回错误信息 */
-        $list = PeopleMain::toMain($data);
         if(is_array($list)){
             return self::returnMsg(200, 'success', $list);
         }else{

@@ -22,12 +22,13 @@ class TestingSearch extends Controller
     /**
      * 获取委托单列表方法
      * @param $search
+     * @param $isReport
      * @return false|\PDOStatement|string|\think\Collection
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public static function toList($search)
+    public static function toList($search,$isReport = 1)
     {
         $check = new TestingAutoLoad();
         $field = $check::$fieldGroup;
@@ -43,6 +44,9 @@ class TestingSearch extends Controller
 
         if(isset($search['show'])){
             $where['st.show_type'] = $search['show'];
+        }
+        if(!$isReport == 0) {
+            $where['is_report'] = 0;
         }
         /* 如果传递了公司的话，就根据公司获取指定的工程列表，把查询条件缩小到该企业相关的项目 */
         if(isset($search['company_id'])){
@@ -64,6 +68,7 @@ class TestingSearch extends Controller
         }
         $key = array_search('company_id',$field);
         array_push($field,'sr.report_file');
+        array_push($field,'smt.type_name');
         unset($field[$key]);
         /* 执行企业列表查询 */
         try{
@@ -71,8 +76,8 @@ class TestingSearch extends Controller
                 ->alias('sts')
                 ->join('su_trust st','st.trust_id = sts.trust_id')
                 ->join('su_engineering se','se.engineering_id = st.engineering_id')
-                ->join('su_material sm','sm.material_id = st.testing_material')
-                ->join('su_material_type smt','smt.type_id = st.testing_quality')
+                ->join('su_material sm','sm.material_id = st.testing_material','left')
+                ->join('su_material_type smt','smt.type_id = st.testing_quality','left')
                 ->join('su_report sr','sr.trust_id = st.trust_id','left')
                 ->field($field)
                 ->where($where)

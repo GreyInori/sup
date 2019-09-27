@@ -15,8 +15,19 @@
         var pic = new FormData();
         // pic.append('error', '东西8行');
         // pic.append('company', 'c643cc681a5b0aa13a6597bcf166199e');
-        pic.append('trust', 'b622ce6e3267a301873c8f25482ae9fd');
-        pic.append('reportMain', '检测合格');
+        pic.append('trust', 'ffba3e2c8098e883f4b8a6af8a2a5986');
+        pic.append('reportMain', '合格');
+        // pic.append('reportMain', '检测合格');
+        // pic.append('user', '138576473640');        // 人员账号
+        // pic.append('pass', '123456');                 // 人员密码，可不填
+        // pic.append('name', '大型陨石');                   // 人员姓名
+        // pic.append('sex', '1');                                 // 人员性别，1男0女
+        // pic.append('idCard', '330398197705065933');      // 人员身份证号
+        // pic.append('mobile', '13857643640');              // 人员手机号
+        // pic.append('information', '有事就找弟弟中型陨石');            // 人员其他联系方式
+        // pic.append('accept', '1');                           // 是否同意协议，1同意
+        // pic.append('address', '温州省乐清市');                 // 人员地址
+        // pic.append('birthday', '2019-1-1');                  // 人员生日
         // pic.append('errorId', '1');
         // pic.append('trustCode', '');
         // pic.append('inputCompany', '');
@@ -31,7 +42,8 @@
         // pic.append('quality', '陨石质监站');
         // pic.append('engineering', '3271e961902c266676029f35156ba03a');
         // pic.append('agreementFile', document.getElementById('img').files[0]);
-        pic.append('pdf', document.getElementById('img').files[0]);
+        pic.append('pic', document.getElementById('img').files[0]);
+        // pic.append('pic', document.getElementById('main').files[0]);
         $.ajax({
             url: 'http://localhost/material/StandardEdit',
             url: 'http://localhost/engineer/DivideEngineer',
@@ -94,19 +106,19 @@
             url: 'http://localhost/testing/ReportList',
             url: 'http://localhost/testing/Report',
             url: 'http://jiance.server2.puankang.com.cn/trust/TrustList',
-            // url: 'http://localhost/engineer/DivideCompanyId',
-            // url: 'http://localhost/agreement/AgreementDel',
-            // url: 'http://jiance.server2.puankang.com.cn/agreement/AgreementDel',
-            // url: 'http://localhost/trust/CompanyTrust',
-            // url: 'http://localhost/trust/CompanyTrust',
-            // url: 'http://localhost/agreement/AgreementDel',
-            // url: 'http://localhost/agreement/Agreement',
-            // url: 'http://localhost/trust/TrustAllow',
-            // url: 'http://localhost/engineer/EngineerPass',
-            // url: 'http://localhost/area/areaAdd',
-            // url: 'http://localhost/area/areaEdit',
-            // url: 'http://localhost/area/areaDel',
-            // url: 'http://localhost/area/Area',
+            url: 'http://localhost/engineer/DivideCompanyId',
+            url: 'http://localhost/agreement/AgreementDel',
+            url: 'http://jiance.server2.puankang.com.cn/agreement/AgreementDel',
+            url: 'http://localhost/trust/CompanyTrust',
+            url: 'http://localhost/trust/CompanyTrust',
+            url: 'http://localhost/agreement/AgreementDel',
+            url: 'http://localhost/agreement/Agreement',
+            url: 'http://localhost/trust/TrustAllow',
+            url: 'http://localhost/engineer/EngineerPass',
+            url: 'http://localhost/area/areaAdd',
+            url: 'http://localhost/area/areaEdit',
+            url: 'http://localhost/area/areaDel',
+            url: 'http://localhost/area/Area',
             url: 'http://localhost/admin/AdminAdd',
             url: 'http://localhost/admin/AdminEdit',
             url: 'http://localhost/admin/AdminDel',
@@ -128,13 +140,13 @@
             url: 'http://jiance.server2.puankang.com.cn/qrcode/Qrcode',
             url: 'http://localhost/qrcode/Qrcode',
             url: 'http://localhost/company/Character',
-            // url: 'http://jiance.server2.puankang.com.cn/admin/AdminList',
+            url: 'http://jiance.server2.puankang.com.cn/admin/AdminList',
             url: 'http://localhost/area/Area',
             url: 'http://jiance.server2.puankang.com.cn/trust/TrustUploadAdd',
             url: 'http://jiance.server2.puankang.com.cn/trust/TrustUpload',
             url: 'http://jiance.server2.puankang.com.cn/trust/TrustPeopleUpload',
-            // url: 'http://jiance.server2.puankang.com.cn/company/companyList',
-            // url: 'http://jiance.server2.puankang.com.cn/company/CompanyMain',
+            url: 'http://jiance.server2.puankang.com.cn/company/companyList',
+            url: 'http://jiance.server2.puankang.com.cn/company/CompanyMain',
             url: 'http://jiance.server2.puankang.com.cn/trust/TrustPeopleFaceCheck',
             url: 'http://jiance.server2.puankang.com.cn/trust/TrustUploadForCode',
             url: 'http://jiance.server2.puankang.com.cn/engineer/EngineerMain',
@@ -154,31 +166,52 @@
             url: 'http://jiance.server2.puankang.com.cn/trust/TrustList',
             url: 'http://jiance.server2.puankang.com.cn/qrcode/QrcodePng',
             url: 'http://jiance.server2.puankang.com.cn/qrcode/QrcodeCreate',
+            url: 'http://jiance.server2.puankang.com.cn/testing/ReportUpload',
+            url: 'http://jiance.server2.puankang.com.cn/testing/Report',
+            url: 'http://jiance.server2.puankang.com.cn/trust/TrustDel',
+            url: 'http://jiance.server2.puankang.com.cn/engineer/EngineerDivide',
+            url: 'http://jiance.server2.puankang.com.cn/qrcode/Qrcode',
+            url: 'http://localhost/admin/AdminRole',
+            url: 'http://localhost/admin/AdminList',
+            url: 'http://jiance.server2.puankang.com.cn/admin/AdminList',
             url: 'http://jiance.server2.puankang.com.cn/agreement/Agreement',
             url: 'http://jiance.server2.puankang.com.cn/testing/TestingErrorResponse',
             url: 'http://jiance.server2.puankang.com.cn/agreement/AgreementType',
             url: 'http://jiance.server2.puankang.com.cn/testing/TestingError',
             url: 'http://jiance.server2.puankang.com.cn/count/WeekError',
             url: 'http://jiance.server2.puankang.com.cn/engineer/EngineerReg',
-            // url: 'http://jiance.server2.puankang.com.cn/testing/ReportUpload',
-            // url: 'http://jiance.server2.puankang.com.cn/testing/Report',
-            // url: 'http://jiance.server2.puankang.com.cn/trust/TrustDel',
-            // url: 'http://jiance.server2.puankang.com.cn/engineer/EngineerDivide',
-            // url: 'http://jiance.server2.puankang.com.cn/qrcode/Qrcode',
-            // url: 'http://localhost/admin/AdminRole',
-            // url: 'http://localhost/admin/AdminList',
-            // url: 'http://jiance.server2.puankang.com.cn/admin/AdminList',
+            url: 'http://jiance.server2.puankang.com.cn/engineer/EngineerReckonerList',
+            url: 'http://jiance.server2.puankang.com.cn/engineer/EngineerReckonerAdd',
+            url: 'http://jiance.server2.puankang.com.cn/engineer/EngineerReckonerEdit',
+            url: 'http://jiance.server2.puankang.com.cn/engineer/EngineerReckonerDel',
+            url: 'http://jiance.server2.puankang.com.cn/people/PeopleList',
+            url: 'http://jiance.server2.puankang.com.cn/people/PeopleRegister',
+            url: 'http://jiance.server2.puankang.com.cn/people/PeopleAdd',
+            url: 'http://jiance.server2.puankang.com.cn/trust/TrustSave',
+            url: 'http://jiance.server2.puankang.com.cn/testing/ReportUploadList',
+            url: 'http://jiance.server2.puankang.com.cn/testing/ReportUpload',
             // url : 'https://apiserer1.bangninyou.com/version/user/Products?aithorization=89577f2a6a943243dff4929aeafb0b7b,123',
             // url : 'https://apiserer1.bangninyou.com/version/homepage/Products?aithorization=89577f2a6a943243dff4929aeafb0b7b,123',
             type: 'post',
-            // contentType : false,
-            // processData : false,
-            data :
-                {
-                    'divide' : 3,
-                    'name' : 12323213,
-                    'mobile' : 15757300865,
-                    'companyName' : 1235434322,
+            contentType : false,
+            processData : false,
+            data : pic,
+                // {
+                    // 'trust' : 'd60ba68196a5c826ec2951a3e148ef43',
+                    // 'code' : 'P',
+                    // 'mobile' : '1',
+                    // 'idCard' : '3',
+                    // 'name' : '石',
+                    // 'engineer' : '4ee61eab294b43ed475dc571594411a1',
+                    // 'peopleId' : 'a25164d94658c6f757edabf157af5e77',
+                    // 'name' : '天降',
+                    // 'peopleName' : '石',
+                    // 'peopleMobile' : '13',
+                    // 'peopleCode' : 'P',
+                    // 'divide' : 3,
+                    // 'name' : 12323213,
+                    // 'mobile' : 15757300865,
+                    // 'companyName' : 1235434322,
                     // 'error' : '东西8行',
                     // 'inputCompany' : '儒雅随和公司',
                     // 'errorId' : 2,
@@ -222,7 +255,7 @@
             // 'site' : 55.1,                      // 建筑面积
             // 'underground' : 55.1,
         //     'uuid' : '3371c043e814859c9a33318c51c71ee5',
-                },
+        //         },
             //     'areaParent' : 0,
                 // 'use' : 0,
                 // 'page' : [0,100],

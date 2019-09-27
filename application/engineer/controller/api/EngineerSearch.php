@@ -53,7 +53,7 @@ class EngineerSearch extends Controller
         try{
             $list = Db::table('su_engineering')
                 ->alias('se')
-                ->join('su_engineering_type set','se.engineering_type = set.type_id')
+                ->join('su_engineering_type set','se.engineering_type = set.type_id','left')
                 ->field($field)
                 ->where($where)
                 ->limit($page[0], $page[1])
@@ -84,8 +84,18 @@ class EngineerSearch extends Controller
         if(empty($admin) || $admin[0]['user_role'] == 1) {
             return false;
         }
+        if(isset($admin['user_name'])) {
+            $user = $admin['user_name'];
+        }elseif(isset($admin['mobile'])) {
+            $user = $admin['mobile'];
+        }
+        if(isset($user)) {
+            $list = Db::table('su_engineering_divide')->where('divide_user',$admin['user_name'])->field(['engineering_id'])->select();
+
+        }else{
+            return false;
+        }
         /* 如果不是最高管理员的话，就获取当前账号相关的工程列表 */
-        $list = Db::table('su_engineering_divide')->where('divide_user',$admin['user_name'])->field(['engineering_id'])->select();
         if(!empty($list)) {
             foreach($list as $key => $row) {
                 $result .= "{$row['engineering_id']},";

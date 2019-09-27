@@ -508,6 +508,92 @@ class EngineerMain extends Controller
         return array($update);
     }
     // +----------------------------------------------------------------------
+    // | 结算人相关
+    // +----------------------------------------------------------------------
+    /**
+     * 添加工程结算人
+     * @return array|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function reckonerAdd()
+    {
+        $data = request()->param();
+        /* 检测是否重复添加数据 */
+        $list = Db::table('su_engineering_reckoner')->where('engineering_id',$data['engineer'])->field(['engineering_id'])->select();
+        if(!empty($list)) {
+            return '当前工程已经存在结算人，请先删除或者给其他工程分配结算人';
+        }
+        /* 检测填写的数据是否存在 */
+        $people = Db::table('su_people')->where('people_id',$data['peopleId'])->field(['people_id'])->select();
+        $engineer = Db::table('su_engineering')->where('engineering_id',$data['engineer'])->field(['engineering_id'])->select();
+        if(empty($people)) {
+            return '该人员不存在，请检查传递的人员id';
+        }
+        if(empty($engineer)) {
+            return '该工程不存在，请检查传递的工程id';
+        }
+        /* 执行添加操作 */
+        try{
+            $add = Db::table('su_engineering_reckoner')->insert(['engineering_id'=>$data['engineer'],'people_id'=>$data['peopleId']]);
+            return array($add);
+        }catch(\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * 执行工程结算人修改
+     * @return array|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function reckonerEdit()
+    {
+        $data = request()->param();
+        /* 检测填写的数据是否存在 */
+        $people = Db::table('su_people')->where('people_id',$data['peopleId'])->field(['people_id'])->select();
+        $engineer = Db::table('su_engineering_reckoner')->where('engineering_id',$data['engineer'])->field(['engineering_id'])->select();
+        if(empty($people)) {
+            return '该人员不存在，请检查传递的人员id';
+        }
+        if(empty($engineer)) {
+            return '该工程不存在，请检查传递的工程id';
+        }
+        /* 执行添加操作 */
+        try{
+            $edit = Db::table('su_engineering_reckoner')->where('engineering_id',$data['engineer'])->update(['engineering_id'=>$data['engineer'],'people_id'=>$data['peopleId']]);
+            return array($edit);
+        }catch(\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * @return array|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function  reckonerDel()
+    {
+        $data = request()->param();
+        /* 检测填写的数据是否存在 */
+        $engineer = Db::table('su_engineering_reckoner')->where('engineering_id',$data['engineer'])->field(['engineering_id'])->select();
+        if(empty($engineer)) {
+            return '该工程不存在，请检查传递的工程id';
+        }
+        /* 执行添加操作 */
+        try{
+            $del = Db::table('su_engineering_reckoner')->where('engineering_id',$data['engineer'])->delete();
+            return array($del);
+        }catch(\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+    // +----------------------------------------------------------------------
     // | 地面基础类型相关
     // +----------------------------------------------------------------------
     /**
@@ -781,7 +867,8 @@ class EngineerMain extends Controller
                 $member = array(
                     'member_id' => $company['company_id'],
                     'divide_user' => $member['user_name'],
-                    'divide_passwd' => $member['user_pass']
+                    'divide_passwd' => $member['user_pass'],
+                    'company' => $company['company_id'][0],
                 );
                 return $member;
             }catch(\Exception $e) {

@@ -64,5 +64,6 @@ class TrustValidate extends  Validate
         'trustUploadList' => array('trust'),
         'trustUploadAdd' => array('file','code','people','depict'),
         'trustUploadCode' => array('qrcode'),
+        'trustSave' => array('trust'),
     );
 }

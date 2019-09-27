@@ -328,6 +328,45 @@ class TrustMain extends Controller
         }
         return $result;
     }
+
+    /**
+     * 获取委托单下对应的记录字段数据
+     * @return array|false|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toTrustSave()
+    {
+        $data = request()->param();
+        if(!isset($data['trust'])) {
+            return '请传递需要获取记录信息的委托单号';
+        }
+        $list = Db::table('su_trust')
+                    ->alias('st')
+                    ->join('su_trust_list_default stld','stld.trust_id = st.trust_id')
+                    ->where('st.trust_id',$data['trust'])
+                    ->field(['st.testing_material'])
+                    ->select();
+        if(empty($list)) {
+            return '当前委托单尚未添加记录信息，请先添加后再进行查询';
+        }
+        /* 执行查询操作 */
+        $list = Db::table('su_material_list')
+                ->alias('sml')
+                ->join('su_material sm','sm.material_id = sml.material_id ')
+                ->where('sml.material_id',$list[0]['testing_material'])
+                ->where('sml.show_type',1)
+                ->field(['sml.trial_id','sml.trial_name','sml.trial_depict','sml.trial_default_hint','sml.trial_custom_hint','sm.testing_code'])
+                ->select();
+        if(empty($list)) {
+            return $list;
+        }
+
+        /* 根据字段获取对应的默认值 */
+        $list = self::fieldDefault($list,$data['trust']);
+        return $list;
+    }
     // +----------------------------------------------------------------------
     // | 委托单号图片相关
     // +----------------------------------------------------------------------
@@ -522,6 +561,52 @@ class TrustMain extends Controller
     // +----------------------------------------------------------------------
     // | 辅助相关
     // +----------------------------------------------------------------------
+    /**
+     * 获取委托单下对应的记录数据
+     * @param $list
+     * @param $trust
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function fieldDefault($list,$trust)
+    {
+        $result = array();
+        $defaultStr = "";
+        $defaultArr = array();
+        /* 根据已经查询出来的检测字段数据缩小默认值的查询范围，获取需要的默认值 */
+        foreach($list as $key => $row) {
+            $defaultStr .= "{$row['trial_id']},";
+        }
+        $defaultStr = rtrim($defaultStr,',');
+        $defaultList = Db::table('su_trust_list_default')
+            ->where('trial_id','IN',$defaultStr)
+            ->where('show_type',1)
+            ->where('trust_id',$trust)
+            ->field(['default_id','trial_id','trial_default_value','trial_default_token','trial_verify'])
+            ->select();
+        if(empty($defaultList)) {
+            return $list;
+        }
+        /* 把所有默认值转换成 字段id => 结果数组 的格式，方便匹配到字段下
+            顺便把数据库字段转换成前端传递过来的字段
+         */
+        foreach($defaultList as $key => $row) {
+            if(!isset($defaultArr[$row['trial_id']])) {
+                $defaultArr[$row['trial_id']] = array();
+            }
+            $row = self::fieldChange($row);
+            array_push($defaultArr[$row['trial']],$row);
+        }
+        foreach($list as $key => $row) {
+            $result[$key] = self::fieldChange($row);
+            if(isset($defaultArr[$row['trial_id']])){
+                $result[$key]['default'] = $defaultArr[$row['trial_id']];
+            }
+        }
+        return $result;
+    }
     /**
      * 生成工程编号方法
      * @return string
