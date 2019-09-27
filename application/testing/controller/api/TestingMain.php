@@ -129,13 +129,11 @@ class TestingMain extends Controller
         /* 委托单状态修改数组创建 */
         $trustUpdate = array(
             'testing_report' => 1,
-            'trust_progress' => 4,
             'testing_status' => '已检测',
             'report_upload_time' => time(),
         );
         Db::startTrans();
         try{
-            var_dump($reportInsert);exit;
             $update = Db::table('su_report')->insertGetId($reportInsert);
             /* 委托状态修改 */
             Db::table('su_testing_status')
