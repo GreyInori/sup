@@ -108,6 +108,8 @@ class EngineerMain extends Controller
         }
         $admin['engineering_id'] = $engineer['engineering_id'];
         $admin['divide_id'] = $data['divide_id'];
+        $companyName = Db::table('su_company')->where('company_id',$admin['member_id'])->field(['company_full_name'])->select();
+        $engineer['construction_company'] = $companyName[0]['company_full_name'];
         Db::startTrans();
         try{
             Db::table('su_engineering')->insert($engineer);
@@ -868,7 +870,6 @@ class EngineerMain extends Controller
                     'member_id' => $company['company_id'],
                     'divide_user' => $member['user_name'],
                     'divide_passwd' => $member['user_pass'],
-                    'company' => $company['company_id'][0],
                 );
                 return $member;
             }catch(\Exception $e) {
