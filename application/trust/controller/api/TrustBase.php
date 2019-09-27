@@ -30,7 +30,7 @@ class TrustBase extends Controller
      */
     public static function toTrustPic($trust)
     {
-            $trust = $trust['trust_id'];
+            $trust = $trust['trust'];
             $pic = Db::table('su_trust_people_pic')->where('trust_id',$trust)->field(['people_pic'])->select();
             if(empty($pic)) {
                 return '当前委托单尚未上传取样人面部照片，请联系相关人员';

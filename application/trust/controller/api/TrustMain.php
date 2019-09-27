@@ -227,7 +227,6 @@ class TrustMain extends Controller
      * @param $data
      * @return array|string
      * @throws \think\exception\DbException
-     *
      */
     public static function toTrustAllow($data)
     {

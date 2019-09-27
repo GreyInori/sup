@@ -299,6 +299,10 @@ class Trust extends Controller
         if(!is_array($data)) {
             return self::returnMsg(500,'fail',$data);
         }
+        $data = request()->param();
+        if(!isset($data['trust'])) {
+            return self::returnMsg(500,'fail','请传递委托单号');
+        }
         /* 执行图片上传操作，拿到图片的路径进行转换处理 */
         $Upload = TrustBase::picUpload();
         if(!is_array($Upload)) {
