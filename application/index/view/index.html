@@ -15,8 +15,7 @@
         var pic = new FormData();
         // pic.append('error', '东西8行');
         // pic.append('company', 'c643cc681a5b0aa13a6597bcf166199e');
-        pic.append('trust', 'ffba3e2c8098e883f4b8a6af8a2a5986');
-        pic.append('reportMain', '合格');
+        pic.append('trust', 'eca2b063a72e38990c27faa7e8ec4e9b');
         // pic.append('reportMain', '检测合格');
         // pic.append('user', '138576473640');        // 人员账号
         // pic.append('pass', '123456');                 // 人员密码，可不填
@@ -43,7 +42,7 @@
         // pic.append('engineering', '3271e961902c266676029f35156ba03a');
         // pic.append('agreementFile', document.getElementById('img').files[0]);
         pic.append('pic', document.getElementById('img').files[0]);
-        // pic.append('pic', document.getElementById('main').files[0]);
+        pic.append('pic', document.getElementById('main').files[0]);
         $.ajax({
             url: 'http://localhost/material/StandardEdit',
             url: 'http://localhost/engineer/DivideEngineer',
@@ -190,6 +189,7 @@
             url: 'http://jiance.server2.puankang.com.cn/trust/TrustSave',
             url: 'http://jiance.server2.puankang.com.cn/testing/ReportUploadList',
             url: 'http://jiance.server2.puankang.com.cn/testing/ReportUpload',
+            url: 'http://jiance.server2.puankang.com.cn/trust/TrustPeopleFaceCheck',
             // url : 'https://apiserer1.bangninyou.com/version/user/Products?aithorization=89577f2a6a943243dff4929aeafb0b7b,123',
             // url : 'https://apiserer1.bangninyou.com/version/homepage/Products?aithorization=89577f2a6a943243dff4929aeafb0b7b,123',
             type: 'post',
