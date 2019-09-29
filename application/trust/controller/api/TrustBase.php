@@ -55,7 +55,7 @@ class TrustBase extends Controller
         if(empty($trustList)) {
             return '查无此委托单，请检查传递的委托单号';
         }
-        $trustBase = Db::table('su_trust_people_pic')->where('trust_id',$trust['trust_id'])->field(['trust_id'])->select();
+        $trustBase = Db::table('su_trust_people_pic')->where('trust_id',$trust['trust_id'])->field(['people_pic'])->select();
         if(!empty($trustBase)) {
             $token = 1;
         }
@@ -64,6 +64,7 @@ class TrustBase extends Controller
             if($token == 0){
                 $update = Db::table('su_trust_people_pic')->insert(['trust_id'=>$trust['trust_id'],'people_pic'=>$path]);
             }else{
+                self::picDel($trustBase[0]['people_pic']);
                 $update = Db::table('su_trust_people_pic')->where(['trust_id'=>$trust['trust_id']])->update(['people_pic'=>$path]);
             }
             return array($update);

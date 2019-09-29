@@ -650,7 +650,11 @@ class TrustMain extends Controller
             foreach($list as $key => $row) {
                 $result[$saveKey - 1][$key] = self::fieldChange($row);
                 if(isset($defaultArr[$saveKey - 1][$row['trial_id']])){          // 把检测项目结果类型id 分配到对应的类型id父类下
-                    $result[$saveKey - 1][$key]['default'] = $defaultArr[$saveKey - 1][$row['trial_id']];
+                    if(!isset($result[$saveKey - 1][$key]['default'])) {
+                        $result[$saveKey - 1][$key]['default'] = array();
+                    }
+                    array_push($result[$saveKey - 1][$key]['default'],$defaultArr[$saveKey - 1][$row['trial_id']]);
+//                    $result[$saveKey - 1][$key]['default'] = $defaultArr[$saveKey - 1][$row['trial_id']];
                 }
             }
         }

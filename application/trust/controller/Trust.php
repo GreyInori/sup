@@ -259,6 +259,27 @@ class Trust extends Controller
     }
 
     /**
+     * 根据委托单号获取对应的人脸照片
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getTrustPeopleUploadPic()
+    {
+        $trust = request()->param();
+        if(!isset($trust['trust'])) {
+            return self::returnMsg(500,'fail','请传递委托单号');
+        }
+        $data = TrustBase::toTrustPic($trust);
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        $url = request()->domain();
+        return self::returnMsg(200,'success',$url.$data[0]['people_pic']);
+    }
+
+    /**
      * 上传取样人面部检测照片数据
      * @return false|string
      * @throws \think\db\exception\DataNotFoundException
