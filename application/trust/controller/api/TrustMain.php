@@ -620,7 +620,8 @@ class TrustMain extends Controller
             ->where('trial_id','IN',$defaultStr)
             ->where('show_type',1)
             ->where('trust_id',$trust)
-            ->field(['default_id','trial_id','trial_default_value','trial_default_token','trial_verify'])
+            ->field(['save_id','default_id','trial_id','trial_default_value','trial_default_token','trial_verify'])
+            ->order('save_id ASC')
             ->select();
         if(empty($defaultList)) {
             return $list;
@@ -628,19 +629,32 @@ class TrustMain extends Controller
         /* 把所有默认值转换成 字段id => 结果数组 的格式，方便匹配到字段下
             顺便把数据库字段转换成前端传递过来的字段
          */
+        $saveArr = array();     // 记录的组号数组
         foreach($defaultList as $key => $row) {
             if(!isset($defaultArr[$row['trial_id']])) {
                 $defaultArr[$row['trial_id']] = array();
             }
+            /* 根据查询出来的组号创建对应的组号数组用于后期的分类 */
+            if(!isset($defaultArr[$row['save_id']])) {
+                $saveArr[$row['save_id']] = array();
+            }
             $row = self::fieldChange($row);
-            array_push($defaultArr[$row['trial']],$row);
+            $defaultArr[$row['save'] - 1][$row['trial']] = $row;
         }
-        foreach($list as $key => $row) {
-            $result[$key] = self::fieldChange($row);
-            if(isset($defaultArr[$row['trial_id']])){
-                $result[$key]['default'] = $defaultArr[$row['trial_id']];
+        /* 把对应组号的值分配到对应的组号数组下， 由于组号是从 1 开始的，转换为索引数组需要 -1 */
+        foreach($saveArr as $saveKey => $saveRow) {
+            if(!isset($result[$saveKey - 1])) {
+                $result[$saveKey - 1] = array();
+            }
+            /* 根据查询项目下的组号 save_id 把对应数据分配到 键值是对应的 save_id 下的 $result 数组下 */
+            foreach($list as $key => $row) {
+                $result[$saveKey - 1][$key] = self::fieldChange($row);
+                if(isset($defaultArr[$saveKey - 1][$row['trial_id']])){          // 把检测项目结果类型id 分配到对应的类型id父类下
+                    $result[$saveKey - 1][$key]['default'] = $defaultArr[$saveKey - 1][$row['trial_id']];
+                }
             }
         }
+
         return $result;
     }
     /**
@@ -767,6 +781,9 @@ class TrustMain extends Controller
         foreach($list as $key => $row) {
             if(strstr($key,'_time') && is_int($row)) {
                 $row = date('Y-m-d H:i:s',$row);
+            }elseif(strstr($key,'_file')) {
+                $url = request()->domain();
+                $row = $url.$row;
             }
             $result[array_search($key, $check)] = $row;
         }

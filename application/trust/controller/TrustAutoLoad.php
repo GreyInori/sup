@@ -76,6 +76,7 @@ class TrustAutoLoad extends Validate
         'trialHint' => 'trial_default_hint',
         'trialCustomHint' => 'trial_custom_hint',
         'reportFile' => 'report_file',
+        'save' => 'save_id',
     );
 
     /**
