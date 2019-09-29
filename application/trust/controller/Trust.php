@@ -303,8 +303,13 @@ class Trust extends Controller
         if(!isset($data['trust'])) {
             return self::returnMsg(500,'fail','请传递委托单号');
         }
+        if(!isset($data['path'])) {
+            return self::returnMsg(500,'fail','请传递图片路径');
+        }
         /* 执行图片上传操作，拿到图片的路径进行转换处理 */
-        $Upload = TrustBase::picUpload();
+//        $Upload = TrustBase::picUpload();
+        $Upload = TrustMain::curlUrl($data['path']);
+        $Upload = TrustBase::creatFile(date('Ymdhis'),$Upload);
         if(!is_array($Upload)) {
             return self::returnMsg(500,'fail',$Upload);
         }

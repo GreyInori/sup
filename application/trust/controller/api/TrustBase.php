@@ -82,6 +82,32 @@ class TrustBase extends Controller
     }
 
     /**
+     * 创建文件方法
+     * @param $fileName
+     * @param $content
+     * @return int|string
+     */
+    public static function creatFile($fileName, $content)
+    {
+        /* 根据上传日期生成指定的文件夹 */
+        $time = date('Ymd');
+        $path = ROOT_PATH.'public'.DS.'static'.DS.'images'.DS.'qrcode'.DS."{$time}";
+        if(!is_dir($path)) {
+            mkdir($path,0755);
+        }
+        /* 创建文件并写入数据 */
+        $filePath = $path."/{$fileName}.jpg";
+        try{
+            $file = fopen($filePath, 'w');
+            fwrite($file, $content);
+            fclose($file);
+        }catch(\Exception $e){
+            return $e->getMessage();
+        }
+        return strchr($filePath, '/static');
+    }
+
+    /**
      * 执行删除图片操作
      * @param $path
      * @return array|string

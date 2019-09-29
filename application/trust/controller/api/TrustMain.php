@@ -107,6 +107,7 @@ class TrustMain extends Controller
                         ->field(['st.engineering_id','st.trust_id','st.trust_code','se.engineering_name','st.serial_number','st.testing_result','st.input_time'])
                         ->where('trust_id','IN',rtrim($trustStr,','))
                         ->where('st.show_type',1)
+                        ->order('st.input_time DESC')
                         ->select();
         if(!empty($trustList)) {
             foreach ($trustList as $key => $row) {
@@ -572,6 +573,31 @@ class TrustMain extends Controller
     // | 辅助相关
     // +----------------------------------------------------------------------
     /**
+     * 创建文件方法
+     * @param $fileName
+     * @param $content
+     * @return int|string
+     */
+    public static function creatFile($fileName, $content)
+    {
+        /* 根据上传日期生成指定的文件夹 */
+        $time = date('Ymd');
+        $path = ROOT_PATH.'public'.DS.'static'.DS.'images'.DS.'trustPeople'.DS."{$time}";
+        if(!is_dir($path)) {
+            mkdir($path,0755);
+        }
+        /* 创建文件并写入数据 */
+        $filePath = $path."/{$fileName}.jpg";
+        try{
+            $file = fopen($filePath, 'w');
+            fwrite($file, $content);
+            fclose($file);
+        }catch(\Exception $e){
+            return $e->getMessage();
+        }
+        return strchr($filePath, '/static');
+    }
+    /**
      * 获取委托单下对应的记录数据
      * @param $list
      * @param $trust
@@ -685,6 +711,27 @@ class TrustMain extends Controller
             return '查无此委托,请传递正确的委托单号';
         }
         return array($uuid);
+    }
+
+    /**
+     * curl地址方法
+     * @param string $url
+     * @param array $value
+     * @return bool|string
+     */
+    public static function curlUrl($url = '',$value = [])
+    {
+        $curl = curl_init();
+        /* get传输方法带值curl微信消息推送接口 */
+        if(!empty($value)){
+            $url  = $url.'?'.http_build_query($value);
+        }
+        curl_setopt($curl,CURLOPT_URL,$url);
+        curl_setopt($curl,CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($curl,CURLOPT_HEADER,0);
+        $output = curl_exec($curl);
+        curl_close($curl);
+        return($output);
     }
 
     /**

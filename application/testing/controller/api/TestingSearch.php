@@ -45,9 +45,10 @@ class TestingSearch extends Controller
         if(isset($search['show'])){
             $where['st.show_type'] = $search['show'];
         }
-        if(!$isReport == 0) {
-            $where['is_report'] = 0;
-            $where['testing_process'] = 3;
+        if($isReport == 0) {
+            $where['st.is_report'] = 0;
+//            $where['testing_process'] = 3;
+            $where['st.is_allow'] = 1;
         }
         /* 如果传递了公司的话，就根据公司获取指定的工程列表，把查询条件缩小到该企业相关的项目 */
         if(isset($search['company_id'])){
@@ -62,9 +63,9 @@ class TestingSearch extends Controller
                     $engineerStr .= "{$row['engineering_id']},";
                 }
                 $engineerStr = rtrim($engineerStr,',');
-                $where['engineering_id'] = array('IN',$engineerStr);
+                $where['se.engineering_id'] = array('IN',$engineerStr);
             }else{
-                $where['engineering_id'] = array('=',0);
+                $where['se.engineering_id'] = array('=',0);
             }
         }
         $key = array_search('company_id',$field);
@@ -82,6 +83,7 @@ class TestingSearch extends Controller
                 ->join('su_report sr','sr.trust_id = st.trust_id','left')
                 ->field($field)
                 ->where($where)
+                ->order('st.input_time DESC')
                 ->limit($page[0], $page[1])
                 ->select();
         }catch(\Exception $e) {

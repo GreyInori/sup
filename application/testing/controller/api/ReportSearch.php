@@ -35,10 +35,12 @@ class ReportSearch extends Controller
             $list = Db::table('su_trust')
                     ->alias('st')
                     ->join('su_report sr','sr.trust_id = st.trust_id')
+                    ->join('su_report_main srm','srm.report_number = sr.report_number','left')
                     ->join('su_material_type smt','smt.type_id = st.testing_quality')
                     ->join('su_engineering se','se.engineering_id = st.engineering_id')
-                    ->field(['st.input_testing_company','st.trust_id','smt.type_name','st.testing_name','sr.report_number','se.engineering_name','sr.report_time','sr.report_main'])
+                    ->field(['srm.report_content','st.input_testing_company','st.trust_id','smt.type_name','st.testing_name','sr.report_number','se.engineering_name','sr.report_time','sr.report_main'])
                     ->where($where)
+                    ->order('sr.report_time DESC')
                     ->limit($page[0],$page[1])
                     ->select();
         }catch(\Exception $e) {

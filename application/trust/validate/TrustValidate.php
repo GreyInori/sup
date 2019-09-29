@@ -24,11 +24,11 @@ class TrustValidate extends  Validate
         'trust' => 'alphaDash',   // 委托单号
         'trustNumber' => 'alphaDash',   // 委托单编号
         'serial' => 'number',   // 流水号
-        'preCompany' => 'chsDash',   // 预检测机构
-        'inputCompany' => 'chsDash',   // 送检测机构
-        'materialName' => 'chsDash',   // 试验项目名称
-        'project' => 'chsDash',   // 工程名称
-        'testName' => 'chsDash',   // 试验项目名称
+//        'preCompany' => 'chsDash',   // 预检测机构
+//        'inputCompany' => 'chsDash',   // 送检测机构
+//        'materialName' => 'chsDash',   // 试验项目名称
+//        'project' => 'chsDash',   // 工程名称
+//        'testName' => 'chsDash',   // 试验项目名称
 //        'customCompany' => 'chsDash',   // 客户单位名称
         'testType' => 'number',   // 检测类型
         'material' => 'alphaDash',   // 检测内容id
@@ -42,7 +42,7 @@ class TrustValidate extends  Validate
         'report' => 'number',   // 是否报告
         'cancellation' => 'number',   // 是否作废
         'allow' => 'number',   // 是否允许收样
-        'result' => 'chsDash',   // 检测结果
+//        'result' => 'chsDash',   // 检测结果
         'engineering' => 'alphaDash',   // 工程id
         'processing' => 'number',   // 样品处理方式
         'file' => 'require|number',   // 委托单图片id
@@ -58,7 +58,8 @@ class TrustValidate extends  Validate
     protected  $scene = array(
         'list' => array('engineering','trust','serial','preCompany','inputCompany','testName','trustCode','project','input','price','submit','print','witness','sample','testing','report','cancellation','allow','result'),
         'companyTrust' => array('company'),
-        'trustAdd' => array('serial','preCompany','inputCompany','project','testName','testType','material','input','price','engineering','processing'),
+        'trustAdd' => array('serial','project','testName','testType','material','input','price','engineering','processing'),
+//        'trustAdd' => array('serial','preCompany','inputCompany','project','testName','testType','material','input','price','engineering','processing'),
         'trustEdit' => array('trust','serial','preCompany','inputCompany','materialName','project','testName','testType','material','input','price','engineering','processing'),
         'trustDel' => array('trust'),
         'trustUploadList' => array('trust'),

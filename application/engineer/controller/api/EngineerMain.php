@@ -857,7 +857,8 @@ class EngineerMain extends Controller
             $companyId = array('company'=>$admin);
             $company = array(
                 'company_full_name' => $admin['company_full_name'],
-                'company_id' => companyMain::companyAlreadyCreat($companyId)
+                'company_id' => companyMain::companyAlreadyCreat($companyId),
+                'company_mobile' => $admin['user_name'],
             );
             if(!is_array($company['company_id'])) {
                 return $company['company_id'];
@@ -1470,6 +1471,9 @@ class EngineerMain extends Controller
     {
         $result = array();
         foreach($list as $key => $row) {
+            if($row == null) {
+                $row = '';
+            }
             $result[array_search($key, $check)] = $row;
         }
         return $result;

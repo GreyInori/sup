@@ -66,6 +66,7 @@ class TestingAutoLoad extends Controller
         'mobile' => 'user_name',
         'errorTime' => 'ste.error_time',
         'trustCode' => 'st.trust_code',
+        'reportContent' => 'srm.report_content'
     );
 
     public static $fieldGroup = array(
