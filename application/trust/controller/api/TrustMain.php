@@ -93,6 +93,11 @@ class TrustMain extends Controller
         foreach($list as $key => $row) {
             $engineerStr .= "{$row['engineering_id']},";
         }
+        $trust = Db::table('su_status_file')->where('file_file',null)->field(['trust_id'])->select();
+        $trustStr = '';
+        foreach($trust as $key => $row) {
+            $trustStr .= "{$row['trust_id']},";
+        }
         $engineerStr = rtrim($engineerStr,',');
 
         $trustList = Db::table('su_trust')
@@ -100,6 +105,8 @@ class TrustMain extends Controller
                         ->join('su_engineering se','se.engineering_id = st.engineering_id')
                         ->where('st.engineering_id','IN',$engineerStr)
                         ->field(['st.engineering_id','st.trust_id','st.trust_code','se.engineering_name','st.serial_number','st.testing_result','st.input_time'])
+                        ->where('trust_id','IN',rtrim($trustStr,','))
+                        ->where('st.show_type',1)
                         ->select();
         if(!empty($trustList)) {
             foreach ($trustList as $key => $row) {
@@ -144,6 +151,7 @@ class TrustMain extends Controller
             }
         }
         $trust['trust_code'] = self::creatCode();
+        $trust['serial_number'] = $trust['trust_code'];
         /* 进行企业以及企业详细信息的添加操作 */
         Db::startTrans();
         try{
@@ -546,6 +554,9 @@ class TrustMain extends Controller
             Db::table('su_testing_status')
                 ->where('trust_id',$file[0]['trust_id'])
                 ->update($testUpdate);
+            Db::table('su_trust')
+                ->where('trust_id',$file[0]['trust_id'])
+                ->update(['is_sample'=>1]);
             /* 标记当前二维码为已使用 */
             Db::table('su_qrcode')
                 ->where('qr_code',$updateArr['file_code'])

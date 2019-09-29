@@ -108,6 +108,11 @@ class EngineerMain extends Controller
         }
         $admin['engineering_id'] = $engineer['engineering_id'];
         $admin['divide_id'] = $data['divide_id'];
+        if($data['divide_id'] == 4) {
+            $data['divide_id'] = 2;
+        }elseif($data['divide_id'] == 3) {
+            $data['divide_id'] = 1;
+        }
         $field = Db::table('su_divide')->where('divide_id',$data['divide_id'])->field(['divide_field'])->select();
         $companyName = Db::table('su_company')->where('company_id',$admin['member_id'])->field(['company_full_name'])->select();
         $engineer[$field[0]['divide_field']] = $companyName[0]['company_full_name'];

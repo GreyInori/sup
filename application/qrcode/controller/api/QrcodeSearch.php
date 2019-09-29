@@ -28,6 +28,7 @@ class QrcodeSearch extends Controller
         $page = self::pageInit();
         $where = new QrcodeWhere();
         $where = $where->getWhereArray($search);
+        $where['qr_path'] = array('<>','null');
         try{
             $list = Db::table('su_qrcode')
                     ->field(['company_code','work_code','qr_time','qr_code','is_use','qr_path'])

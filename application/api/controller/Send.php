@@ -23,9 +23,9 @@
 			$return['message'] = $message;
 			$return['data'] = $data;
 			//发送返回头
-//			$access = isset($_SERVER['HTTP_ORIGIN'])?$_SERVER['HTTP_ORIGIN']:'*';
-//			header("Access-Control-Allow-Origin: {$access}");
-			 header("Access-Control-Allow-Origin: *");
+			$access = isset($_SERVER['HTTP_ORIGIN'])?$_SERVER['HTTP_ORIGIN']:'*';
+			header("Access-Control-Allow-Origin: {$access}");
+//			 header("Access-Control-Allow-Origin: *");
 			header("Access-Control-Allow-Credentials: true");
 			header('Access-Control-Allow-Method:POST,GET');
 

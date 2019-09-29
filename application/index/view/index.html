@@ -9,13 +9,15 @@
     <input type="file" id="img">
     <input type="file" id="main">
     <button onclick="fileUp()">点击</button>
+<div id="qrcode"></div>
 </body>
 <script>
     function fileUp() {
         var pic = new FormData();
         // pic.append('error', '东西8行');
         // pic.append('company', 'c643cc681a5b0aa13a6597bcf166199e');
-        pic.append('trust', 'eca2b063a72e38990c27faa7e8ec4e9b');
+        // pic.append('trust', 'eca2b063a72e38990c27faa7e8ec4e9b');
+        // pic.append('file', '149');
         // pic.append('reportMain', '检测合格');
         // pic.append('user', '138576473640');        // 人员账号
         // pic.append('pass', '123456');                 // 人员密码，可不填
@@ -33,7 +35,7 @@
         // pic.append('response', '');
         // pic.append('fileDepict', '嗦不粗话了');
         // pic.append('file', '25');
-        // pic.append('fileCode', '3001YS190916000000547361');
+        // pic.append('fileCode', '3001YS190926000000014325');
         // pic.append('UploadPeople', '陨石');
         // pic.append('trust', '74c05b81de8e80c528686cf9912738ce');
         // pic.append('agreementType', '1');
@@ -190,14 +192,19 @@
             url: 'http://jiance.server2.puankang.com.cn/testing/ReportUploadList',
             url: 'http://jiance.server2.puankang.com.cn/testing/ReportUpload',
             url: 'http://jiance.server2.puankang.com.cn/trust/TrustPeopleFaceCheck',
+            url: 'http://jiance.server2.puankang.com.cn/trust/TrustUpload',
+            url: 'http://jiance.server2.puankang.com.cn/trust/TrustUpload',
+            url: 'http://jiance.server2.puankang.com.cn/qrcode/QrcodeCreate',
+            url: 'http://jiance.server2.puankang.com.cn/qrcode/Qrcode',
+            // url: 'http://jiance.server2.puankang.com.cn/trust/TrustUploadAdd',
             // url : 'https://apiserer1.bangninyou.com/version/user/Products?aithorization=89577f2a6a943243dff4929aeafb0b7b,123',
             // url : 'https://apiserer1.bangninyou.com/version/homepage/Products?aithorization=89577f2a6a943243dff4929aeafb0b7b,123',
-            type: 'post',
-            contentType : false,
-            processData : false,
-            data : pic,
-                // {
-                    // 'trust' : 'd60ba68196a5c826ec2951a3e148ef43',
+            type: 'get',
+            // contentType : false,
+            // processData : false,
+            data :
+                {
+                    // 'trust' : '2dddedd7786f2573f253e4cbf848c7da',
                     // 'code' : 'P',
                     // 'mobile' : '1',
                     // 'idCard' : '3',
@@ -216,11 +223,12 @@
                     // 'inputCompany' : '儒雅随和公司',
                     // 'errorId' : 2,
                     // 'response' : '',
-                    // 'codeNum' : 10,
-                //     // 'workName' : '陨石',
-                //     'workCode' : 'YS',
-                //     'company' : '3',
-                //     'work' : 4,
+                    'codeNum' : 10,
+                    // 'workName' : '陨石',
+                    'workCode' : 'YS',
+                    'company' : '3',
+                    'work' : 4,
+                    'page' : [0,100],
                     // 'ewmcode' : 'dgiuhsdfgdsaiofhidsfhoipsdhf',
                     // 'trust' : '74c05b81de8e80c528686cf9912738ce',
                     // 'mobile' : '13819782536',
@@ -255,7 +263,7 @@
             // 'site' : 55.1,                      // 建筑面积
             // 'underground' : 55.1,
         //     'uuid' : '3371c043e814859c9a33318c51c71ee5',
-        //         },
+                },
             //     'areaParent' : 0,
                 // 'use' : 0,
                 // 'page' : [0,100],
@@ -483,6 +491,15 @@
             success: function (msg) {
                 msg = JSON.parse(msg);
                 console.log(msg);
+                var html = '<ul>';
+                var data = msg.data;
+                for(var i = 0; i < data.length; i++) {
+                    html += "<li><a target=\'_blank\'  href=\'"+ data[i].path +"\'>"+ data[i].qrCode +"</a></li>";
+                }
+                html += '</ul>';
+                console.log(html);
+                $('#qrcode').empty();
+                $('#qrcode').html(html);
             },
             error: function () {
             }
