@@ -324,25 +324,25 @@ class Trust extends Controller
         if(!isset($data['trust'])) {
             return self::returnMsg(500,'fail','请传递委托单号');
         }
-        if(!isset($data['path'])) {
-            return self::returnMsg(500,'fail','请传递图片路径');
+        if(!isset($data['pic'])) {
+            return self::returnMsg(500,'fail','请传递图片base64');
         }
         /* 执行图片上传操作，拿到图片的路径进行转换处理 */
 //        $Upload = TrustBase::picUpload();
-        $Upload = TrustMain::curlUrl($data['path']);
-        $Upload = TrustBase::creatFile(date('Ymdhis'),$Upload);
-        if(!is_array($Upload)) {
-            return self::returnMsg(500,'fail',$Upload);
-        }
-        $UploadBase = TrustBase::imgToBase($Upload['pic']);
-        TrustBase::picDel($Upload['pic']);         // 在拿到图片的base64后删除图片
+//        $Upload = TrustMain::curlUrl($data['path']);
+//        $Upload = TrustBase::creatFile(date('Ymdhis'),$Upload);
+//        if(!strstr($Upload,'/static')) {
+//            return self::returnMsg(500,'fail',$Upload);
+//        }
+//        $UploadBase = TrustBase::imgToBase($Upload);
+//        TrustBase::picDel($Upload);         // 在拿到图片的base64后删除图片
         $trustPic = TrustBase::toTrustPic($data);
         if(!is_array($trustPic)) {
             return self::returnMsg(500,'fail',$trustPic);
         }
         /* 把后台上传的图片转换成base64跟上传的图片进行比较，如果置信度大于70就认证通过 */
         $trustBase = TrustBase::imgToBase($trustPic[0]['people_pic']);
-        $faceVerify = AliFace::toFaceVerify($UploadBase,$trustBase);
+        $faceVerify = AliFace::toFaceVerify($data['pic'],$trustBase);
         $faceVerify = json_decode($faceVerify,256);
         if(isset($faceVerify['confidence']) && $faceVerify['confidence'] > 70){
             return self::returnMsg(200,'success',$faceVerify);
