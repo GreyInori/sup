@@ -60,8 +60,21 @@ class Count extends Controller
         return self::returnMsg(200,'success',CountMain::toCompanyCount());
     }
 
+    /**
+     * 获取异常周数据
+     * @return false|string
+     */
     public function getWeekError()
     {
         return self::returnMsg(200,'success',CountMain::toWeekError());
+    }
+
+    /**
+     * 获取异常月数据
+     * @return false|string
+     */
+    public function getMoonError()
+    {
+        return self::returnMsg(200,'success',CountMain::toMoonError());
     }
 }

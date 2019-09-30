@@ -212,4 +212,27 @@ class Testing extends Controller
         $list = $main::fieldChange($list);
         return self::returnMsg(200,'success',$list);
     }
+
+    /**
+     * 委托单报告修改
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function postReportEdit()
+    {
+        $data = FieldCheck::checkData('reportEdit');
+        if(!isset($data['sr.report_number'])) {
+            return self::returnMsg(500,'fail','请传递需要修改的报告编号');
+        }
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        $edit = TestingMain::toReportEdit($data);
+        if(!is_array($edit)) {
+            return self::returnMsg(500,'fail',$edit);
+        }
+        return self::returnMsg(200,'success',$edit);
+    }
 }

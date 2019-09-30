@@ -86,13 +86,14 @@ class TrustBase extends Controller
      * 创建文件方法
      * @param $fileName
      * @param $content
+     * @param $path
      * @return int|string
      */
-    public static function creatFile($fileName, $content)
+    public static function creatFile($fileName, $content, $path = 'qrcode')
     {
         /* 根据上传日期生成指定的文件夹 */
         $time = date('Ymd');
-        $path = ROOT_PATH.'public'.DS.'static'.DS.'images'.DS.'qrcode'.DS."{$time}";
+        $path = ROOT_PATH.'public'.DS.'static'.DS.'images'.DS.$path.DS."{$time}";
         if(!is_dir($path)) {
             mkdir($path,0755);
         }

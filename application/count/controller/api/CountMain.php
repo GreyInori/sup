@@ -94,22 +94,64 @@ class CountMain extends Controller
      * @return array|mixed
      */
     public static function toWeekError()
+{
+    /* 获取并且转换本周异常数据，其中0为未处理，1为已处理 */
+    $list = array(
+        self::fetchWeekErr(0),self::fetchWeekErr(1)
+    );
+    $weekArray = array(
+        self::changeWeekErr($list[0]),self::changeWeekErr($list[1])
+    );
+    $result = array(
+        'x_val' => array(array(),array()),
+        'y_val' => array(array(),array()),
+        'type_val' => ['异常结果','已处理'],
+    );
+    /* 循环根据查询转换出来的异常数据结果，插入返回值中,并且把键值为0的星期一排到最后 */
+    $result = self::makeErrResult($weekArray,0,$result);
+    $result = self::makeErrResult($weekArray,1,$result);
+    return $result;
+}
+
+    public static function toMoonError()
     {
         /* 获取并且转换本周异常数据，其中0为未处理，1为已处理 */
         $list = array(
-            self::fetchWeekErr(0),self::fetchWeekErr(1)
-        );
-        $weekArray = array(
-            self::changeWeekErr($list[0]),self::changeWeekErr($list[1])
+            self::fetchMoonErr(0),self::fetchMoonErr(1)
         );
         $result = array(
             'x_val' => array(array(),array()),
             'y_val' => array(array(),array()),
             'type_val' => ['异常结果','已处理'],
         );
+        $result = self::makeErrMoonResult($list,0,$result);
+        $result = self::makeErrMoonResult($list,1,$result);
         /* 循环根据查询转换出来的异常数据结果，插入返回值中,并且把键值为0的星期一排到最后 */
-        $result = self::makeErrResult($weekArray,0,$result);
-        $result = self::makeErrResult($weekArray,1,$result);
+        return $result;
+    }
+
+    private static function makeErrMoonResult($list, $token, $result)
+    {
+        $start = date('z',strtotime('-29 day'));
+        $end = date('z');
+        $errorList = array(array(),array());
+        $errorDay = array(array(),array());
+        foreach($list[$token] as $key => $row) {
+            array_push($errorList[$token],$row['day']);
+            $errorDay[$token][$row['day']] = $row['num'];
+        }
+        $num = 1;
+        for($st = $start; $st <= $end; $st++) {
+            array_push($result['x_val'][$token],$num);
+            $num++;
+            if(!in_array($st,$errorList[$token])) {
+                $errorDay[$token][$st] = 0;
+            }
+        }
+        ksort($errorDay[$token]);
+        foreach($errorDay[$token] as $key => $row) {
+            array_push($result['y_val'][$token],$row);
+        }
         return $result;
     }
 
@@ -155,6 +197,18 @@ class CountMain extends Controller
         ksort($weekArray);
 
         return $weekArray;
+    }
+
+    private static function fetchMoonErr($token = 0)
+    {
+        $time = strtotime('-29 day');
+        if($token == 1) {
+            $sql = "SELECT count(error_id) num,FROM_UNIXTIME(error_time,'%j') as day FROM su_testing_error WHERE error_time >= {$time} AND error_success = 1 GROUP BY FROM_UNIXTIME(error_time,'%j')";
+        }else {
+            $sql = "SELECT count(error_id) num,FROM_UNIXTIME(error_time,'%j') as day FROM su_testing_error WHERE error_time >= {$time} AND error_success = 0 GROUP BY FROM_UNIXTIME(error_time,'%j')";
+        }
+        $list = Db::query($sql);
+        return $list;
     }
 
     /**

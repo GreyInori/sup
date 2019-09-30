@@ -138,13 +138,15 @@ class TestingMain extends Controller
             $update = Db::table('su_report')->insertGetId($reportInsert);
             /* 进行富文本编辑器内容插入 */
             $content = request()->param();
-            $content = $content['content'];
-            $contentInsert = array(
-                'report_number' => $update,
-                'report_content' => $content
-            );
-            Db::table('su_report_main')->where('report_number',$contentInsert['report_number'])->delete();
-            Db::table('su_report_main')->insert($contentInsert);
+            if(isset($content['content']) && $content['content'] != '') {
+                $content = $content['content'];
+                $contentInsert = array(
+                    'report_number' => $update,
+                    'report_content' => $content
+                );
+                Db::table('su_report_main')->where('report_number',$contentInsert['report_number'])->delete();
+                Db::table('su_report_main')->insert($contentInsert);
+            }
             /* 委托状态修改 */
             Db::table('su_testing_status')
                 ->where('trust_id',$data['report']['st.trust_id'])
@@ -152,6 +154,66 @@ class TestingMain extends Controller
             Db::table('su_trust')
                 ->where('trust_id',$data['report']['st.trust_id'])
                 ->update(['is_report'=>1]);
+            Db::commit();
+            return array($update);
+        }catch(\Exception $e) {
+            Db::rollback();
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * 检测报告修改
+     * @param $data
+     * @return string|array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toReportEdit($data)
+    {
+        $list = Db::table('su_report')->where('report_number',$data['sr.report_number'])->field(['report_file'])->select();
+        if(empty($list)) {
+            return '查无此报告信息，请检查传递的报告编号';
+        }
+        $reportUpdate = array(
+            'edit_time' => time(),
+        );
+        if(isset($data['sr.report_main'])) {
+            $reportUpdate['report_main'] = $data['sr.report_main'];
+        }
+        /* 有传递新报告文件的话就把旧的文件给替换掉 */
+        if(is_object(request()->file('pdf'))){
+            $file = self::toImgUp('report','pdf');
+            if(is_array($list)) {
+                $reportUpdate['report_file'] = $file['pic'];
+                $path = ROOT_PATH.'public'.$list[0]['report_file'];
+                if(strstr($path,'static')) {
+                    unlink($path);
+                }
+            }
+        }
+        $reportLog = array(
+            'report_number' => $data['sr.report_number'],
+            'log_user' => $data['user_name'],
+            'log_time' => time()
+        );
+        Db::startTrans();
+        /* 执行报告修改操作 */
+        try{
+            $update = Db::table('su_report')->where('report_number',$data['sr.report_number'])->update($reportUpdate);
+            Db::table('su_report_log')->insert($reportLog);
+            /* 进行富文本编辑器内容插入 */
+            $content = request()->param();
+            if(isset($content['content']) && $content['content'] != '') {
+                $content = $content['content'];
+                $contentInsert = array(
+                    'report_number' => $data['sr.report_number'],
+                    'report_content' => $content
+                );
+                Db::table('su_report_main')->where('report_number',$data['sr.report_number'])->delete();
+                Db::table('su_report_main')->insert($contentInsert);
+            }
             Db::commit();
             return array($update);
         }catch(\Exception $e) {
@@ -223,7 +285,7 @@ class TestingMain extends Controller
         foreach($list as $key => $row) {
             if(strstr($key,'_time') && is_int($row)) {
                 $row = date('Y-m-d H:i:s',$row);
-            }elseif($key == 'report_file') {
+            }elseif($key == 'report_file' && !is_null($row) && $row != '') {
                 $url = request()->domain();
                 $row = $url.$row;
             }

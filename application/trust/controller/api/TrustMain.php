@@ -444,11 +444,11 @@ class TrustMain extends Controller
             ->field(['ssf.file_id','ssf.file_file','ssf.file_depict','ssf.file_type','ssf.file_time','ssf.file_code','ssf.upload_people','stft.type_name','stft.type_depict'])
             ->order('stft.type_id')
             ->select();
-        foreach($UploadList as $key => $row) {
-            if($row['file_file'] !== null) {
-                $UploadList[$key]['file_file'] = $url.$row['file_file'];
-            }
-        }
+//        foreach($UploadList as $key => $row) {
+//            if(!is_null($row['file_file'])) {
+//                $UploadList[$key]['file_file'] = $url.$row['file_file'];
+//            }
+//        }
 
         if(empty($UploadList)) {
             return '当前委托单所属分类尚未存在图片上传规则，请检查传递的委托单id';
@@ -477,11 +477,11 @@ class TrustMain extends Controller
                           ->order('stft.type_id')
                          ->select();
         /* 如果该文件数据存在图片的话，就把域名拼接到图片路径上 */
-        foreach($UploadList as $key => $row) {
-            if($row['file_file'] !== null) {
-                $UploadList[$key]['file_file'] = $url.$row['file_file'];
-            }
-        }
+//        foreach($UploadList as $key => $row) {
+//            if($row['file_file'] !== null) {
+//                $UploadList[$key]['file_file'] = $url.$row['file_file'];
+//            }
+//        }
         if(empty($UploadList)) {
             return '当前委托单所属分类尚未存在图片上传规则，请检查传递的委托单id';
         }
@@ -521,12 +521,21 @@ class TrustMain extends Controller
             'sample_pic' => 1
         );
         /* 执行图片上传操作，如果上传失败就返回错误信息，如果成功就根据传值以及当前时间创建图片文件修改数据 */
-        $pic = self::toImgUp('file','pic');
-        if(!is_array($pic)) {
+//        $pic = self::toImgUp('file','pic');
+//        if(!is_array($pic)) {
+//            return $pic;
+//        }
+        $pic = request()->param();
+        if(!isset($pic['path'])) {
+            return '请传递图片路径';
+        }
+        $pic = self::curlUrl($pic['path']);
+        $pic = TrustBase::creatFile(date('Ymdhis').rand(10000,99999),$pic , 'file');
+        if(!strstr($pic,'/static')) {
             return $pic;
         }
         $updateArr = array(
-            'file_file' => $pic['pic'],
+            'file_file' => $pic,
             'file_time' => time(),
         );
         foreach($data['upload'] as $key => $row) {
@@ -785,7 +794,7 @@ class TrustMain extends Controller
         foreach($list as $key => $row) {
             if(strstr($key,'_time') && is_int($row)) {
                 $row = date('Y-m-d H:i:s',$row);
-            }elseif(strstr($key,'_file')) {
+            }elseif(strstr($key,'_file') && !is_null($row)) {
                 $url = request()->domain();
                 $row = $url.$row;
             }
