@@ -153,7 +153,7 @@ class TestingMain extends Controller
                 ->update($trustUpdate);
             Db::table('su_trust')
                 ->where('trust_id',$data['report']['st.trust_id'])
-                ->update(['is_report'=>1]);
+                ->update(['is_report'=>1,'testing_result'=>'已检测']);
             Db::commit();
             return array($update);
         }catch(\Exception $e) {

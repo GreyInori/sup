@@ -38,7 +38,7 @@ class ReportSearch extends Controller
                     ->join('su_report_main srm','srm.report_number = sr.report_number','left')
                     ->join('su_material_type smt','smt.type_id = st.testing_quality')
                     ->join('su_engineering se','se.engineering_id = st.engineering_id')
-                    ->field(['srm.report_content','st.input_testing_company','st.trust_id','smt.type_name','st.testing_name','sr.report_number','se.engineering_name','sr.report_time','sr.report_main'])
+                    ->field(['sr.report_file','srm.report_content','st.input_testing_company','st.trust_id','smt.type_name','st.testing_name','sr.report_number','se.engineering_name','sr.report_time','sr.report_main'])
                     ->where($where)
                     ->order('sr.report_time DESC')
                     ->limit($page[0],$page[1])

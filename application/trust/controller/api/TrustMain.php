@@ -794,7 +794,7 @@ class TrustMain extends Controller
         foreach($list as $key => $row) {
             if(strstr($key,'_time') && is_int($row)) {
                 $row = date('Y-m-d H:i:s',$row);
-            }elseif(strstr($key,'_file') && !is_null($row)) {
+            }elseif(strstr($key,'_file') && !is_null($row) && $row != '') {
                 $url = request()->domain();
                 $row = $url.$row;
             }
