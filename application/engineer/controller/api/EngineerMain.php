@@ -494,6 +494,7 @@ class EngineerMain extends Controller
         if(!isset($data['company'])) {
             return '请传递分配的企业id';
         }
+
         $divideList = Db::table('su_engineering_divide')
                         ->where('divide_index',$data['divide'])
                         ->field(['engineering_id'])
