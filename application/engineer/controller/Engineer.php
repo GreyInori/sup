@@ -293,6 +293,13 @@ class Engineer extends Controller
         return self::returnMsg(200,'success',$list);
     }
 
+    /**
+     * 结算人添加
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public function postEngineerReckonerAdd()
     {
         /* 检查传递参数是否符合规范 */
@@ -301,13 +308,20 @@ class Engineer extends Controller
             return self::returnMsg(500,'fail',$data);
         }
         /* 获取企业列表数据，如果有抛出异常的话就返回错误信息 */
-        $list = EngineerMain::reckonerAdd($data);
+        $list = EngineerMain::reckonerAdd();
         if(!is_array($list)) {
             return self::returnMsg(500,'fail',$list);
         }
         return self::returnMsg(200,'success',$list);
     }
 
+    /**
+     * 结算人修改
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public function postEngineerReckonerEdit()
     {
         /* 检查传递参数是否符合规范 */
@@ -316,13 +330,20 @@ class Engineer extends Controller
             return self::returnMsg(500,'fail',$data);
         }
         /* 获取企业列表数据，如果有抛出异常的话就返回错误信息 */
-        $list = EngineerMain::reckonerEdit($data);
+        $list = EngineerMain::reckonerEdit();
         if(!is_array($list)) {
             return self::returnMsg(500,'fail',$list);
         }
         return self::returnMsg(200,'success',$list);
     }
 
+    /**
+     * 结算人删除
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public function postEngineerReckonerDel()
     {
         /* 检查传递参数是否符合规范 */
@@ -331,7 +352,7 @@ class Engineer extends Controller
             return self::returnMsg(500,'fail',$data);
         }
         /* 获取企业列表数据，如果有抛出异常的话就返回错误信息 */
-        $list = EngineerMain::reckonerDel($data);
+        $list = EngineerMain::reckonerDel();
         if(!is_array($list)) {
             return self::returnMsg(500,'fail',$list);
         }

@@ -49,6 +49,16 @@ class EngineerSearch extends Controller
         }
         array_push($field,'set.type_name');
         array_push($field,'se.engineering_id');
+        array_push($field,'se.testing_company');
+        /* 如果有传递手机号的话，就根据该手机号拿到相关的工程列表，否则返回空 */
+        $mobile = request()->param();
+        if(!isset($mobile['mobile'])) {
+            $where['se.engineering_id'] = '';
+        }else{
+            $whereStr = self::engineerWhere($mobile['mobile']);
+            $where['se.engineering_id'] = array('IN',$whereStr);
+        }
+
         /* 执行企业列表查询 */
         try{
             $list = Db::table('su_engineering')
@@ -64,6 +74,24 @@ class EngineerSearch extends Controller
         }
 //        $list = self::idToName($list, $check);
         return $list;
+    }
+
+    /**
+     * 获取手机号相关工程id列表
+     * @param $mobile
+     * @return string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    private static function engineerWhere($mobile)
+    {
+        $list = Db::table('su_engineering_divide')->where('divide_user',$mobile)->field(['engineering_id'])->select();
+        $whereStr = '';
+        foreach($list as $key => $row) {
+            $whereStr .= "{$row['engineering_id']},";
+        }
+        return rtrim($whereStr,',');
     }
 
     /**

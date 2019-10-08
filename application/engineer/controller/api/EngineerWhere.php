@@ -34,7 +34,8 @@ class EngineerWhere extends Controller
         'sampling_people' => ['se.sampling_people','LIKE','%code%'],
         'input_person' => ['se.input_person','LIKE','%code%'],
         'input_type' => ['se.input_type','=','input'],
-        'engineering_verify' => ['se.engineering_verify','=','input']
+        'engineering_verify' => ['se.engineering_verify','=','input'],
+        'testing_company' => ['se.testing_company','LIKE','%code%']
     );
 
     /**

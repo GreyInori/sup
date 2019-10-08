@@ -418,6 +418,14 @@ class EngineerMain extends Controller
             if(empty($user)) {
                 return '查无此用户，请检查传递的用户id';
             }
+            /* 检测指定企业是否已经以指定的角色存在于指定的工程下，如果存在，就不进行操作 */
+            $alreadyHas = Db::table('su_engineering_divide')
+                ->where(['engineering_id'=>$data['engineer'],'divide_id'=>$data['divide'],'member_id'=>$user[0]['user_company']])
+                ->field(['engineering_id'])
+                ->select();
+            if(!empty($alreadyHas)) {
+                return '该企业以及存在于当前工程下';
+            }
             $divideUpdate['member_id'] = $user[0]['user_company'];
             $divideUpdate['divide_user'] = $user[0]['user_name'];
             $divideUpdate['divide_passwd'] = $user[0]['user_pass'];
@@ -434,7 +442,6 @@ class EngineerMain extends Controller
             Db::rollback();
             return $e->getMessage();
         }
-
         return array('divide'=>$insert,'divideUser'=>$divideUpdate['divide_user']);
     }
 
@@ -494,6 +501,7 @@ class EngineerMain extends Controller
         if(!isset($data['company'])) {
             return '请传递分配的企业id';
         }
+
         $divideList = Db::table('su_engineering_divide')
                         ->where('divide_index',$data['divide'])
                         ->field(['engineering_id'])

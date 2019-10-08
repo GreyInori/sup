@@ -68,6 +68,25 @@ class TestingSearch extends Controller
                 $where['se.engineering_id'] = array('=',0);
             }
         }
+        /* 如果传递了手机号，就根据手机号获取指定的工程列表，把查询条件缩小到该企业相关的项目 */
+        $mobile = request()->param();
+        if(isset($mobile['mobile'])){
+            $engineer = Db::table('su_engineering_divide')
+                ->where('divide_user',$mobile['mobile'])
+                ->field(['engineering_id'])
+                ->select();
+            /* 如果该企业有负责的相关的工程的话，就获取工程查询条件，否则就匹配到无工程 */
+            if(!empty($engineer)) {
+                $engineerStr = '';
+                foreach($engineer as $key => $row) {
+                    $engineerStr .= "{$row['engineering_id']},";
+                }
+                $engineerStr = rtrim($engineerStr,',');
+                $where['se.engineering_id'] = array('IN',$engineerStr);
+            }else{
+                $where['se.engineering_id'] = array('=',0);
+            }
+        }
         $key = array_search('company_id',$field);
         array_push($field,'sr.report_file');
         array_push($field,'smt.type_name');

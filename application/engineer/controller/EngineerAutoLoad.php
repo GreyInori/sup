@@ -64,6 +64,7 @@ class EngineerAutoLoad extends Controller
         'peopleName' => 'people_name',
         'peopleCode' => 'people_code',
         'peopleMobile' => 'people_mobile',
+        'testing' => 'testing_company',
     );
 
     /**
