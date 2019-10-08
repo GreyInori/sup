@@ -57,6 +57,7 @@ class CompanyAutoLoad extends Controller
         'characterId' => 'character_id',
         'characterName' => 'character_name',
         'from' => 'is_from',
+        'createUser' => 'create_mobile',
     );
 
     /**
@@ -66,7 +67,7 @@ class CompanyAutoLoad extends Controller
     public static $fieldGroup = array(
         'main' => array('company_corporation','company_corporation_mobile','company_registered_capital','company_character','company_website','company_fax','company_area','company_register_address','company_AD','company_postal_code','company_business_address'),
         'text' => array('company_rules','company_profile'),
-        'company' => array('is_from','company_passwd','company_form','company_id','company_register_time','company_name','company_full_name','company_code','company_linkman','company_linkman_mobile','company_mobile','company_contact_information','company_business_license','company_business_start','company_business_end')
+        'company' => array('create_mobile','is_from','company_passwd','company_form','company_id','company_register_time','company_name','company_full_name','company_code','company_linkman','company_linkman_mobile','company_mobile','company_contact_information','company_business_license','company_business_start','company_business_end')
     );
 
     /**

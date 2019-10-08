@@ -33,6 +33,7 @@ class AdminAutoLoad extends Controller
         'controlParent' => 'control_pid',
         'controlUrl' => 'control_url',
         'controlIcon' => 'control_icon',
+        'createUser' => 'create_user',
     );
 
     /**
@@ -40,7 +41,7 @@ class AdminAutoLoad extends Controller
      * 给指定字段数据根据数据表区别分组
      */
     public static $fieldGroup = array(
-        'admin' => array('user_id','user_name','user_pass','user_company','user_role','role_name','company_full_name'),
+        'admin' => array('create_user','user_id','user_name','user_pass','user_company','user_role','role_name','company_full_name'),
     );
 
     /**

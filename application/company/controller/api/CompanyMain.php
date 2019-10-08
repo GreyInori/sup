@@ -278,7 +278,7 @@ class CompanyMain extends Controller
      * 生成工程编号方法
      * @return string
      */
-    private static function creatCode()
+    public static function creatCode()
     {
         $str = 'Q';
         $timeStr = date('Ymd');

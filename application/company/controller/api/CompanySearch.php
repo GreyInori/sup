@@ -37,6 +37,11 @@ class CompanySearch extends Controller
         if(isset($search['show'])){
             $where['show_type'] = $search['show'];
         }
+        /* 如果传递了手机号，就获取对应手机号下的企业列表 */
+        $mobile = request()->param();
+        if(isset($mobile['createUser'])) {
+            $where['sc.create_mobile'] = $mobile['createUser'];
+        }
 
         /* 执行企业列表查询 */
         try{

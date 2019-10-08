@@ -862,11 +862,14 @@ class EngineerMain extends Controller
                 $member['user_role'] = 4;
             }
             /* 生成企业存在检测规范的数组，进行企业是否存在检测 */
+            $companyObj = new \app\company\controller\api\CompanyMain();
             $companyId = array('company'=>$admin);
             $company = array(
                 'company_full_name' => $admin['company_full_name'],
                 'company_id' => companyMain::companyAlreadyCreat($companyId),
                 'company_mobile' => $admin['user_name'],
+                'create_mobile' => $admin['user_name'],
+                'company_number' => $companyObj::creatCode(),
             );
             if(!is_array($company['company_id'])) {
                 return $company['company_id'];

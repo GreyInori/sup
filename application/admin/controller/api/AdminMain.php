@@ -41,6 +41,10 @@ class AdminMain extends Controller
         }else{
             $data['admin']['user_pass'] = md5($data['user_pass']);
         }
+        /* 根据添加该用户的管理员名给该用户添加创建管理人数据 */
+        if(isset($data['create_user'])) {
+            $data['admin']['create_user'] = $data['create_user'];
+        }
 
         try{
             $id = Db::table('su_admin')->insertGetId($data['admin']);
@@ -239,7 +243,7 @@ class AdminMain extends Controller
             ->join('su_control sc','sc.control_id = srn.control_id')
             ->where('srn.role_id',$role)
             ->field(['sc.control_id','control_chs','control_pid','control_url','control_icon'])
-            ->order('control_index ASC,control_pid')
+            ->order('control_index ASC,control_pid,control_id ASC')
             ->select();
         if(empty($list)) {
             return array();
@@ -299,6 +303,9 @@ class AdminMain extends Controller
     {
         $result = array();
         foreach($list as $key => $row) {
+            if($row == null) {
+                $row = '';
+            }
             $result[array_search($key, $check)] = $row;
         }
         return $result;

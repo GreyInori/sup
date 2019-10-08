@@ -36,12 +36,18 @@ class AdminSearch extends Controller
         if(empty($where)) {
             return '请传递正确的查询条件';
         }
+        /* 如果不是管理员登录的话就只获取当前用户添加的用户列表 */
+        $mobile = request()->param();
+        if(isset($mobile['createUser'])) {
+            $where['create_user'] = $mobile['createUser'];
+        }
+
         /* 执行企业列表查询 */
         try{
             $list = Db::table('su_admin')
                 ->alias('sa')
-                ->join('su_role sr','sr.role_id = sa.user_role')
                 ->join('su_company sc','sc.company_id = sa.user_company','left')
+                ->join('su_role sr','sr.role_id = sa.user_role')
                 ->field(['sa.user_id','sa.user_name','sa.user_company','sa.user_role','sc.company_full_name','sr.role_name'])
                 ->where($where)
                 ->limit($page[0], $page[1])
