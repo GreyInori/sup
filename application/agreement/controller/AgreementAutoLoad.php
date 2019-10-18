@@ -22,6 +22,7 @@ class AgreementAutoLoad extends Controller
      */
     public static $fieldArr = array(
         'agreement' => 'agreement_id',
+        'agreementName' => 'agreement_name',
         'agreementNumber' => 'agreement_number',
         'agreementType' => 'agreement_type',
         'agreementTime' => 'agreement_time',

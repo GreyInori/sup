@@ -45,9 +45,16 @@ class Testing extends Controller
             return self::returnMsg(500,'fail',$list);
         }
         /* 把查询结果的字段转换为前端传递过来的字段数据 */
+        $numData = request()->param();
+        $num = 20;
+        if(isset($numData['page'])) {
+            $num = $numData['page'][1];
+        }
+        $page = ceil($list['count']/$num);
+        unset($list['count']);
         $change = new TestingMain();
         $list = $change::fieldChange($list);
-        return self::returnMsg(200,'success',$list);
+        return self::returnMsg(200,$page,$list);
     }
 
     /**
@@ -106,9 +113,18 @@ class Testing extends Controller
         if(!is_array($list)) {
             return self::returnMsg(500,'fail',$list);
         }
+        /* 根据查询出来的数据总条数以及每页显示的数据量，计算总页数 */
+        $numData = request()->param();
+        $num = 20;
+        if(isset($numData['page'])) {
+            $num = $numData['page'][1];
+        }
+        $page = ceil($list['count']/$num);
+        unset($list['count']);
+        /* 进行数据库对应前端字段转换并返回 */
         $change = new TestingMain();
         $list = $change::fieldChange($list);
-        return self::returnMsg(200,'success',$list);
+        return self::returnMsg(200,$page,$list);
     }
 
     /**
@@ -129,6 +145,14 @@ class Testing extends Controller
         if(!is_array($list)) {
             return self::returnMsg(500,'fail',$list);
         }
+        /* 根据查询出来的数据总条数以及每页显示的数据量，计算总页数 */
+        $numData = request()->param();
+        $num = 20;
+        if(isset($numData['page'])) {
+            $num = $numData['page'][1];
+        }
+        $page = ceil($list['count']/$num);
+        unset($list['count']);
         $fieldArr = array('engineerName','inputCompany','materialName','reportMain','reportNumber','reportTime','testingType','trust');
         /* 把查询结果的字段转换为前端传递过来的字段数据 */
         $change = new TestingMain();
@@ -146,7 +170,7 @@ class Testing extends Controller
                 }
             }
         }
-        return self::returnMsg(200,'success',$list);
+        return self::returnMsg(200,$page,$list);
     }
 
     /**
@@ -183,10 +207,18 @@ class Testing extends Controller
         if(!is_array($list)) {
             return self::returnMsg(500,'fail',$list);
         }
+        /* 根据查询出来的数据总条数以及每页显示的数据量，计算总页数 */
+        $numData = request()->param();
+        $num = 20;
+        if(isset($numData['page'])) {
+            $num = $numData['page'][1];
+        }
+        $page = ceil($list['count']/$num);
+        unset($list['count']);
         /* 把查询结果的字段转换为前端传递过来的字段数据 */
         $change = new TestingMain();
         $list = $change::fieldChange($list);
-        return self::returnMsg(200,'success',$list);
+        return self::returnMsg(200,$page,$list);
     }
 
     /**

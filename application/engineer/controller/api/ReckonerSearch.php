@@ -25,7 +25,7 @@ class ReckonerSearch extends Controller
     public static function toList($search)
     {
         /* 初始化，根据传递的数据生成指定的分页信息以及查询条件 */
-        $page = self::pageInit($search);
+        $page = self::pageInit();
         $where = new ReckonerWhere();
         $where = $where->getWhereArray($search);
         $where['se.show_type'] = 1;
@@ -45,10 +45,18 @@ class ReckonerSearch extends Controller
                 ->limit($page[0], $page[1])
                 ->order('se.input_time DESC')
                 ->select();
+            $count = Db::table('su_engineering_reckoner')
+                ->alias('ser')
+                ->join('su_engineering se','se.engineering_id = ser.engineering_id')
+                ->join('su_people sp','sp.people_id = ser.people_id')
+                ->field(['count(se.engineering_id) as page'])
+                ->where($where)
+                ->order('se.input_time DESC')
+                ->select();
         }catch(\Exception $e) {
             return $e->getMessage();
         }
-//        $list = self::idToName($list, $check);
+        $list['count'] = $count[0]['page'];
         return $list;
     }
 
@@ -82,12 +90,12 @@ class ReckonerSearch extends Controller
 
     /**
      * 分页初始化方法
-     * @param $data
      * @return array
      */
-    private static function pageInit($data)
+    private static function pageInit()
     {
-        $result = array(0,20);
+        $data = request()->param();
+        $result = array(0,200);
         /* 如果传递数据不符合规范，就返回默认分页数据 */
         if(!isset($data['page']) || count($data['page']) != 2) {
             return $result;

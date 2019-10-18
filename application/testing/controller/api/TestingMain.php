@@ -55,6 +55,7 @@ class TestingMain extends Controller
             Db::commit();
             return array($id);
         }catch(\Exception $e) {
+            Db::rollback();
             return $e->getMessage();
         }
     }

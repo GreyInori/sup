@@ -242,7 +242,14 @@ class Qrcode extends Controller
         if(!is_array($list)) {
             return self::returnMsg(500,'fail',$list);
         }
+        $numData = request()->param();
+        $num = 20;
+        if(isset($numData['page'])) {
+            $num = $numData['page'][1];
+        }
+        $page = ceil($list['count']/$num);
+        unset($list['count']);
         $list = QrcodeMain::fieldChange($list);
-        return self::returnMsg(200,'success',$list);
+        return self::returnMsg(200,$page,$list);
     }
 }

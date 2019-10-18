@@ -60,7 +60,7 @@ class PeopleSearch extends Controller
     private static function pageInit()
     {
         $page = request()->param();
-        $result = array(0,20);
+        $result = array(0,200);
         /* 如果传递数据不符合规范，就返回默认分页数据 */
         if(!isset($page['page']) || count($page['page']) != 2) {
             return $result;

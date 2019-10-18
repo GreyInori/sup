@@ -27,7 +27,7 @@ class EngineerValidate extends Validate
         'code' => 'alphaDash',    // 工程编号
         'name' => 'require|chsDash',    // 工程名称
         'type' => 'number',     // 工程类型
-        'from' => 'alphaDash',    // 所属质监站
+        'from' => 'chsDash',    // 所属质监站
         'level' => 'alphaDash',     // 质监登记号
         'area' => 'chsDash',     // 工程区域
         'foundations' => 'number',    // 地面基础类型
@@ -60,7 +60,7 @@ class EngineerValidate extends Validate
         'name.require' => '请传递工程名称',
         'name.chsDash' => '传递工程名称不符合规范',
         'type.number' => '传递工程类型不符合规范',
-        'from.alphaDash' => '传递所属质监站不符合规范',
+        'from.chsDash' => '传递所属质监站不符合规范',
         'level.alphaDash' => '传递质监登记号不符合规范',
         'area.chsDash' => '传递工程区域不符合规范',
         'foundations.number' => '传递地面基础类型不符合规范',

@@ -107,6 +107,13 @@ class CompanyMain extends Controller
         $company['company_id'] = $uuid[0];
         $company['company_register_time'] = time();
         $company['company_number'] = self::creatCode();
+        /* 根据传递过来的参数给该企业添加创建人以及企业电话等数据 */
+        if(isset($data['company']['create_mobile'])) {
+            $company['create_mobile'] = $data['company']['create_mobile'];
+        }
+        if(isset($data['company']['company_mobile'])) {
+            $company['company_mobile'] = $data['company']['company_mobile'];
+        }
         /* 进行企业以及企业详细信息的添加操作 */
         Db::startTrans();
         try{
@@ -420,6 +427,9 @@ class CompanyMain extends Controller
     {
         $result = array();
         foreach($list as $key => $row) {
+            if($row == null) {
+                $row = '';
+            }
             $result[array_search($key, $check)] = $row;
         }
         return $result;

@@ -33,8 +33,14 @@ class QrcodeSearch extends Controller
             $list = Db::table('su_qrcode')
                     ->field(['company_code','work_code','qr_time','qr_code','is_use','qr_path'])
                     ->where($where)
+                    ->order('create_time DESC,qr_time DESC')
                     ->limit($page[0],$page[1])
                     ->select();
+            $count = Db::table('su_qrcode')
+                    ->field(['count(qr_code) as page'])
+                    ->where($where)
+                    ->select();
+            $list['count'] = $count[0]['page'];
             return $list;
         }catch(\Exception $e) {
             return $e->getMessage();

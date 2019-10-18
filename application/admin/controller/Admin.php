@@ -95,9 +95,17 @@ class Admin extends Controller
         if(!is_array($list)) {
             return self::returnMsg(500,'fail',$list);
         }
+        /* 根据查询出来的数据总条数以及每页显示的数据量，计算总页数 */
+        $numData = request()->param();
+        $num = 20;
+        if(isset($numData['page'])) {
+            $num = $numData['page'][1];
+        }
+        $page = ceil($list['count']/$num);
+        unset($list['count']);
         $change = new AdminMain();
         $list = $change::fieldChange($list);
-        return self::returnMsg(200,'success',$list);
+        return self::returnMsg(200,$page,$list);
     }
 
     /**

@@ -215,7 +215,8 @@ class QrcodeMain extends Controller
                 'work_code' => $code['work'],
                 'qr_time' => date('ymd'),
                 'check_code' => $code['company'].$code['work'].rand(1000,9999),
-                'rand_code' => rand(1000,9999)
+                'rand_code' => rand(1000,9999),
+                'create_time' => time(),
             );
             /* 根据编码和序列号生成二维码编码 */
             $numCode = self::qrcodeNumberCreat($first+$num+1);

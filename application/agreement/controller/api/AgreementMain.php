@@ -56,7 +56,7 @@ class AgreementMain extends Controller
         $agreement = $data['agreement'];
         $agreement['agreement_id'] = $uuid[0];
         /* 执行图片上传操作，如果上传失败就返回错误信息，如果成功就根据传值以及当前时间创建图片文件修改数据 */
-        $pic = self::toImgUp('agreementFile','agreement');
+        $pic = self::toImgUp('agreement','agreementFile');
         if(!is_array($pic)) {
             return $pic;
         }

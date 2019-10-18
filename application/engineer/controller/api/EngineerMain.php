@@ -268,7 +268,7 @@ class EngineerMain extends Controller
 
         $list = Db::table('su_engineering')
                 ->alias('se')
-                ->join('su_engineering_main sem','sem.engineering_id')
+                ->join('su_engineering_main sem','sem.engineering_id','left')
                 ->where('se.engineering_id',$check['engineer']['engineering_id'])
                 ->field($field['engineerMain'])
                 ->select();
@@ -362,6 +362,7 @@ class EngineerMain extends Controller
             ->join('su_divide sd','sd.divide_id = sed.divide_id')
             ->where(['sed.divide_user'=>$data['divideUser'],'sed.divide_passwd'=>md5($data['dividePass'])])
             ->field(['sed.member_id as company','sed.divide_id as divide','sd.divide_name as divideName'])
+            ->order('sed.divide_index DESC')
             ->select();
         if(empty($list)) {
             return '账号或密码错误，请检查';
@@ -841,8 +842,29 @@ class EngineerMain extends Controller
     {
         $list = Db::table('su_admin')
                 ->where('user_name',$admin['user_name'])
+                ->where('show_type',1)
                 ->field(['user_name','user_company','user_pass'])
                 ->select();
+        if(isset($list[0]['user_company']) && $list[0]['user_company'] == '') {
+            if(!isset($admin['company_full_name'])) {
+                return '请传递注册工程的企业名';
+            }
+            /* 生成企业存在检测规范的数组，进行企业是否存在检测 */
+            $companyObj = new \app\company\controller\api\CompanyMain();
+            $companyId = array('company'=>$admin);
+            $company = array(
+                'company_full_name' => $admin['company_full_name'],
+                'company_id' => companyMain::companyAlreadyCreat($companyId),
+                'company_mobile' => $admin['user_name'],
+                'create_mobile' => $admin['user_name'],
+                'company_number' => $companyObj::creatCode(),
+            );
+            if(!is_array($company['company_id'])) {
+                return $company['company_id'];
+            }
+            Db::table('su_company')->insert($company);
+            $list[0]['user_company'] = $company['company_id'];
+        }
         /* 如果用户名不存在的话就进行创建，如果存在的话就返回成员信息 */
         if(!empty($list)) {
             $member = array(
@@ -855,7 +877,7 @@ class EngineerMain extends Controller
             if(!isset($admin['company_full_name'])) {
                 return '请传递注册工程的企业名';
             }
-            $member = array('user_name'=>$admin['user_name'],'user_pass'=>md5(123456));
+            $member = array('user_name'=>$admin['user_name'],'user_pass'=>md5(123456),'create_user'=>$admin['user_name']);
             if($role == 1) {
                 $member['user_role'] = 3;
             }else{
@@ -874,6 +896,7 @@ class EngineerMain extends Controller
             if(!is_array($company['company_id'])) {
                 return $company['company_id'];
             }
+            /* 进行企业添加以及工程对应成员的创建 */
             Db::startTrans();
             try{
                 $company['company_id'] = $company['company_id'][0];
@@ -882,7 +905,6 @@ class EngineerMain extends Controller
                 Db::table('su_admin')->insert($member);
                 $member['member_id'] = $member['user_company'];
                 unset($member['user_company']);
-
                 Db::commit();
                 $member = array(
                     'member_id' => $company['company_id'],

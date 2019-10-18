@@ -253,7 +253,7 @@ class TrustMain extends Controller
         Db::startTrans();
         try{
             $allow = Db::table('su_trust')->where('trust_id',$list[0]['trust_id'])->update(['is_allow'=>1]);
-            Db::table('su_testing_status')->where('trust_id',$list[0]['trust_id'])->update(['receive_time'=>time(),'testing_process'=>3]);
+            Db::table('su_testing_status')->where('trust_id',$list[0]['trust_id'])->update(['testing_status'=>'已收样','receive_time'=>time(),'testing_process'=>3]);
             Db::commit();
             return array($allow);
         }catch(\Exception $e) {
@@ -518,7 +518,8 @@ class TrustMain extends Controller
         $testUpdate = array(
             'testing_process' => 2,
             'sample_time' => time(),
-            'sample_pic' => 1
+            'sample_pic' => 1,
+            'testing_status' => '已取样',
         );
         /* 执行图片上传操作，如果上传失败就返回错误信息，如果成功就根据传值以及当前时间创建图片文件修改数据 */
 //        $pic = self::toImgUp('file','pic');
@@ -539,8 +540,9 @@ class TrustMain extends Controller
             'file_time' => time(),
         );
         foreach($data['upload'] as $key => $row) {
-            if($key != 'file_file' || $key != 'file_time')
+            if($key != 'file_file' || $key != 'file_time') {
                 $updateArr[$key] = $row;
+            }
         }
         /* 检测传递的二维码是否符合规范 */
         $qrCode = Db::table('su_qrcode')

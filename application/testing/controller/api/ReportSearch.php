@@ -21,7 +21,7 @@ class ReportSearch extends Controller
     public static function toList($search)
     {
         /* 初始化，根据传递的数据生成指定的分页信息以及查询条件 */
-        $page = self::pageInit($search);
+        $page = self::pageInit();
         $where = new ReportWhere();
         $where = $where->getWhereArray($search);
         $where['st.show_type'] = 1;
@@ -43,21 +43,32 @@ class ReportSearch extends Controller
                     ->order('sr.report_time DESC')
                     ->limit($page[0],$page[1])
                     ->select();
+            $count = Db::table('su_trust')
+                ->alias('st')
+                ->join('su_report sr','sr.trust_id = st.trust_id')
+                ->join('su_report_main srm','srm.report_number = sr.report_number','left')
+                ->join('su_material_type smt','smt.type_id = st.testing_quality')
+                ->join('su_engineering se','se.engineering_id = st.engineering_id')
+                ->field(['count(st.trust_id) as page'])
+                ->where($where)
+                ->order('sr.report_time DESC')
+                ->select();
         }catch(\Exception $e) {
             return $e->getMessage();
         }
+        $list['count'] = $count[0]['page'];
         return $list;
     }
 
 
     /**
      * 分页初始化方法
-     * @param $data
      * @return array
      */
-    private static function pageInit($data)
+    private static function pageInit()
     {
-        $result = array(0,20);
+        $data = request()->param();
+        $result = array(0,200);
         /* 如果传递数据不符合规范，就返回默认分页数据 */
         if(!isset($data['page']) || count($data['page']) != 2) {
             return $result;

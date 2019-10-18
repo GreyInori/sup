@@ -42,9 +42,9 @@ class AdminMain extends Controller
             $data['admin']['user_pass'] = md5($data['user_pass']);
         }
         /* 根据添加该用户的管理员名给该用户添加创建管理人数据 */
-        if(isset($data['create_user'])) {
-            $data['admin']['create_user'] = $data['create_user'];
-        }
+        if(!isset($data['admin']['create_user'])) {
+            $data['admin']['create_user'] = $data['admin']['user_name'];
+    }
 
         try{
             $id = Db::table('su_admin')->insertGetId($data['admin']);
@@ -77,6 +77,11 @@ class AdminMain extends Controller
             $data['admin']['user_pass'] = md5($data['admin']['user_pass']);
         }
         try{
+            /* 如果管理员有关联到公司的话，就把公司的手机号更改为对应管理员的手机号 */
+            if(isset($data['admin']['user_company'])) {
+                $mobile = Db::table('su_admin')->where('user_id',$pid[0])->field(['user_name'])->select();
+                Db::table('su_company')->where('company_id',$data['admin']['user_company'])->update(['company_mobile' => $mobile[0]['user_name']]);
+            }
             $id = Db::table('su_admin')->where('user_id',$pid[0])->update($data['admin']);
             return array($id);
         }catch(\Exception $e) {
@@ -166,7 +171,7 @@ class AdminMain extends Controller
                 ->join('su_role sr','sr.role_id = sa.user_role')
                 ->join('su_company sc','sc.company_id = sa.user_company')
                 ->field(['sa.user_id','sa.user_name','sa.user_company','sa.user_role','sc.company_full_name','sr.role_name'])
-                ->where('sa.user_role',$data['role'])
+                ->where(['sa.user_role'=>$data['role'],'sa.show_type'=>1,'sc.show_type'=>1])
                 ->select();
             return $list;
         }catch(\Exception $e) {

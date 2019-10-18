@@ -138,9 +138,16 @@ class Engineer extends Controller
         if(!is_array($list)) {
             return self::returnMsg(500,'fail',$list);
         }
+        $numData = request()->param();
+        $num = 20;
+        if(isset($numData['page'])) {
+            $num = $numData['page'][1];
+        }
+        $page = ceil($list['count']/$num);
+        unset($list['count']);
         $change = new EngineerMain();
         $list = $change::fieldChange($list);
-        return self::returnMsg(200,'success',$list);
+        return self::returnMsg(200,$page,$list);
     }
 
     /**

@@ -40,9 +40,8 @@ class CompanySearch extends Controller
         /* 如果传递了手机号，就获取对应手机号下的企业列表 */
         $mobile = request()->param();
         if(isset($mobile['createUser'])) {
-            $where['sc.create_mobile'] = $mobile['createUser'];
+            $where['sc.create_mobile|sc.company_mobile'] = $mobile['createUser'];
         }
-
         /* 执行企业列表查询 */
         try{
             $list = Db::table('su_company')
@@ -52,9 +51,16 @@ class CompanySearch extends Controller
                 ->where($where)
                 ->limit($page[0], $page[1])
                 ->select();
+            $count = Db::table('su_company')
+                ->alias('sc')
+                ->join('su_company_main scm','sc.company_id = scm.company_id','LEFT')
+                ->field(['count(sc.show_type) as page'])
+                ->where($where)
+                ->select();
         }catch(\Exception $e) {
             return $e->getMessage();
         }
+        $list['count'] = $count[0]['page'];
         return $list;
     }
 
@@ -65,7 +71,7 @@ class CompanySearch extends Controller
      */
     private static function pageInit($data)
     {
-        $result = array(0,20);
+        $result = array(0,200);
         /* 如果传递数据不符合规范，就返回默认分页数据 */
         if(!isset($data['page']) || count($data['page']) != 2) {
             return $result;

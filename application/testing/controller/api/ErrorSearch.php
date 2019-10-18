@@ -25,7 +25,7 @@ class ErrorSearch extends Controller
      */
     public static function toList($search)
     {
-        $page  = self::pageinit($search);
+        $page  = self::pageinit();
         $where = new ErrorWhere();
         $where = $where->getWhereArray($search);
         $where['st.show_type'] = 1;
@@ -45,20 +45,28 @@ class ErrorSearch extends Controller
                     ->field(['ste.error_id','ste.error_main','ste.error_response','st.input_testing_company','st.trust_code','ste.error_time'])
                     ->limit($page[0],$page[1])
                     ->select();
+            $count = Db::table('su_testing_status')
+                        ->alias('sts')
+                        ->join('su_trust st','st.trust_id = sts.trust_id')
+                        ->join('su_testing_error ste','ste.trust_id = sts.trust_id')
+                        ->where($where)
+                        ->field(['count(st.trust_id) as page'])
+                        ->select();
         }catch(\Exception $e) {
             return $e->getMessage();
         }
+        $list['count'] = $count[0]['page'];
         return $list;
     }
 
     /**
      * 分页初始化方法
-     * @param $data
      * @return array
      */
-    private static function pageInit($data)
+    private static function pageInit()
     {
-        $result = array(0,20);
+        $data = request()->param();
+        $result = array(0,200);
         /* 如果传递数据不符合规范，就返回默认分页数据 */
         if(!isset($data['page']) || count($data['page']) != 2) {
             return $result;

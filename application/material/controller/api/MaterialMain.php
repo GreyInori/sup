@@ -312,9 +312,11 @@ class MaterialMain extends Controller
             ->join('su_material_type smt','smt.type_id = sm.material_type')
             ->where($where)
             ->field(['material_id','material_name','material_type','smt.type_name'])
+            ->order('material_type ASC,material_id ASC')
             ->select();
         if(empty($list)){
-            return '查无此检测项目数据，请检查传递的检测分类id';
+
+            return array();
         }
         $list = self::typeGroup($list);
         return $list;
@@ -556,6 +558,9 @@ class MaterialMain extends Controller
                             ->field(['default_id','trial_id','trial_default_value','trial_default_token','trial_verify'])
                             ->select();
         if(empty($defaultList)) {
+            foreach($list as $key => $row) {
+                $list[$key] = self::fieldChange($row);
+            }
             return $list;
         }
         /* 把所有默认值转换成 字段id => 结果数组 的格式，方便匹配到字段下

@@ -63,6 +63,7 @@ class TrustBase extends Controller
         try{
             if($token == 0){
                 $update = Db::table('su_trust_people_pic')->insert(['trust_id'=>$trust['trust_id'],'people_pic'=>$path]);
+                Db::table('su_testing_status')->where('trust_id',$trust['trust_id'])->update(['testing_status'=>'取样人照片已上传']);
             }else{
                 self::picDel($trustBase[0]['people_pic']);
                 $update = Db::table('su_trust_people_pic')->where(['trust_id'=>$trust['trust_id']])->update(['people_pic'=>$path]);
