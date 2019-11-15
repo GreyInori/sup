@@ -51,7 +51,7 @@ class AdminSearch extends Controller
                     ->alias('sa')
                     ->join('su_company sc','sc.company_id = sa.user_company','left')
                     ->join('su_role sr','sr.role_id = sa.user_role')
-                    ->field(['sa.user_id','sa.user_name','sa.user_company','sa.user_role','sc.company_full_name','sr.role_name'])
+                    ->field(['sa.user_sign','sa.user_nickname','sa.user_id','sa.user_name','sa.user_company','sa.user_role','sc.company_full_name','sr.role_name'])
                     ->where($where)
                     ->limit($page[0], $page[1])
                     ->select();
@@ -60,7 +60,7 @@ class AdminSearch extends Controller
                     ->alias('sa')
                     ->join('su_company sc','sc.company_id = sa.user_company','left')
                     ->join('su_role sr','sr.role_id = sa.user_role')
-                    ->field(['sa.user_id','sa.user_name','sa.user_company','sa.user_role','sc.company_full_name','sr.role_name'])
+                    ->field(['sa.user_sign','sa.user_nickname','sa.user_id','sa.user_name','sa.user_company','sa.user_role','sc.company_full_name','sr.role_name'])
                     ->where($where)
                     ->select();
             }

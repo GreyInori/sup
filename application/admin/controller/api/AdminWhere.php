@@ -22,8 +22,10 @@ class AdminWhere extends Controller
      */
     public $where = array(
         'user_name' => ['sa.user_name','LIKE','code%'],
+        'user_nickname' => ['sa.user_nickname','LIKE','%code%'],
         'company_full_name' => ['sc.company_full_name','LIKE','code%'],
         'role_name' => ['sr.role_name','LIKE','code%'],
+        'user_role' => ['sa.user_role','='],
     );
 
     /**

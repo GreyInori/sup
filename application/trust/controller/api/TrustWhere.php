@@ -18,7 +18,7 @@ class TrustWhere extends Controller
 {
     private $where = array(
         'testing_material' => ['testing_material','='],
-        'trust_id' => ['st.trust_id','LIKE','code%'],
+        'trust_id' => ['st.trust_id','=','code%'],
         'trust_code' => ['st.trust_code','LIKE','code%'],
         'engineering_id' => ['st.engineering_id','='],
         'serial_number' => ['st.serial_number','LIKE','code%'],

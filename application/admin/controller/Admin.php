@@ -123,6 +123,30 @@ class Admin extends Controller
     }
 
     /**
+     * 根据id获取管理员详细信息
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getAdminMain()
+    {
+        /* 检测传递过来的参数是否符合规范 */
+        $data = FieldCheck::checkData('main');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 进行详细信息的获取 */
+        $list = AdminMain::toAdminMain($data);
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        /* 把查询出来的结果转换为前端传递过来的字段 */
+        $list = AdminMain::fieldChange($list);
+        return self::returnMsg(200,'success',$list);
+    }
+
+    /**
      * 根据账号密码获取管理员信息以及权限方法
      * @return false|string
      * @throws \think\db\exception\DataNotFoundException

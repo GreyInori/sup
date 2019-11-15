@@ -52,21 +52,11 @@ class EngineerMain extends Controller
 //        $check['divide'] = $value['divide'];
         $check['engineer']['engineering_id'] = $uuid[0];
         $check['engineer']['input_time'] = $people['input_time'];
-//        $check['engineer']['input_person'] = $people['input_person'];
         $check['engineer']['contract_code'] = self::creatCode();      // 生成工程编号
-        /* 如果传递了企业id的话，那么这个企业id就是施工的id，进行指定单位成员分配 */
-//        if(isset($check['engineer']['company_id'])) {
-//            $company = self::createDivide($check['engineer']['contract_code'], $uuid[0],$check['engineer']['company_id']);
-//            unset($check['engineer']['company_id']);
-//        }else {
-//            $company = self::createDivide($check['engineer']['contract_code'], $uuid[0]);
-//        }
-
         /* 进行工程以及工程详细信息添加等操作 */
         Db::startTrans();
         try{
             Db::table('su_engineering')->insert($check['engineer']);
-//            Db::table('su_engineering_divide')->insertAll($company);
             self::engineerMainCheck($check, $uuid[0]);
             Db::commit();
             return array('uid'=>$uuid[0]);
@@ -106,14 +96,18 @@ class EngineerMain extends Controller
         if(!is_array($admin)){
             return $admin;
         }
+        /* 把当前注册人的名字录入到工程填单人信息内 */
+        $engineer['input_person'] = $admin['user_nickname'];
+        unset($admin['user_nickname']);
         $admin['engineering_id'] = $engineer['engineering_id'];
         $admin['divide_id'] = $data['divide_id'];
         if($data['divide_id'] == 4) {
-            $data['divide_id'] = 2;
+            $admin['divide_id'] = 2;
         }elseif($data['divide_id'] == 3) {
-            $data['divide_id'] = 1;
+            $admin['divide_id'] = 1;
         }
-        $field = Db::table('su_divide')->where('divide_id',$data['divide_id'])->field(['divide_field'])->select();
+        /* 获取到创建工程的企业id，用来给工程修改详细信息 */
+        $field = Db::table('su_divide')->where('divide_id',$admin['divide_id'])->field(['divide_field'])->select();
         $companyName = Db::table('su_company')->where('company_id',$admin['member_id'])->field(['company_full_name'])->select();
         $engineer[$field[0]['divide_field']] = $companyName[0]['company_full_name'];
         Db::startTrans();
@@ -166,12 +160,15 @@ class EngineerMain extends Controller
         if(isset($check['engineer']['company_id'])) {
             unset($check['engineer']['company_id']);
         }
+        /* 对工程填单人数据进行验证 */
+        if(isset($check['engineer']['user_name'])) {
+            $check['engineer']['makeup_people'] = self::makeupCheck($check['engineer']['user_name'], $uuid[0], 'makeup_people');
+            unset($check['engineer']['user_name']);
+        }
         /* 进行工程以及工程详细信息添加等操作 */
         Db::startTrans();
         try{
             Db::table('su_engineering')->where('engineering_id',$uuid[0])->update($check['engineer']);
-//            Db::table('su_engineering_divide')->where('engineering_id',$uuid[0])->delete();
-//            Db::table('su_engineering_divide')->insertAll($check['divide']);
             self::engineerMainCheck($check, $uuid[0]);
             Db::commit();
             return array('uid'=>$uuid[0]);
@@ -275,6 +272,17 @@ class EngineerMain extends Controller
         if(empty($list)) {
             return '查无此工程，请检查传递的工程id';
         }
+        /* 工程结算人内容获取 */
+        $reckoner = Db::table('su_engineering_reckoner')
+                        ->alias('ser')
+                        ->join('su_admin sa','sa.user_id = ser.people_id')
+                        ->where('ser.engineering_id',$list[0]['engineering_id'])
+                        ->field(['sa.user_id','sa.user_name','sa.user_nickname'])
+                        ->select();
+        if(!empty($reckoner)) {
+            $reckoner = self::fieldChange($reckoner);
+        }
+        $result['reckoner'] = $reckoner;
         /* 获取到工程对应的详细人员以及企业的数据，进行匹配以及键值对转换 */
 //        $mainList = self::fetchMainList($list[0]);
         $mainList = self::fetchDivide($check['engineer']['engineering_id']);
@@ -310,6 +318,33 @@ class EngineerMain extends Controller
                     ->where('sed.engineering_id',$check['engineer']['engineering_id'])
                     ->field(['sed.member_id','sed.divide_user','sd.divide_name','sd.divide_id','sed.divide_index','sc.company_full_name'])
                     ->select();
+        return $list;
+    }
+
+    /**
+     * 根据工程id获取工程下的检测单位列表
+     * @param $data
+     * @return false|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function fetchEngineerTesting($data)
+    {
+        /* 把传递过来的数据根据数据表进行分组，用于后续插入和检测等操作 */
+        $group = new EngineerAutoLoad();
+        $check = $group->toGroup($data);
+        /* 生成检测单位查询条件 */
+        $where = array(
+            'sed.engineering_id' => $check['engineer']['engineering_id'],
+            'sed.divide_id' => 11,
+        );
+        $list = Db::table('su_engineering_divide')
+            ->alias('sed')
+            ->join('su_company sc','sc.company_Id = sed.member_id')
+            ->where($where)
+            ->field(['sc.company_id','sc.company_full_name'])
+            ->select();
         return $list;
     }
 
@@ -357,6 +392,13 @@ class EngineerMain extends Controller
         if(!isset($data['dividePass'])) {
             return '请传递企业密码';
         }
+        $admin = Db::table('su_admin')
+                        ->where(['user_name'=>$data['divideUser'],'user_pass'=>md5($data['dividePass'])])
+                        ->field(['user_id'])
+                        ->select();
+        if(empty($admin)) {
+            return '账号或密码错误，请检查';
+        }
         $list = Db::table('su_engineering_divide')
             ->alias('sed')
             ->join('su_divide sd','sd.divide_id = sed.divide_id')
@@ -365,7 +407,7 @@ class EngineerMain extends Controller
             ->order('sed.divide_index DESC')
             ->select();
         if(empty($list)) {
-            return '账号或密码错误，请检查';
+            return '当前账号尚未被分配到工程，请联系相关人员';
         }
         $node = self::fetchNode($list[0]['divide']);
         $list[0]['node'] = $node;
@@ -402,7 +444,7 @@ class EngineerMain extends Controller
             ->field(['contract_code',$divide[0]['divide_field']])
             ->select();
         if(empty($engineer)) {
-            return '查无此成员身份，请检查出传递的成员id';
+            return '查无此工程身份，请检查出传递的成员id';
         }
         /* 根据查询结果生成用户名等数据进行操作 */
         $divideUpdate = array(
@@ -421,21 +463,27 @@ class EngineerMain extends Controller
             }
             /* 检测指定企业是否已经以指定的角色存在于指定的工程下，如果存在，就不进行操作 */
             $alreadyHas = Db::table('su_engineering_divide')
-                ->where(['engineering_id'=>$data['engineer'],'divide_id'=>$data['divide'],'member_id'=>$user[0]['user_company']])
+                ->where(['engineering_id'=>$data['engineer'],'divide_id'=>$data['divide'],'divide_user'=>$user[0]['user_name']])
                 ->field(['engineering_id'])
                 ->select();
             if(!empty($alreadyHas)) {
-                return '该企业以及存在于当前工程下';
+                return '该人员已经存在于当前工程下';
             }
-            $divideUpdate['member_id'] = $user[0]['user_company'];
-            $divideUpdate['divide_user'] = $user[0]['user_name'];
-            $divideUpdate['divide_passwd'] = $user[0]['user_pass'];
+
+            $divideUpdate['member_id'] = $user[0]['user_company'];       //
+            $divideUpdate['divide_user'] = $user[0]['user_name'];       //  工程下人员的用户名就等于人员添加时输入的手机号
+            $divideUpdate['divide_passwd'] = $user[0]['user_pass'];        // 工程下人员密码就等于人员添加时输入的密码
         }
         Db::startTrans();
         try{
             /* 如果传递了企业id的话，就给添加的数组增添加企业 */
             if(isset($divideUpdate['member_id'])) {
                 self::updateEngineerMember($divideUpdate['member_id'],$divide[0]['divide_field'],$data['engineer']);
+            }
+            /* 如果分配的是监理单位的话，就对采样人员数据进行完善 */
+            if($data['divide'] == 3) {
+                $dividePeople = self::makeupCheck($divideUpdate['divide_user'], $data['engineer'], 'sampling_people');
+                Db::table('su_engineering')->where('engineering_id',$data['engineer'])->update(['sampling_people'=>$dividePeople]);
             }
             $insert = Db::table('su_engineering_divide')->insertGetId($divideUpdate);
             Db::commit();
@@ -538,12 +586,12 @@ class EngineerMain extends Controller
     {
         $data = request()->param();
         /* 检测是否重复添加数据 */
-        $list = Db::table('su_engineering_reckoner')->where('engineering_id',$data['engineer'])->field(['engineering_id'])->select();
+        $list = Db::table('su_engineering_reckoner')->where('engineering_id',$data['engineer'])->where('people_id',$data['peopleId'])->field(['engineering_id'])->select();
         if(!empty($list)) {
-            return '当前工程已经存在结算人，请先删除或者给其他工程分配结算人';
+            return '当前工程已经存在该结算人，请先删除或者给其他工程分配结算人';
         }
         /* 检测填写的数据是否存在 */
-        $people = Db::table('su_people')->where('people_id',$data['peopleId'])->field(['people_id'])->select();
+        $people = Db::table('su_admin')->where('user_id',$data['peopleId'])->field(['user_id'])->select();
         $engineer = Db::table('su_engineering')->where('engineering_id',$data['engineer'])->field(['engineering_id'])->select();
         if(empty($people)) {
             return '该人员不存在，请检查传递的人员id';
@@ -553,7 +601,13 @@ class EngineerMain extends Controller
         }
         /* 执行添加操作 */
         try{
-            $add = Db::table('su_engineering_reckoner')->insert(['engineering_id'=>$data['engineer'],'people_id'=>$data['peopleId']]);
+            /* 如果当前工程下存在结算人的话就进行修改操作，否则就进行添加操作 */
+            $isset = Db::table('su_engineering_reckoner')->where('engineering_id',$data['engineer'])->field(['engineering_id'])->select();
+            if(empty($isset)) {
+                $add = Db::table('su_engineering_reckoner')->insert(['engineering_id'=>$data['engineer'],'people_id'=>$data['peopleId']]);
+            }else{
+                $add = Db::table('su_engineering_reckoner')->where('engineering_id',$data['engineer'])->update(['people_id'=>$data['peopleId']]);
+            }
             return array($add);
         }catch(\Exception $e) {
             return $e->getMessage();
@@ -830,6 +884,29 @@ class EngineerMain extends Controller
     // | 辅助类型相关
     // +----------------------------------------------------------------------
     /**
+     * 对工程内是否存在指定用户为对应的角色进行判断
+     * @param $mobile
+     * @param $engineerId
+     * @param $field
+     * @return string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    private static function makeupCheck($mobile, $engineerId, $field)
+    {
+        $list = Db::table('su_engineering')->where('engineering_id',$engineerId)->field([$field])->select();
+        $user = Db::table('su_admin')->where('user_name',$mobile)->field(['user_nickname'])->select();
+
+        if(strchr($list[0][$field],$user[0]['user_nickname'])) {
+            return $list[0][$field];
+        }
+        $result = $list[0][$field] . "," . $user[0]['user_nickname'];
+        $result = ltrim($result,',');
+        return $result;
+    }
+
+    /**
      * 检测传递的用户名是否存在，如果不存在就重新创建并添加企业数据
      * @param $admin
      * @param $role
@@ -843,80 +920,93 @@ class EngineerMain extends Controller
         $list = Db::table('su_admin')
                 ->where('user_name',$admin['user_name'])
                 ->where('show_type',1)
-                ->field(['user_name','user_company','user_pass'])
+                ->field(['user_name','user_company','user_pass','user_id','user_nickname'])
                 ->select();
-        if(isset($list[0]['user_company']) && $list[0]['user_company'] == '') {
-            if(!isset($admin['company_full_name'])) {
-                return '请传递注册工程的企业名';
-            }
-            /* 生成企业存在检测规范的数组，进行企业是否存在检测 */
-            $companyObj = new \app\company\controller\api\CompanyMain();
-            $companyId = array('company'=>$admin);
-            $company = array(
-                'company_full_name' => $admin['company_full_name'],
-                'company_id' => companyMain::companyAlreadyCreat($companyId),
-                'company_mobile' => $admin['user_name'],
-                'create_mobile' => $admin['user_name'],
-                'company_number' => $companyObj::creatCode(),
-            );
-            if(!is_array($company['company_id'])) {
-                return $company['company_id'];
-            }
-            Db::table('su_company')->insert($company);
-            $list[0]['user_company'] = $company['company_id'];
+
+        if(isset($list[0]['user_company']) && ($list[0]['user_company'] == '' || $list[0]['user_company'] == null)) {
+            $list[0]['user_company'] = self::companyCheck($admin);
         }
         /* 如果用户名不存在的话就进行创建，如果存在的话就返回成员信息 */
         if(!empty($list)) {
             $member = array(
                 'member_id' => $list[0]['user_company'],
                 'divide_user' => $list[0]['user_name'],
-                'divide_passwd' => $list[0]['user_pass']
+                'divide_passwd' => $list[0]['user_pass'],
+                'user_nickname' => $list[0]['user_nickname'],
             );
             return $member;
-        }else{
-            if(!isset($admin['company_full_name'])) {
-                return '请传递注册工程的企业名';
-            }
-            $member = array('user_name'=>$admin['user_name'],'user_pass'=>md5(123456),'create_user'=>$admin['user_name']);
-            if($role == 1) {
-                $member['user_role'] = 3;
-            }else{
-                $member['user_role'] = 4;
-            }
-            /* 生成企业存在检测规范的数组，进行企业是否存在检测 */
-            $companyObj = new \app\company\controller\api\CompanyMain();
-            $companyId = array('company'=>$admin);
-            $company = array(
-                'company_full_name' => $admin['company_full_name'],
-                'company_id' => companyMain::companyAlreadyCreat($companyId),
-                'company_mobile' => $admin['user_name'],
-                'create_mobile' => $admin['user_name'],
-                'company_number' => $companyObj::creatCode(),
-            );
-            if(!is_array($company['company_id'])) {
-                return $company['company_id'];
-            }
-            /* 进行企业添加以及工程对应成员的创建 */
-            Db::startTrans();
-            try{
-                $company['company_id'] = $company['company_id'][0];
-                Db::table('su_company')->insert($company);
-                $member['user_company'] = $company['company_id'];
-                Db::table('su_admin')->insert($member);
-                $member['member_id'] = $member['user_company'];
-                unset($member['user_company']);
-                Db::commit();
-                $member = array(
-                    'member_id' => $company['company_id'],
-                    'divide_user' => $member['user_name'],
-                    'divide_passwd' => $member['user_pass'],
-                );
-                return $member;
-            }catch(\Exception $e) {
-                Db::rollback();
-                return $e->getMessage();
-            }
         }
+        $companyId = self::companyCheck($admin);
+        $member = array('user_name'=>$admin['user_name'],'user_pass'=>md5(123456),'create_user'=>$admin['user_name'],'user_company' => $companyId);
+        if($role == 1) {
+            $member['user_role'] = 3;
+        }else{
+            $member['user_role'] = 4;
+        }
+        /* 如果传递了人员姓名，就给管理员添加上真实姓名 */
+        if(isset($admin['user_nickname'])) {
+            $member['user_nickname'] = $admin['user_nickname'];
+        }
+        /* 进行企业添加以及工程对应成员的创建 */
+        Db::startTrans();
+        try{
+            Db::table('su_admin')->insertGetId($member);
+            Db::commit();
+            $member = array(
+                'member_id' => $member['user_company'],
+                'divide_user' => $member['user_name'],
+                'divide_passwd' => $member['user_pass'],
+                'user_nickname' => $member['user_nickname'],
+            );
+            return $member;
+        }catch(\Exception $e) {
+            Db::rollback();
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * 检测对应的企业是否存在，如果不存在就创建，返回id
+     * @param $admin
+     * @return array|string
+     * @throws \think\exception\DbException
+     */
+    private static function companyCheck($admin)
+    {
+        if(!isset($admin['company_full_name'])) {
+            return '请传递注册工程的企业名';
+        }
+        /* 生成企业存在检测规范的数组，进行企业是否存在检测 */
+        $companyObj = new CompanyMain();
+        $companyId = array('company'=>$admin);
+        $companyId = $companyObj::companyAlreadyCreat($companyId);
+        /* 进行企业添加操作 */
+        if(is_array($companyId)) {
+            self::companyCreate($admin, $companyId[0]);
+            $companyId = $companyId[0];
+        }else{
+            $companyId = strchr($companyId,'id: ');
+            $companyId = ltrim($companyId,'id: ');
+        }
+        return $companyId;
+    }
+
+    /**
+     * 进行企业的创建
+     * @param $company
+     * @param $companyId
+     */
+    private static function companyCreate($company, $companyId)
+    {
+        $company = array(
+            'company_full_name' => $company['company_full_name'],
+            'company_id' => $companyId,
+            'company_mobile' => $company['user_name'],
+            'create_mobile' => $company['user_name'],
+            'company_number' => CompanyMain::creatCode(),
+        );
+
+        Db::table('su_company')->insert($company);
     }
 
     /**
@@ -1025,7 +1115,7 @@ class EngineerMain extends Controller
                             ->where('engineering_id',$engineer)
                             ->field($field)
                             ->select();
-       if(empty($engineerDivide) || $engineerDivide[0][$field] === '' || $engineerDivide[0][$field] === null) {
+       if(empty($engineerDivide) || $engineerDivide[0][$field] === '' || $engineerDivide[0][$field] === null || strchr($engineerDivide[0][$field],$company[0]['company_full_name'])) {
            $update = array(
                $field => $company[0]['company_full_name'],
            );

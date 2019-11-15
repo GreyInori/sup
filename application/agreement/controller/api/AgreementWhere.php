@@ -19,6 +19,7 @@ class AgreementWhere extends Controller
     private $where = array(
         'agreement_id' => ['agreement_id','=.'],
         'engineering_name' => ['se.engineering_name','LIKE','%code%'],
+        'agreement_name' => ['sia.agreement_name','LIKE','%code%'],
         'type_name' => ['sat.type_name','LIKE','%code%'],
         'construction_company' => ['se.construction_company','LIKE','%code%'],
         'quality_station' => ['sia.quality_station','LIKE','%code%'],

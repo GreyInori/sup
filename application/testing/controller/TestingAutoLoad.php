@@ -50,7 +50,7 @@ class TestingAutoLoad extends Controller
         'reportTime' => 'sts.report_time',
         'reportUploadTime' => 'sts.report_upload_time',
         'reportUploadTD' => 'sts.report_upload_TD',
-        'testingProcess' => 'sts.sts.testing_process',
+        'testingProcess' => 'sts.testing_process',
         'company' => 'company_id',
         'response' => 'ste.error_response',
         'error' => 'ste.error_main',
@@ -66,7 +66,17 @@ class TestingAutoLoad extends Controller
         'mobile' => 'user_name',
         'errorTime' => 'ste.error_time',
         'trustCode' => 'st.trust_code',
-        'reportContent' => 'srm.report_content'
+        'reportContent' => 'srm.report_content',
+        'nickname' => 'user_nickname',
+        'sign' => 'user_sign',
+        'user' => 'user_id',
+        'testingCompany' => 'st.testing_company',
+        'testingCompanyName' => 'st.testing_company_name',
+        'delMobile' => 'st.del_mobile',
+        'delName' => 'st.del_name',
+        'allow' => 'st.is_allow',
+        'constructionCompany' => 'se.construction_company',
+        'reportSign' => 'report_sign',
     );
 
     public static $fieldGroup = array(

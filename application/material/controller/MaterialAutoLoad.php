@@ -59,6 +59,7 @@ class MaterialAutoLoad extends Controller
         'defaultToken' => 'trial_default_token',
         'defaultVerify' => 'trial_verify',
         'divideName' => 'divide_name',
+        'remark' => 'material_remark',
     );
 
     /**

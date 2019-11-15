@@ -40,7 +40,7 @@ class AgreementAutoLoad extends Controller
      * 给指定字段数据根据数据表区别分组
      */
     public static $fieldGroup = array(
-        'agreement' => array('agreement_id','agreement_number','agreement_type',
+        'agreement' => array('agreement_name','agreement_id','agreement_number','agreement_type',
             'agreement_time','input_person','quality_station','engineering_id'),
     );
 

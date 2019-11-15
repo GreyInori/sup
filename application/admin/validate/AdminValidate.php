@@ -46,6 +46,7 @@ class AdminValidate extends Validate
         'add' => ['userName','userPass','company','role'],
         'edit' => ['user','userName','userPass','company','role'],
         'del' => ['user'],
-        'list' => ['companyName','roleName']
+        'list' => ['companyName','roleName'],
+        'main' => ['user'],
     );
 }

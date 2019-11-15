@@ -195,6 +195,28 @@ class Engineer extends Controller
     }
 
     /**
+     * 根据工程id获取工程下的检测单位列表
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getEngineerTesting()
+    {
+        $data = FieldCheck::checkData('divide');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 获取企业详细数据，如果有抛出异常的话就返回错误信息 */
+        $list = EngineerMain::fetchEngineerTesting($data);
+        if(!is_array($list)) {
+            return self::returnMsg(500,'fail',$list);
+        }
+        $list = EngineerMain::fieldChange($list);
+        return self::returnMsg(200,'success',$list);
+    }
+
+    /**
      * 根据企业账号密码获取对应的企业详情
      * @return false|string
      * @throws \think\db\exception\DataNotFoundException

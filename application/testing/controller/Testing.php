@@ -54,6 +54,17 @@ class Testing extends Controller
         unset($list['count']);
         $change = new TestingMain();
         $list = $change::fieldChange($list);
+        /* 把报告内的签名列表转换为索引数组 */
+        foreach ($list as $key => $row) {
+            if(isset($row['reportSign']) && $row['reportSign'] != '' && $row['reportSign'] != null) {
+                $list[$key]['reportSign'] = explode(',',$row['reportSign']);
+                /* 如果非空就给签名路径添加网站域名 */
+                $url = request()->domain();
+                foreach ($list[$key]['reportSign'] as $signKey => $signValue) {
+                    $list[$key]['reportSign'][$signKey] = $url . $signValue;
+                }
+            }
+        }
         return self::returnMsg(200,$page,$list);
     }
 
@@ -153,7 +164,7 @@ class Testing extends Controller
         }
         $page = ceil($list['count']/$num);
         unset($list['count']);
-        $fieldArr = array('engineerName','inputCompany','materialName','reportMain','reportNumber','reportTime','testingType','trust');
+        $fieldArr = array('engineerName','constructionCompany','materialName','reportMain','reportNumber','reportTime','testingType','trust');
         /* 把查询结果的字段转换为前端传递过来的字段数据 */
         $change = new TestingMain();
         $list = $change::fieldChange($list);

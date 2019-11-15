@@ -305,17 +305,24 @@ class MaterialMain extends Controller
         /* 根据传递的类型id生成指定的查询语句 */
         $where = new MaterialWhere();
         $where = $where->getWhereArray($data['material']);
-
+        $field = array('material_id','material_name','material_type','smt.type_name');
+        /* 如果传递了企业id的话就是获取检测项目对应企业备注信息，需要把检测备注加进返回值里面去 */
+        if(isset($data['price']['company_id'])) {
+            $remarkField = "IFNULL((SELECT material_remark 
+                                    FROM su_material_company smc 
+                                    WHERE sm.material_id = smc.material_id
+                                    AND smc.company_id = '{$data['price']['company_id']}'),' ') as material_remark";
+            array_push($field,$remarkField);
+        }
         /* 执行查询操作 */
         $list = Db::table('su_material')
             ->alias('sm')
             ->join('su_material_type smt','smt.type_id = sm.material_type')
             ->where($where)
-            ->field(['material_id','material_name','material_type','smt.type_name'])
+            ->field($field)
             ->order('material_type ASC,material_id ASC')
             ->select();
         if(empty($list)){
-
             return array();
         }
         $list = self::typeGroup($list);
@@ -409,6 +416,60 @@ class MaterialMain extends Controller
             return array('uid'=>$id);
         }catch(\Exception $e) {
             Db::rollback();
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * 进行企业检测项目备注添加操作
+     * @param $data
+     * @return array|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toMaterialRemarkAdd($data)
+    {
+        $material = Db::table('su_material')->where('material_id',$data['material_id'])->field(['material_id'])->select();
+        $company = Db::table('su_company')->where('company_id',$data['company_id'])->field(['company_id'])->select();
+        if(empty($material)) {
+            return '查无此检测项目，请传递正确的检测出项目信息';
+        }
+        if(empty($company)) {
+            return '查无此企业，请传递正确的企业信息';
+        }
+        $where = array('material_id'=>$data['material_id'],'company_id'=>$data['company_id']);
+        $remark = Db::table('su_material_company')->where($where)->field('mark_id')->select();
+        if(!empty($remark)) {
+            return '当前备注已经存在，请进行修改操作';
+        }
+        try{
+            $list = Db::table('su_material_company')->insertGetId($data);
+            return array('uid'=>$list);
+        }catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * 执行企业检测项目备注修改操作
+     * @param $data
+     * @return array|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toMaterialRemarkEdit($data)
+    {
+        $where = array('material_id'=>$data['material_id'],'company_id'=>$data['company_id']);
+        $remark = Db::table('su_material_company')->where($where)->field('mark_id')->select();
+        if(empty($remark)) {
+            return '查无此检测备注，请检查传递的企业备注';
+        }
+        try{
+            $list = Db::table('su_material_company')->where($where)->update(['material_remark'=>$data['material_remark']]);
+            return array($list);
+        }catch (\Exception $e) {
             return $e->getMessage();
         }
     }
@@ -595,7 +656,7 @@ class MaterialMain extends Controller
         if(isset($data['materialDefault']['default_id'])) {
             unset($data['materialDefault']['default_id']);
         }
-        /* 进行图片上传规范的添加操作 */
+        /* 进行委托单字段默认值范的添加操作 */
         Db::startTrans();
         try{
             $id = Db::table('su_material_list_default')->insertGetId($data['materialDefault']);
@@ -620,7 +681,7 @@ class MaterialMain extends Controller
         /* 把传递过来的数据根据数据表进行分组，用于后续插入和检测等操作 */
         $group = new MaterialAutoLoad();
         $data = $group->toGroup($data);
-        /* 进行图片上传规范的添加操作 */
+        /* 检测并进行委托单默认字段值修改操作 */
         $material = Db::table('su_material_list_default')->where('default_id',$data['materialDefault']['default_id'])->field(['default_id'])->select();
         if(empty($material)) {
             return '查无此检测项目字段，请检查传递的检测项目字段id';
@@ -652,7 +713,7 @@ class MaterialMain extends Controller
         /* 把传递过来的数据根据数据表进行分组，用于后续插入和检测等操作 */
         $group = new MaterialAutoLoad();
         $data = $group->toGroup($data);
-        /* 进行图片上传规范的添加操作 */
+        /* 检测并进行检测字段默认值删除操作 */
         $material = Db::table('su_material_list_default')->where('default_id',$data['materialDefault']['default_id'])->field(['default_id'])->select();
         if(empty($material)) {
             return '查无此检测项目字段，请检查传递的检测项目字段id';

@@ -475,7 +475,7 @@ class Material extends Controller
         if(!is_array($data)) {
             return self::returnMsg(500,'fail',$data);
         }
-        /* 获取企业列表数据，如果有抛出异常的话就返回错误信息 */
+        /* 获取检测项目列表数据，如果有抛出异常的话就返回错误信息 */
         $list = MaterialMain::fetchMaterialList($data);
         if(!is_array($list)) {
             return self::returnMsg(500,'fail',$list);
@@ -542,6 +542,49 @@ class Material extends Controller
         $list = MaterialMain::toMaterialDel($data);
         if(is_array($list)){
             return self::returnMsg(200, 'success', $list['uid']);
+        }else{
+            return self::returnMsg(500,'fail',$list);
+        }
+    }
+
+    /**
+     * 企业检测项目备注添加
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function postMaterialRemarkAdd()
+    {
+        $data = FieldCheck::checkData('materialRemark');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        /* 执行检测项目对应企业备注添加方法，如果成功的话就返回添加的备注id */
+        $list = MaterialMain::toMaterialRemarkAdd($data);
+        if(is_array($list)) {
+            return self::returnMsg(200,'success',$list['uid']);
+        }else{
+            return self::returnMsg(500,'fail',$list);
+        }
+    }
+
+    /**
+     * 企业检测项目备注修改
+     * @return false|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function postMaterialRemarkEdit()
+    {
+        $data = FieldCheck::checkData('materialRemark');
+        if(!is_array($data)) {
+            return self::returnMsg(500,'fail',$data);
+        }
+        $list = MaterialMain::toMaterialRemarkEdit($data);
+        if(is_array($list)) {
+            return self::returnMsg(200,'success',$list[0]);
         }else{
             return self::returnMsg(500,'fail',$list);
         }

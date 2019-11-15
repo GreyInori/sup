@@ -47,9 +47,15 @@ class EngineerSearch extends Controller
         foreach($whereArr as $whereKey => $whereRow) {
             array_push($field, $whereKey);
         }
+        /* 工程下结算人列表数据获取 */
         array_push($field,'set.type_name');
         array_push($field,'se.engineering_id');
         array_push($field,'se.testing_company');
+        array_push($field,'se.witness_people');
+        array_push($field,'se.makeup_people');
+        array_push($field,'se.input_person');
+        array_push($field,'se.sampling_people');
+        array_push($field,'sa.user_nickname as engineering_reckoner');
         /* 如果有传递手机号的话，就根据该手机号拿到相关的工程列表，否则返回空 */
         $mobile = request()->param();
         if(!isset($mobile['mobile'])) {
@@ -64,6 +70,8 @@ class EngineerSearch extends Controller
             $list = Db::table('su_engineering')
                 ->alias('se')
                 ->join('su_engineering_type set','se.engineering_type = set.type_id','left')
+                ->join('su_engineering_reckoner ser','ser.engineering_id = se.engineering_id','left')
+                ->join('su_admin sa','sa.user_id = ser.people_id','left')
                 ->field($field)
                 ->where($where)
                 ->limit($page[0], $page[1])

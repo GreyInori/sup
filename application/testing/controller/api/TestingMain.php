@@ -137,8 +137,19 @@ class TestingMain extends Controller
         Db::startTrans();
         try{
             $update = Db::table('su_report')->insertGetId($reportInsert);
-            /* 进行富文本编辑器内容插入 */
+            /* 进行富文本编辑器内容以及报告成员列表插入 */
             $content = request()->param();
+            if(isset($content['member']) && count($content['member']) >= 1) {
+                $memberArr = array();
+                $content['member'] = explode(',',$content['member']);
+                foreach($content['member'] as $key => $row) {
+                    $memberArr[$key] = array(
+                        'report_number' => $update,
+                        'user_id' => $row
+                    );
+                }
+                Db::table('su_report_member')->insertAll($memberArr);
+            }
             if(isset($content['content']) && $content['content'] != '') {
                 $content = $content['content'];
                 $contentInsert = array(
@@ -245,6 +256,17 @@ class TestingMain extends Controller
             ->field(['srm.report_content','st.input_testing_company','st.trust_id','smt.type_name','st.testing_name','sr.report_number','se.engineering_name','sr.report_time','sr.report_file','sr.report_main'])
             ->where('st.trust_id',$data['trust'])
             ->select();
+        $member = Db::table('su_report_member')
+                        ->alias('srm')
+                        ->join('su_admin sa','sa.user_id = srm.user_id')
+                        ->where('srm.report_number',$list[0]['report_number'])
+                        ->field(['sa.user_sign','sa.user_id','sa.user_nickname'])
+                        ->select();
+        if(!empty($member)) {
+            $member = self::fieldChange($member);
+        }
+        $list[0]['report_sign'] = $member;
+
         return $list;
     }
 
@@ -279,14 +301,18 @@ class TestingMain extends Controller
     {
         $checkArr = array();
         foreach ($check as $key => $row) {
-            $field = strchr($row,'.');
-            $checkArr[$key] = ltrim($field,'.');
+            if(strchr($row,'.')) {
+                $field = strchr($row,'.');
+                $checkArr[$key] = ltrim($field,'.');
+            }else{
+                $checkArr[$key] = $row;
+            }
         }
         $result = array();
         foreach($list as $key => $row) {
             if(strstr($key,'_time') && is_int($row)) {
                 $row = date('Y-m-d H:i:s',$row);
-            }elseif($key == 'report_file' && !is_null($row) && $row != '') {
+            }elseif(($key == 'report_file' || $key == 'user_sign') && $key != 'report_sign' && strchr($row,'/static')) {
                 $url = request()->domain();
                 $row = $url.$row;
             }

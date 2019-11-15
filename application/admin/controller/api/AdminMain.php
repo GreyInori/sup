@@ -12,6 +12,7 @@ use think\Controller;
 use think\Db;
 use \app\admin\controller\AdminAutoLoad as AdminAutoLoad;
 use \app\admin\model\AdminModel as AdminModel;
+use \app\lib\controller\Picture;
 
 /**
  * Class adminMain
@@ -19,6 +20,7 @@ use \app\admin\model\AdminModel as AdminModel;
  */
 class AdminMain extends Controller
 {
+    use Picture;
     /**
      * 执行用户添加操作
      * @param $data
@@ -44,10 +46,15 @@ class AdminMain extends Controller
         /* 根据添加该用户的管理员名给该用户添加创建管理人数据 */
         if(!isset($data['admin']['create_user'])) {
             $data['admin']['create_user'] = $data['admin']['user_name'];
-    }
-
+        }
         try{
             $id = Db::table('su_admin')->insertGetId($data['admin']);
+            /* 如果传递过来的参数有包含详细信息的话，就给对应的人员添加详细信息内容 */
+            if(!isset($data['main'])) {
+                $data['main'] = array();
+            }
+            $data['main']['user_id'] = $id;
+            self::adminMainChange($data['main'],$id,1);
             return array($id);
         }catch(\Exception $e){
             return $e->getMessage();
@@ -76,6 +83,10 @@ class AdminMain extends Controller
         if(isset($data['admin']['user_pass'])) {
             $data['admin']['user_pass'] = md5($data['admin']['user_pass']);
         }
+        $pic = self::toImgUp('sign','img');
+        if(is_array($pic) && $pic['pic'] != '') {
+            $data['admin']['user_sign'] = $pic['pic'];
+        }
         try{
             /* 如果管理员有关联到公司的话，就把公司的手机号更改为对应管理员的手机号 */
             if(isset($data['admin']['user_company'])) {
@@ -83,6 +94,10 @@ class AdminMain extends Controller
                 Db::table('su_company')->where('company_id',$data['admin']['user_company'])->update(['company_mobile' => $mobile[0]['user_name']]);
             }
             $id = Db::table('su_admin')->where('user_id',$pid[0])->update($data['admin']);
+            /* 如果传递过来的字段有包含详细信息等内容的话，就对人员的详细信息进行修改 */
+            if(isset($data['main'])) {
+                self::adminMainChange($data['main'], $pid[0],0);
+            }
             return array($id);
         }catch(\Exception $e) {
             return $e->getMessage();
@@ -117,6 +132,32 @@ class AdminMain extends Controller
         }catch(\Exception $e) {
             return $e->getMessage();
         }
+    }
+
+    /**
+     * 根据id获取管理员详细信息方法
+     * @param $data
+     * @return array|false|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toAdminMain($data)
+    {
+        $group = new AdminAutoLoad();
+        $data = $group->toGroup($data);
+        /* 如果检测通过的话方法会返回一个索引数组，其中第一项就是生成的uuid，否则就会返回错误信息字符串 */
+        $pid = self::adminAlreadyCreat($data, 1);
+        if(!is_array($pid)) {
+            return $pid;
+        }
+        $main = Db::table('su_admin_main')
+                    ->alias('sam')
+                    ->join('su_admin sa','sa.user_id = sam.user_id')
+                    ->where('sa.user_id',$data['admin']['user_id'])
+                    ->field(['sa.user_sign','sa.user_id','user_idCard','user_pic','user_sex','user_address','user_birthday'])
+                    ->select();
+        return $main;
     }
 
     /**
@@ -234,6 +275,34 @@ class AdminMain extends Controller
     // | 辅助类型相关
     // +----------------------------------------------------------------------
     /**
+     * 进行人员相信信息操作方法
+     * @param $data
+     * @param $uid
+     * @param int $token
+     * @return int|string
+     * @throws \think\Exception
+     * @throws \think\exception\PDOException
+     */
+    private static function adminMainChange($data, $uid, $token = 1)
+    {
+        if($token == 1) {
+            $data['user_id'] = $uid;
+        }
+        /* 进行图片上传操作判断是否有上传人员图片 */
+        $pic = self::toImgUp('admin','pic');
+        if(is_array($pic) && $pic['pic'] != '') {
+            $data['user_pic'] = $pic['pic'];
+        }
+        /* 如果token为1的话就是管理员相信信息插入操作，否则就是管理员相信信息修改操作 */
+        if($token == 1) {
+            $change = Db::table('su_admin_main')->insert($data);
+        }else{
+            $change = Db::table('su_admin_main')->where('user_id', $uid)->update($data);
+        }
+        return $change;
+    }
+
+    /**
      * 根据角色id获取对应的权限列表
      * @param $role
      * @return array
@@ -308,6 +377,10 @@ class AdminMain extends Controller
     {
         $result = array();
         foreach($list as $key => $row) {
+            if(strstr($key,'_pic') || $key == 'user_sign' && $row != '') {
+                $url = request()->domain();
+                $row = $url.$row;
+            }
             if($row == null) {
                 $row = '';
             }

@@ -89,22 +89,35 @@ class TrustMain extends Controller
         if(empty($list)) {
             return '当前企业尚未分配到工程，请检查传递的企业id';
         }
+        /* 根据当前企业的id，获取其参与过的工程列表，生成对应的whereIn条件 */
         $engineerStr = "";
         foreach($list as $key => $row) {
             $engineerStr .= "{$row['engineering_id']},";
         }
-        $trust = Db::table('su_status_file')->where('file_file',null)->field(['trust_id'])->select();
+        /* 如果是获取需要绑定二维码的委托单的话，就进行未绑定二维码委托单查询 */
+        $field = 'file_file';
+        if(isset($data['bind'])) {
+            $field = 'file_code';
+        }
+        $trust = Db::table('su_status_file')->where($field,null)->field(['trust_id'])->select();
         $trustStr = '';
         foreach($trust as $key => $row) {
             $trustStr .= "{$row['trust_id']},";
         }
         $engineerStr = rtrim($engineerStr,',');
-
+        /* 把检测项目对应的备注信息对应到对应的委托单上 */
+        $field = array('st.testing_name','st.engineering_id','st.trust_id','st.trust_code','se.engineering_name','st.serial_number','st.testing_result','st.input_time');
+        $remarkField = "IFNULL((SELECT material_remark 
+                                    FROM su_material_company smc 
+                                    WHERE sm.material_id = smc.material_id
+                                    AND smc.company_id = st.testing_company),' ') as material_remark";
+        array_push($field,$remarkField);
         $trustList = Db::table('su_trust')
                         ->alias('st')
                         ->join('su_engineering se','se.engineering_id = st.engineering_id')
+                        ->join('su_material sm','sm.material_id = st.testing_material')
                         ->where('st.engineering_id','IN',$engineerStr)
-                        ->field(['st.engineering_id','st.trust_id','st.trust_code','se.engineering_name','st.serial_number','st.testing_result','st.input_time'])
+                        ->field($field)
                         ->where('trust_id','IN',rtrim($trustStr,','))
                         ->where('st.show_type',1)
                         ->order('st.input_time DESC')
@@ -121,6 +134,9 @@ class TrustMain extends Controller
      * 执行委托单添加方法
      * @param $data
      * @return array|string
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
     public static function toTrustAdd($data)
@@ -149,6 +165,12 @@ class TrustMain extends Controller
             $materialType = Db::table('su_material_type')->where('type_id',$material[0]['material_type'])->field(['type_pid'])->select();
             if(!empty($materialType)) {
                 $trust['testing_type'] = $materialType[0]['type_pid'];
+            }
+        }
+        if(isset($trust['testing_company'])) {
+            $testCompany = Db::table('su_company')->where('company_id',$trust['testing_company'])->field(['company_full_name'])->select();
+            if(!empty($testCompany)) {
+                $trust['testing_company_name'] = $testCompany[0]['company_full_name'];
             }
         }
         $trust['trust_code'] = self::creatCode();
@@ -193,6 +215,10 @@ class TrustMain extends Controller
         if(isset($trust['trust_id'])) {
             unset($trust['trust_id']);
         }
+        $show = request()->param();
+        if(isset($show['show'])) {
+            $trust['show_type'] = $show['show'];
+        }
         /* 进行企业以及企业详细信息的添加操作 */
         Db::startTrans();
         try{
@@ -219,10 +245,20 @@ class TrustMain extends Controller
         if(!is_array($uuid)) {
             return $uuid;
         }
+        $update = array('show_type'=>0);
+        if(isset($data['trust']['del_mark'])) {
+            $update['del_mark'] = $data['trust']['del_mark'];
+        }
+        /* 如果传递了删除人手机号码，就进行删除人手机号码修改 */
+        if(isset($data['trust']['del_mobile'])) {
+            $user = Db::table('su_admin')->where('user_name',$data['trust']['del_mobile'])->field(['user_nickname'])->select();
+            $update['del_name'] = empty($user)?'':$user[0]['user_nickname'];
+            $update['del_mobile'] = $data['trust']['del_mobile'];
+        }
         /* 进行企业以及企业详细信息的添加操作 */
         Db::startTrans();
         try{
-            $delete = Db::table('su_trust')->where('trust_id',$uuid[0])->update(['show_type'=>0]);
+            $delete = Db::table('su_trust')->where('trust_id',$uuid[0])->update($update);
             Db::commit();
             return array($delete);
         }catch(\Exception $e) {
@@ -241,17 +277,32 @@ class TrustMain extends Controller
     {
         $group = new TrustAutoLoad();
         $data = $group->toGroup($data);
-        $list = Db::table('su_status_file')->where('file_code',$data['upload']['file_code'])->field(['trust_id'])->select();
-        if(empty($list)) {
-            return '查无此二维码相关委托单,请检查传递的二维码';
+        /* 判断是根据二维码收样还是根据委托单编号收样 */
+        if(!isset($data['upload']['file_code'])) {
+            if(!isset($data['upload']['trust_code'])) {
+                return '请传递委托单编号';
+            }
+            $list = Db::table('su_trust')->where('trust_code',$data['upload']['trust_code'])->field(['trust_id'])->select();
+            if(empty($list)) {
+                return '查无此委托单号，请检查传递的委托单号';
+            }
+        }else{
+            $list = Db::table('su_status_file')->where('file_code',$data['upload']['file_code'])->field(['trust_id'])->select();
+            if(empty($list)) {
+                return '查无此二维码相关委托单,请检查传递的二维码';
+            }
         }
-        $allow = Db::table('su_trust')->where('trust_id',$list[0]['trust_id'])->field(['is_allow'])->select();
+        $allow = Db::table('su_trust')->where('trust_id',$list[0]['trust_id'])->field(['is_allow','engineering_id'])->select();
         if(!empty($allow) && $allow[0]['is_allow'] == 1){
             return '当前样品已收样';
+        }
+        if(!isset($data['upload']['user_name'])) {
+            return '请传递当前用户的手机号';
         }
         /* 进行企业以及企业详细信息的添加操作 */
         Db::startTrans();
         try{
+            self::engineerWitness($data['upload']['user_name'], $allow[0]['engineering_id']);
             $allow = Db::table('su_trust')->where('trust_id',$list[0]['trust_id'])->update(['is_allow'=>1]);
             Db::table('su_testing_status')->where('trust_id',$list[0]['trust_id'])->update(['testing_status'=>'已收样','receive_time'=>time(),'testing_process'=>3]);
             Db::commit();
@@ -303,9 +354,6 @@ class TrustMain extends Controller
      * @param $list
      * @param $uuid
      * @return array|string
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
      */
     public static function fetchTrustMaterial($list, $uuid)
     {
@@ -313,16 +361,7 @@ class TrustMain extends Controller
         if(!isset($list['save'])) {
             return '请传递委托单记录数据';
         }
-        $save = Db::table('su_trust_list_default')
-            ->where('trust_id',$uuid)
-            ->field(['save_id'])
-            ->order('save_id','DESC')
-            ->limit(0,1)
-            ->select();
-        $saveId = 1;
-        if(!empty($save)) {
-            $saveId += $save[0]['save_id'];
-        }
+
         foreach($list['save'] as $key => $row) {
             $result[$key] = array(
                 'trial_default_value' => $row['trialValue'],
@@ -331,7 +370,7 @@ class TrustMain extends Controller
                 'trial_verify' => $row['trialVerify'],
                 'trial_id' => $row['trial'],
                 'trust_id' => $uuid,
-                'save_id' => $saveId
+                'save_id' => $list['saveNum'] + 1
             );
         }
         return $result;
@@ -429,7 +468,7 @@ class TrustMain extends Controller
      */
     public static function toTrustUploadList($data)
     {
-        $url = request()->domain();
+//        $url = request()->domain();
         $group = new TrustAutoLoad();
         $data = $group->toGroup($data);
         $uuid = self::trustAlreadyCreat($data, 1);
@@ -457,6 +496,62 @@ class TrustMain extends Controller
     }
 
     /**
+     * 检测二维码是否被使用过
+     * @return string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toTrustQrCheck()
+    {
+        $code = request()->param();
+        if(!isset($code['qrcode'])) {
+            return '请传递需要检测的二维码';
+        }
+        $list = Db::table('su_qrcode')->where('qr_code',$code['qrcode'])->field(['is_use'])->select();
+        if(empty($list)) {
+            return '查无此二维码，请检查传递的二维码';
+        }
+        return $list;
+    }
+
+    /**
+     * 委托单绑定二维码方法
+     * @return array|string
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public static function toTrustQrcodeBind()
+    {
+        $code = request()->param();
+        if(!isset($code['qrcode'])) {
+            return '请传递需要绑定的二维码';
+        }
+        if(!isset($code['trust'])) {
+            return '请传递需要绑定的委托单号';
+        }
+        $qrcode = Db::table('su_qrcode')->where('qr_code',$code['qrcode'])->field(['is_use'])->select();
+        $trust = Db::table('su_trust')->where('trust_id',$code['trust'])->field(['trust_id'])->select();
+        if(empty($qrcode)) {
+            return '查无此二维码，请检查传递的二维码';
+        }
+        if(empty($trust)) {
+            return '查无此委托单，请检查传递的委托单号';
+        }
+        Db::startTrans();
+        try{
+            $trust = Db::table('su_trust')->where('trust_id',$code['trust'])->update(['qr_code'=>$code['qrcode']]);
+            Db::table('su_qrcode')->where('qr_code',$code['qrcode'])->update(['is_use'=>1,'trust_id'=>$code['trust']]);
+            Db::table('su_status_file')->where('trust_id',$code['trust'])->update(['file_code'=>$code['qrcode']]);
+            Db::commit();
+            return array($trust);
+        }catch(\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    /**
      * 根据二维码获取二维码绑定的图片信息
      * @return false|\PDOStatement|string|\think\Collection
      * @throws \think\db\exception\DataNotFoundException
@@ -465,7 +560,7 @@ class TrustMain extends Controller
      */
     public static function toTrustUploadForCode()
     {
-        $url = request()->domain();
+//        $url = request()->domain();
         $data = request()->param();
         /* 根据二维码查询对应的图片文件信息 */
         $code = $data['qrcode'];
@@ -508,12 +603,16 @@ class TrustMain extends Controller
         if(empty($file)) {
             return '查无此委托单检测项目图片信息, 请检查传递的图片id';
         }
-        $testing = Db::table('su_testing_status')
+        /* 检测获取委托单绑定的二维码 */
+        $testing = Db::table('su_trust')
             ->where('trust_id',$file[0]['trust_id'])
-            ->field(['testing_status'])
+            ->field(['qr_code'])
             ->select();
         if(empty($testing)) {
             return '查无此检测项目信息';
+        }
+        if($testing[0]['qr_code'] == null || $testing[0]['qr_code'] == '') {
+            return '当前委托单尚未绑定二维码';
         }
         $testUpdate = array(
             'testing_process' => 2,
@@ -540,21 +639,17 @@ class TrustMain extends Controller
             'file_time' => time(),
         );
         foreach($data['upload'] as $key => $row) {
-            if($key != 'file_file' || $key != 'file_time') {
+            if($key != 'file_file' && $key != 'file_time' && $key != 'user_name') {
                 $updateArr[$key] = $row;
             }
         }
-        /* 检测传递的二维码是否符合规范 */
-        $qrCode = Db::table('su_qrcode')
-                    ->where('qr_code',$updateArr['file_code'])
-                    ->field(['is_use','trust_id'])
-                    ->select();
-        if(empty($qrCode)) {
-            return '查无此二维码，请检查传递的二维码';
+        /* 根据传递的手机号，进行图片上传人信息完善 */
+        $mobile = request()->param();
+        if(isset($mobile['mobile'])) {
+            $nickname = Db::table('su_admin')->where('user_name',$mobile['mobile'])->field(['user_nickname'])->select();
+            $updateArr['upload_people'] = empty($nickname)?' ':$nickname[0]['user_nickname'];
         }
-        if($qrCode[0]['is_use'] == 1 && $qrCode[0]['trust_id'] !== $file[0]['trust_id']) {
-            return '当前二维码已经被使用，请检查传递的二维码';
-        }
+        $updateArr['file_code'] = $testing[0]['qr_code'];
         $url = request()->domain();
         /* 执行图片上传数据修改操作 */
         Db::startTrans();
@@ -569,10 +664,6 @@ class TrustMain extends Controller
             Db::table('su_trust')
                 ->where('trust_id',$file[0]['trust_id'])
                 ->update(['is_sample'=>1]);
-            /* 标记当前二维码为已使用 */
-            Db::table('su_qrcode')
-                ->where('qr_code',$updateArr['file_code'])
-                ->update(['is_use'=>1,'trust_id'=>$file[0]['trust_id']]);
             Db::commit();
             return array($url.$updateArr['file_file']);
         }catch(\Exception $e) {
@@ -583,6 +674,31 @@ class TrustMain extends Controller
     // +----------------------------------------------------------------------
     // | 辅助相关
     // +----------------------------------------------------------------------
+    /**
+     * 对工程内是否存在指定用户为见证人进行判断
+     * @param $mobile
+     * @param $engineeringId
+     * @return string
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     * @throws \think\exception\PDOException
+     */
+    private static function engineerWitness($mobile, $engineeringId)
+    {
+        $name = Db::table('su_admin')->where('user_name',$mobile)->field(['user_nickname'])->select();
+        $witness = Db::table('su_engineering')->where('engineering_id',$engineeringId)->field(['witness_people'])->select();
+        $witnessName = $witness[0]['witness_people'];
+        /* 如果指定用户尚未录入为该工程的见证人的话，就进行录入操作 */
+        if(!strchr($witness[0]['witness_people'],$name[0]['user_nickname'])) {
+            $witnessName = $witness[0]['witness_people'] . ',' . $name[0]['user_nickname'];
+            $witnessName = ltrim($witnessName,',');
+            Db::table('su_engineering')->where('engineering_id',$engineeringId)->update(['witness_people'=>$witnessName]);
+        }
+        return $witnessName;
+    }
+
     /**
      * 创建文件方法
      * @param $fileName
@@ -672,16 +788,20 @@ class TrustMain extends Controller
 
         return $result;
     }
+
     /**
      * 生成工程编号方法
      * @return string
+     * @throws \think\Exception
      */
     private static function creatCode()
     {
         $str = 'WT';
         $timeStr = date('ymd');
-        $rand = rand(100,999);
-        return $str.$timeStr.$rand;
+        $num = Db::table('su_trust')->where('trust_code','like',"WT{$timeStr}%")->count();
+        $num = $num + 1;
+        $num = str_pad($num,6,'0',STR_PAD_LEFT);
+        return $str.$timeStr.$num;
     }
 
     /**
@@ -731,7 +851,7 @@ class TrustMain extends Controller
         /* 检测企业是否以及存在，如果不存在，就通过 uniqid 生成唯一id返回给方法调用 */
         $trust = $data['trust'];
         if($token == 1){
-            $list = TrustModel::get(['trust_id' => $trust['trust_id'],'show_type'=>1]);
+            $list = TrustModel::get(['trust_id' => $trust['trust_id']]);
         }
         /* 检测委托是否存在并如果是修改之类的操作的话就需要返回查询出来的委托id进行返回 */
         if(!empty($list) && $token == 1){

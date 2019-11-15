@@ -87,9 +87,24 @@ class TestingSearch extends Controller
                 $where['se.engineering_id'] = array('=',0);
             }
         }
+        $show = request()->param();
+        if(isset($show['show'])){
+            $where['st.show_type'] = $show['show'];
+        }
         $key = array_search('company_id',$field);
         array_push($field,'sr.report_file');
         array_push($field,'smt.type_name');
+        array_push($field,'st.del_name');
+        array_push($field,'st.del_mobile');
+        array_push($field,'st.testing_company_name');
+        array_push($field,'st.testing_company');
+        array_push($field,'se.construction_company');
+        $signList = "(SELECT GROUP_CONCAT(sa.user_sign) 
+                        FROM su_report_member srm 
+                        INNER JOIN su_admin sa ON sa.user_id = srm.user_id
+                        WHERE srm.report_number = sr.report_number
+                        ) as report_sign";
+        array_push($field,$signList);
         unset($field[$key]);
         /* 执行企业列表查询 */
         try{

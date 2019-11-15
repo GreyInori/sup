@@ -24,6 +24,7 @@ class AdminAutoLoad extends Controller
         'user' => 'user_id',
         'userName' => 'user_name',
         'userPass' => 'user_pass',
+        'nickName' => 'user_nickname',
         'company' => 'user_company',
         'role' => 'user_role',
         'roleName' => 'role_name',
@@ -34,6 +35,13 @@ class AdminAutoLoad extends Controller
         'controlUrl' => 'control_url',
         'controlIcon' => 'control_icon',
         'createUser' => 'create_user',
+        'idCard' => 'user_idCard',
+        'sex' => 'user_sex',
+        'address' => 'user_address',
+        'birthday' => 'user_birthday',
+        'code' => 'user_credential_code',
+        'pic' => 'user_pic',
+        'sign' => 'user_sign',
     );
 
     /**
@@ -41,7 +49,8 @@ class AdminAutoLoad extends Controller
      * 给指定字段数据根据数据表区别分组
      */
     public static $fieldGroup = array(
-        'admin' => array('create_user','user_id','user_name','user_pass','user_company','user_role','role_name','company_full_name'),
+        'admin' => array('user_nickname','create_user','user_id','user_name','user_pass','user_company','user_role','role_name','company_full_name'),
+        'main' => array('user_idCard','user_sex','user_address','user_birthday','user_credential_code'),
     );
 
     /**

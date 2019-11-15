@@ -21,14 +21,12 @@ class EngineerCheck extends Controller
      */
     public static function peopleCheck($data)
     {
-        /* 根据传入的人员id生成录入时间录入人等数据 */
-        $people = new \app\company\model\companyModel();
-//        $peopleList = $people::get($data['company']['company_id']);
-//        if(empty($peopleList)) {
-//            return '查无此企业id，请检查传递的企业id';
-//        }
+        /* 根据传入的人员手机号生成录入时间录入人等数据 */
+        $nickname = Db::table('su_admin')->where('user_name',$data['engineer']['user_name'])->field(['user_nickname'])->select();
+        if(!empty($nickname)) {
+            $data['input_person'] = $nickname[0]['user_nickname'];
+        }
         $data['input_time'] = time();
-//        $data['input_person'] = $peopleList['company_full_name'];
         return $data;
     }
 

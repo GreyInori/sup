@@ -33,8 +33,9 @@ class TrustSearch extends Controller
         $where = new TrustWhere();
         $where = $where->getWhereArray($search);
         $where['st.show_type'] = 1;
-        if(isset($search['show'])){
-            $where['st.show_type'] = $search['show'];
+        $show = request()->param();
+        if(isset($show['show'])){
+            $where['st.show_type'] = $show['show'];
         }
         if(empty($where)) {
             return '请传递正确的查询条件';
@@ -50,7 +51,7 @@ class TrustSearch extends Controller
                 ->alias('st')
                 ->join('su_report sr','sr.trust_id = st.trust_id','left')
                 ->join('su_report_main srm','srm.report_number = sr.report_number','left')
-                ->field(['srm.report_content','sr.report_file','st.testing_material','st.is_report','st.trust_id','st.serial_number','st.input_testing_company','st.testing_name','st.project_name','st.custom_company','st.input_time','st.testing_price','st.is_submit','st.is_print','st.is_witness','st.is_sample','st.is_testing','st.is_cancellation','st.is_allow','st.testing_result'])
+                ->field(['st.del_name','st.del_mobile','st.testing_company_name','st.testing_company','st.trust_code','st.del_mark','srm.report_content','sr.report_file','st.testing_material','st.is_report','st.trust_id','st.serial_number','st.input_testing_company','st.testing_name','st.project_name','st.custom_company','st.input_time','st.testing_price','st.is_submit','st.is_print','st.is_witness','st.is_sample','st.is_testing','st.is_cancellation','st.is_allow','st.testing_result'])
                 ->where($where)
                 ->limit($page[0], $page[1])
                 ->order('st.input_time DESC')

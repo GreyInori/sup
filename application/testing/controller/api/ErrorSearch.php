@@ -40,9 +40,10 @@ class ErrorSearch extends Controller
             $list = Db::table('su_testing_status')
                     ->alias('sts')
                     ->join('su_trust st','st.trust_id = sts.trust_id')
+                    ->join('su_engineering se','se.engineering_id = st.engineering_id')
                     ->join('su_testing_error ste','ste.trust_id = sts.trust_id')
                     ->where($where)
-                    ->field(['ste.error_id','ste.error_main','ste.error_response','st.input_testing_company','st.trust_code','ste.error_time'])
+                    ->field(['ste.error_id','ste.error_main','ste.error_response','se.construction_company','st.trust_code','ste.error_time'])
                     ->limit($page[0],$page[1])
                     ->select();
             $count = Db::table('su_testing_status')

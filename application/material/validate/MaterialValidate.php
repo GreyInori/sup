@@ -56,6 +56,7 @@ class MaterialValidate extends Validate
         'trialDepict' => 'chsDash',   // 检测字段信息介绍
         'trialHint' => 'chsDash',   // 检测字段默认提示
         'trialCustomHint' => 'chsDash',   // 检测字段自定义提示
+        'remark' => 'require',         // 检测项目备注信息
     );
 
     protected $message = array(
@@ -104,6 +105,7 @@ class MaterialValidate extends Validate
         'trialDepict.chsDash' => '传递的检测项目字段介绍不符合规范',
         'trialHint.chsDash' => '传递的检测项目字段提示不符合规范',
         'trialCustomHint.chsDash' => '传递的检测项目字段自定义提示不符合规范',
+        'remark.require' => '请传递检测项目备注说明',
     );
 
     protected $scene = array(
@@ -112,6 +114,7 @@ class MaterialValidate extends Validate
         'materialEdit' => ['standardCode','materialId','materialType','material','block'],
         'materialDel' => ['materialId'],
         'materialField' => ['materialId'],
+        'materialRemark' => ['company','materialId','remark'],
         'materialFieldAdd' => ['materialId','trialName','trialDepict','trialHint','trialCustomHint'],
         'materialFieldEdit' => ['trial','materialId','trialName','trialDepict','trialHint','trialCustomHint'],
         'materialFieldDel' => ['trial'],
