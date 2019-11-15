@@ -323,6 +323,7 @@ class MaterialMain extends Controller
             ->order('material_type ASC,material_id ASC')
             ->select();
         if(empty($list)){
+
             return array();
         }
         $list = self::typeGroup($list);

@@ -109,7 +109,8 @@ class ImageCompress {
     /**
      * 销毁图片
      */
-    public function __destruct(){
+    public function __destruct()
+    {
         imagedestroy($this->image);
     }
 }

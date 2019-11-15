@@ -4,6 +4,3 @@ composer.lock
 thinkphp
 runtime
 application/database.php
-public
-
-
