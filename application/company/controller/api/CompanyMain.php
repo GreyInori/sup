@@ -317,7 +317,7 @@ class CompanyMain extends Controller
         }
         /* 检测企业是否存在并如果是修改之类的操作的话就需要返回查询出来的企业id进行返回 */
         if(!empty($list) && $token == 0){
-            return '当前添加的企业已存在，请检查填写的企业全称';
+            return "当前添加的企业已存在，请检查填写的企业全称，id: {$list['company_id']}";
         }elseif(!empty($list) && $token == 1){
             return array($company['company_id']);
         }elseif($token ==  1){
